@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MySQL Database for Catalog Service
+  mysql-catalog:
+    image: mysql:8.0
+    container_name: bookstore-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bookstore_catalog}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB for Order Service
+  mongodb-order:
+    image: mongo:6.0
+    container_name: bookstore-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-bookstore_orders}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Database for User Service
+  postgres-user:
+    image: postgres:15
+    container_name: bookstore-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE:-bookstore_users}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  bookstore-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongodb-data:
+  postgres-data:
