@@ -18,6 +18,12 @@
     <description>Shared DTOs, exceptions, constants, and utilities for all microservices</description>
 
     <dependencies>
+        <!-- Spring Web for @ControllerAdvice -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
