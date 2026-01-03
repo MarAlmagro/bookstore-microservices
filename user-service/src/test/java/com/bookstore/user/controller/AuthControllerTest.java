@@ -50,7 +50,7 @@ class AuthControllerTest {
                 .email("test@example.com")
                 .firstName("John")
                 .lastName("Doe")
-                .role(UserRole.CUSTOMER)
+                .role("CUSTOMER")
                 .build();
 
         authResponse = AuthResponseDTO.builder()

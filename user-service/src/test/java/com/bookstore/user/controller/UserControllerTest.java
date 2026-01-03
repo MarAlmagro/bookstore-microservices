@@ -46,7 +46,7 @@ class UserControllerTest {
                 .email("test@example.com")
                 .firstName("John")
                 .lastName("Doe")
-                .role(UserRole.CUSTOMER)
+                .role("CUSTOMER")
                 .build();
     }
 
@@ -81,7 +81,7 @@ class UserControllerTest {
                 .email("test@example.com")
                 .firstName("Jane")
                 .lastName("Smith")
-                .role(UserRole.CUSTOMER)
+                .role("CUSTOMER")
                 .build();
 
         when(userService.getUserByEmail("test@example.com")).thenReturn(userDTO);

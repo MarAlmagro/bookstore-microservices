@@ -54,7 +54,7 @@ class UserServiceTest {
                 .email("test@example.com")
                 .firstName("John")
                 .lastName("Doe")
-                .role(UserRole.CUSTOMER)
+                .role("CUSTOMER")
                 .build();
     }
 

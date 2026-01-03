@@ -36,7 +36,7 @@ class UserServiceIntegrationTest {
                 .email("integration@test.com")
                 .firstName("Integration")
                 .lastName("Test")
-                .role(UserRole.CUSTOMER)
+                .role("CUSTOMER")
                 .build();
 
         AuthResponseDTO registerResponse = authService.register(registerDTO, "password123");

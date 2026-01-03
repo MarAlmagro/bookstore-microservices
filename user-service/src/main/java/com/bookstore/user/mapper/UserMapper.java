@@ -17,7 +17,7 @@ public class UserMapper {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .role(user.getRole())
+                .role(user.getRole() != null ? user.getRole().name() : null)
                 .build();
     }
 
@@ -31,7 +31,7 @@ public class UserMapper {
                 .email(dto.getEmail())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
-                .role(dto.getRole())
+                .role(dto.getRole() != null ? com.bookstore.common.constants.UserRole.valueOf(dto.getRole()) : null)
                 .build();
     }
 }

@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(password))
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
-                .role(userDTO.getRole() != null ? userDTO.getRole() : UserRole.CUSTOMER)
+                .role(userDTO.getRole() != null ? UserRole.valueOf(userDTO.getRole()) : UserRole.CUSTOMER)
                 .enabled(true)
                 .build();
 
