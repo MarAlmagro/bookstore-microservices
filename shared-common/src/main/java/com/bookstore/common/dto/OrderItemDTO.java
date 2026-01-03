@@ -41,4 +41,14 @@ public class OrderItemDTO {
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private BigDecimal price;
+
+    /**
+     * Title of the book (captured at order time).
+     */
+    private String bookTitle;
+
+    /**
+     * ISBN of the book (captured at order time).
+     */
+    private String bookIsbn;
 }
