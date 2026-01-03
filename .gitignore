@@ -58,6 +58,9 @@ spring-boot-devtools.properties
 .grok/
 .perplexity/
 .grok/
+.windsurf/
+AGENT*.md
+CLAUDE.md
 
 # Temporary files
 *.tmp

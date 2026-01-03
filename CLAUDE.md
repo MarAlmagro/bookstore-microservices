@@ -5,12 +5,12 @@ Spring Boot microservices bookstore with polyglot persistence. Portfolio project
 
 ## Git Commit Strategy
 
-### IMPORTANT: Commit After Each Build Plan Step
+### IMPORTANT: Create Commit Message After Each Build Plan Step
 
 After completing each step in @BUILD_PLAN.md, you MUST:
 1. Stage all changes
-2. Create a commit with the format below
-3. Confirm the commit was successful
+2. Create the message for a commit with the format below
+3. detail key features for major phase steps
 
 ### Commit Message Format
 ```
