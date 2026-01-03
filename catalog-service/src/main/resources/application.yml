@@ -30,6 +30,19 @@ spring:
       write-dates-as-timestamps: false
     time-zone: UTC
 
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+
 # OpenAPI/Swagger Configuration
 springdoc:
   api-docs:
