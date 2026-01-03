@@ -2,12 +2,20 @@
 
 # Order Service Test Script
 # Tests order creation and management
-# Base URL: http://localhost:8082
-# Requires: Catalog service running, User service running
+# Updated for Phase 7: Uses API Gateway (port 8080) by default
+# Requires: API Gateway, Eureka Server, and all services running
 
-BASE_URL="http://localhost:8082/api/v1"
-CATALOG_URL="http://localhost:8081/api/v1"
-USER_URL="http://localhost:8083/api/v1"
+# Use API Gateway (Phase 7) - recommended
+GATEWAY_URL="http://localhost:8080"
+BASE_URL="${GATEWAY_URL}/api/v1"
+CATALOG_URL="${GATEWAY_URL}/api/v1"
+USER_URL="${GATEWAY_URL}/api/v1"
+
+# Direct service access (for testing without Gateway)
+# BASE_URL="http://localhost:8082/api/v1"
+# CATALOG_URL="http://localhost:8081/api/v1"
+# USER_URL="http://localhost:8083/api/v1"
+
 CONTENT_TYPE="Content-Type: application/json"
 
 echo "========================================="
