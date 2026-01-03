@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO users (email, password, first_name, last_name, role, created_at, updated_at, enabled)
 VALUES (
     'admin@bookstore.com',
-    '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi',
+    '$2a$10$FRjmPaqwA.oVx6Ae./LYOehm6oE7tbmdpQE6CSaIpr5rL5ohh8Ity',
     'Admin',
     'User',
     'ADMIN',
@@ -44,7 +44,7 @@ INSERT INTO users (email, password, first_name, last_name, role, created_at, upd
 VALUES
 (
     'john.doe@bookstore.com',
-    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG',
+    '$2a$10$dTDo926ioFAU9/XjJr.oVe.zYhmadM7M7N8f.pEaVrzPuUi8HDdfC',
     'John',
     'Doe',
     'CUSTOMER',
@@ -54,7 +54,7 @@ VALUES
 ),
 (
     'jane.smith@bookstore.com',
-    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG',
+    '$2a$10$dTDo926ioFAU9/XjJr.oVe.zYhmadM7M7N8f.pEaVrzPuUi8HDdfC',
     'Jane',
     'Smith',
     'CUSTOMER',
@@ -64,7 +64,7 @@ VALUES
 ),
 (
     'mike.wilson@bookstore.com',
-    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG',
+    '$2a$10$dTDo926ioFAU9/XjJr.oVe.zYhmadM7M7N8f.pEaVrzPuUi8HDdfC',
     'Mike',
     'Wilson',
     'CUSTOMER',
@@ -74,7 +74,7 @@ VALUES
 ),
 (
     'sarah.jones@bookstore.com',
-    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG',
+    '$2a$10$dTDo926ioFAU9/XjJr.oVe.zYhmadM7M7N8f.pEaVrzPuUi8HDdfC',
     'Sarah',
     'Jones',
     'CUSTOMER',
@@ -84,7 +84,7 @@ VALUES
 ),
 (
     'alex.brown@bookstore.com',
-    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG',
+    '$2a$10$dTDo926ioFAU9/XjJr.oVe.zYhmadM7M7N8f.pEaVrzPuUi8HDdfC',
     'Alex',
     'Brown',
     'CUSTOMER',
