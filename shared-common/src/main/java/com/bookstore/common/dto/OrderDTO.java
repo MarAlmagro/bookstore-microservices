@@ -44,16 +44,15 @@ public class OrderDTO {
 
     /**
      * Total amount for the entire order.
+     * Auto-calculated by the service during order creation.
      */
-    @NotNull(message = "Total amount is required")
-    @DecimalMin(value = "0.01", message = "Total amount must be greater than 0")
     private BigDecimal totalAmount;
 
     /**
      * Current status of the order.
      * Valid values: PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+     * Auto-set to PENDING during order creation.
      */
-    @NotNull(message = "Order status is required")
     private String status;
 
     /**
