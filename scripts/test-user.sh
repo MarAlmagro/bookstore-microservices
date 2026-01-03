@@ -2,9 +2,14 @@
 
 # User Service Test Script
 # Tests authentication and user management
-# Base URL: http://localhost:8083
+# Updated for Phase 7: Uses API Gateway (port 8080) by default
 
-BASE_URL="http://localhost:8083/api/v1"
+# Use API Gateway (Phase 7) - recommended
+BASE_URL="http://localhost:8080/api/v1"
+
+# Direct service access (for testing without Gateway)
+# BASE_URL="http://localhost:8083/api/v1"
+
 CONTENT_TYPE="Content-Type: application/json"
 
 echo "========================================="

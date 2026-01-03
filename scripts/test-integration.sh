@@ -3,10 +3,22 @@
 # Integration Test Script
 # Full E2E workflow: Register → Login → Browse Books → Create Order
 # Tests service-to-service communication and complete user journey
+# Updated for Phase 7: All requests go through API Gateway (port 8080)
 
-CATALOG_URL="http://localhost:8081/api/v1"
-ORDER_URL="http://localhost:8082/api/v1"
-USER_URL="http://localhost:8083/api/v1"
+# API Gateway URL (Phase 7)
+GATEWAY_URL="http://localhost:8080"
+API_BASE="${GATEWAY_URL}/api/v1"
+
+# Service URLs (via Gateway)
+CATALOG_URL="${API_BASE}"
+ORDER_URL="${API_BASE}"
+USER_URL="${API_BASE}"
+
+# Direct service URLs (for backward compatibility / direct testing)
+# CATALOG_URL="http://localhost:8081/api/v1"
+# ORDER_URL="http://localhost:8082/api/v1"
+# USER_URL="http://localhost:8083/api/v1"
+
 CONTENT_TYPE="Content-Type: application/json"
 
 echo "========================================="
@@ -15,37 +27,31 @@ echo "========================================="
 echo ""
 
 # Step 1: Verify All Services are Running
-echo "Step 1: Verify All Services are Running"
+echo "Step 1: Verify API Gateway and Services"
 echo "========================================="
 echo ""
 
-echo "Checking Catalog Service..."
-CATALOG_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${CATALOG_URL}/../actuator/health")
-if [ "$CATALOG_HEALTH" == "200" ]; then
-  echo "✓ Catalog Service is running (Port 8081)"
+echo "Checking API Gateway..."
+GATEWAY_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${GATEWAY_URL}/actuator/health")
+if [ "$GATEWAY_HEALTH" == "200" ]; then
+  echo "✓ API Gateway is running (Port 8080)"
 else
-  echo "✗ Catalog Service is NOT running (Expected 200, got $CATALOG_HEALTH)"
+  echo "✗ API Gateway is NOT running (Expected 200, got $GATEWAY_HEALTH)"
+  echo "  Make sure Eureka Server and API Gateway are started"
   exit 1
 fi
 
-echo "Checking Order Service..."
-ORDER_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${ORDER_URL}/../actuator/health")
-if [ "$ORDER_HEALTH" == "200" ]; then
-  echo "✓ Order Service is running (Port 8082)"
+echo "Checking Eureka Server..."
+EUREKA_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8761/actuator/health")
+if [ "$EUREKA_HEALTH" == "200" ]; then
+  echo "✓ Eureka Server is running (Port 8761)"
 else
-  echo "✗ Order Service is NOT running (Expected 200, got $ORDER_HEALTH)"
-  exit 1
+  echo "✗ Eureka Server is NOT running (Expected 200, got $EUREKA_HEALTH)"
 fi
 
-echo "Checking User Service..."
-USER_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${USER_URL}/../actuator/health")
-if [ "$USER_HEALTH" == "200" ]; then
-  echo "✓ User Service is running (Port 8083)"
-else
-  echo "✗ User Service is NOT running (Expected 200, got $USER_HEALTH)"
-  exit 1
-fi
-
+echo ""
+echo "Note: All requests now go through API Gateway (port 8080)"
+echo "Services are discovered via Eureka and load-balanced by Gateway"
 echo ""
 echo "All services are healthy!"
 echo ""

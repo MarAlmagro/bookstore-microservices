@@ -69,3 +69,14 @@ info:
     name: Catalog Service
     description: Book catalog microservice with MySQL persistence
     version: 1.0.0
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}

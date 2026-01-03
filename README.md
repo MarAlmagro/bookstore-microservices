@@ -21,17 +21,49 @@ Portfolio project demonstrating real-world microservices architecture using **Ja
 
 ## Architecture Overview
 
-This project implements a **polyglot persistence microservices architecture** with three core services:
+This project implements a **polyglot persistence microservices architecture** with API Gateway, Service Discovery, and three core services:
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Catalog   │     │    Order    │     │    User     │
-│   Service   │◄────┤   Service   │     │   Service   │
-│  Port 8081  │     │  Port 8082  │     │  Port 8083  │
-│             │     │             │     │             │
-│   MySQL     │     │   MongoDB   │     │ PostgreSQL  │
-└─────────────┘     └─────────────┘     └─────────────┘
+                    ┌──────────────┐
+                    │   Client     │
+                    └──────┬───────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │ API Gateway  │  ← Single Entry Point
+                    │  Port 8080   │
+                    └──────┬───────┘
+                           │
+                           ├─────────► ┌──────────────┐
+                           │           │Eureka Server │
+                           │           │  Port 8761   │
+                           │           └──────────────┘
+                           │                   ▲
+        ┌──────────────────┼──────────────────┼────────────┐
+        │                  │                  │            │
+        ▼                  ▼                  ▼            ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Catalog   │    │    Order    │    │    User     │
+│   Service   │◄───┤   Service   │    │   Service   │
+│  Port 8081  │    │  Port 8082  │    │  Port 8083  │
+│             │    │             │    │             │
+│   MySQL     │    │   MongoDB   │    │ PostgreSQL  │
+└─────────────┘    └─────────────┘    └─────────────┘
 ```
+
+### Infrastructure Services
+
+- **API Gateway** (Port 8080) - Single entry point for all client requests
+  - Route management and load balancing
+  - Service discovery integration
+  - CORS configuration
+  - Request logging and filtering
+
+- **Eureka Server** (Port 8761) - Service discovery and registration
+  - Dynamic service registration
+  - Health monitoring
+  - Load balancing support
+  - Service instance management
 
 ### Core Services
 
@@ -39,24 +71,30 @@ This project implements a **polyglot persistence microservices architecture** wi
   - CRUD operations for books
   - Search and filtering
   - Stock management
+  - Registered with Eureka
   
 - **Order Service** (Port 8082) - Order lifecycle management using MongoDB
   - Order creation with stock validation
-  - Service-to-service communication with Catalog
+  - Service-to-service communication via Eureka
   - Order history and status tracking
+  - Registered with Eureka
   
 - **User Service** (Port 8083) - User authentication and authorization using PostgreSQL
   - JWT-based authentication
   - User registration and login
   - Role-based access control (CUSTOMER, ADMIN)
+  - Registered with Eureka
 
 ### Technology Stack
 
 - **Java**: 11
 - **Spring Boot**: 2.7.18
+- **Spring Cloud**: 2021.0.8
 - **Build Tool**: Maven 3.8+
 - **Databases**: MySQL 8.0, MongoDB 6.0, PostgreSQL 15
 - **Security**: Spring Security + JWT
+- **API Gateway**: Spring Cloud Gateway
+- **Service Discovery**: Netflix Eureka
 - **API Documentation**: SpringDoc OpenAPI 3 (Swagger)
 - **Containerization**: Docker & Docker Compose
 
@@ -64,12 +102,14 @@ This project implements a **polyglot persistence microservices architecture** wi
 
 ```
 bookstore-microservices/
-├── pom.xml                          # Parent POM
+├── pom.xml                          # Parent POM with Spring Cloud
 ├── shared-common/                   # Shared DTOs, exceptions, constants
+├── eureka-server/                   # Service discovery server
+├── api-gateway/                     # API Gateway (entry point)
 ├── catalog-service/                 # Book catalog microservice
 ├── order-service/                   # Order management microservice
 ├── user-service/                    # User authentication microservice
-├── docker-compose.yml               # Database orchestration
+├── docker-compose.yml               # Full stack orchestration
 └── .env.example                     # Environment variables template
 ```
 
@@ -108,10 +148,14 @@ docker-compose ps
 ### ✅ Verify Installation
 
 ```bash
-# Check service health
-curl http://localhost:8081/actuator/health  # Catalog
-curl http://localhost:8082/actuator/health  # Order
-curl http://localhost:8083/actuator/health  # User
+# Check API Gateway (main entry point)
+curl http://localhost:8080/actuator/health
+
+# Check Eureka Server
+curl http://localhost:8761/actuator/health
+
+# Access Eureka Dashboard to see registered services
+# Open browser: http://localhost:8761
 
 # All should return: {"status":"UP"}
 ```
@@ -130,38 +174,57 @@ curl http://localhost:8083/actuator/health  # User
 
 ### 🌐 Access Services
 
+**Primary Access (via API Gateway)**:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **API Gateway** | http://localhost:8080 | Single entry point for all API requests |
+| **Eureka Dashboard** | http://localhost:8761 | Service registry and health monitoring |
+
+**Direct Service Access** (for development/debugging):
+
 | Service | URL | Swagger UI |
 |---------|-----|------------|
 | Catalog Service | http://localhost:8081 | http://localhost:8081/swagger-ui.html |
 | Order Service | http://localhost:8082 | http://localhost:8082/swagger-ui.html |
 | User Service | http://localhost:8083 | http://localhost:8083/swagger-ui.html |
 
+**Note**: In production, all requests should go through the API Gateway (port 8080).
+
 ## API Endpoints
 
-### Catalog Service (Port 8081)
+**All endpoints are accessed via API Gateway at `http://localhost:8080`**
+
+### Catalog Service (via Gateway)
 ```
-GET    /api/v1/books           # List all books
-GET    /api/v1/books/{id}      # Get book by ID
-POST   /api/v1/books           # Create book (admin only)
-PUT    /api/v1/books/{id}      # Update book (admin only)
-DELETE /api/v1/books/{id}      # Delete book (admin only)
-GET    /api/v1/books/search    # Search books
+GET    http://localhost:8080/api/v1/books           # List all books
+GET    http://localhost:8080/api/v1/books/{id}      # Get book by ID
+POST   http://localhost:8080/api/v1/books           # Create book (admin only)
+PUT    http://localhost:8080/api/v1/books/{id}      # Update book (admin only)
+DELETE http://localhost:8080/api/v1/books/{id}      # Delete book (admin only)
+GET    http://localhost:8080/api/v1/books/search    # Search books
 ```
 
-### Order Service (Port 8082)
+### Order Service (via Gateway)
 ```
-GET    /api/v1/orders          # List user's orders
-GET    /api/v1/orders/{id}     # Get order details
-POST   /api/v1/orders          # Create new order
-PUT    /api/v1/orders/{id}/status  # Update order status
+GET    http://localhost:8080/api/v1/orders          # List user's orders
+GET    http://localhost:8080/api/v1/orders/{id}     # Get order details
+POST   http://localhost:8080/api/v1/orders          # Create new order
+PUT    http://localhost:8080/api/v1/orders/{id}/status  # Update order status
 ```
 
-### User Service (Port 8083)
+### User Service (via Gateway)
 ```
-POST   /api/v1/auth/register   # User registration
-POST   /api/v1/auth/login      # User login (returns JWT)
-GET    /api/v1/users/profile   # Get user profile
-PUT    /api/v1/users/profile   # Update user profile
+POST   http://localhost:8080/api/v1/auth/register   # User registration
+POST   http://localhost:8080/api/v1/auth/login      # User login (returns JWT)
+GET    http://localhost:8080/api/v1/users/profile   # Get user profile
+PUT    http://localhost:8080/api/v1/users/profile   # Update user profile
+```
+
+### Gateway Management
+```
+GET    http://localhost:8080/actuator/gateway/routes  # View configured routes
+GET    http://localhost:8080/actuator/health          # Gateway health check
 ```
 
 ## Development Workflow
@@ -247,7 +310,7 @@ Role: CUSTOMER
 
 #### 1. Register a User
 ```bash
-curl -X POST http://localhost:8083/api/v1/auth/register \
+curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "newuser@example.com",
@@ -259,7 +322,7 @@ curl -X POST http://localhost:8083/api/v1/auth/register \
 
 #### 2. Login to Get JWT Token
 ```bash
-curl -X POST http://localhost:8083/api/v1/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@bookstore.com",
@@ -269,12 +332,12 @@ curl -X POST http://localhost:8083/api/v1/auth/login \
 
 #### 3. Browse Books (No Auth Required)
 ```bash
-curl http://localhost:8081/api/v1/books
+curl http://localhost:8080/api/v1/books
 ```
 
 #### 4. Create an Order (Auth Required)
 ```bash
-curl -X POST http://localhost:8082/api/v1/orders \
+curl -X POST http://localhost:8080/api/v1/orders \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
@@ -289,10 +352,11 @@ curl -X POST http://localhost:8082/api/v1/orders \
 ```
 
 **Note**: The Order Service automatically:
-- Fetches book details from Catalog Service
+- Fetches book details from Catalog Service via Eureka
 - Validates stock availability
 - Calculates total amount
 - Sets order status to PENDING
+- All service-to-service communication uses service discovery
 
 ## Troubleshooting
 
@@ -347,7 +411,7 @@ docker-compose up -d
 
 Tokens expire after 1 hour. Login again to get a new token:
 ```bash
-curl -X POST http://localhost:8083/api/v1/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@bookstore.com","password":"admin123"}'
 ```
@@ -358,8 +422,8 @@ If the catalog is empty, reinitialize databases:
 ```bash
 docker-compose down -v
 docker-compose up -d
-sleep 30  # Wait for initialization
-curl http://localhost:8081/api/v1/books
+sleep 60  # Wait for all services to register with Eureka
+curl http://localhost:8080/api/v1/books
 ```
 
 For more troubleshooting help, see **[docs/TESTING.md](docs/TESTING.md#troubleshooting)**
@@ -368,6 +432,7 @@ For more troubleshooting help, see **[docs/TESTING.md](docs/TESTING.md#troublesh
 
 - **[Testing Guide](docs/TESTING.md)** - Comprehensive testing instructions
 - **[Architecture](docs/ARCHITECTURE.md)** - Detailed system design and patterns
+- **[API Gateway Guide](docs/GATEWAY.md)** - Gateway configuration and routing
 - **[Test Scenarios](test-data/scenarios/)** - Happy path, error cases, integration tests
 - **[Test Results](test-data/TEST_RESULTS.md)** - Phase 6.4 validation results
 
@@ -386,21 +451,21 @@ See `.env.example` for complete list.
 ## Project Status
 
 ### ✅ Completed
-- [x] Parent POM configuration
+- [x] Parent POM configuration with Spring Cloud
 - [x] Shared common module (DTOs, exceptions, constants)
 - [x] Catalog service implementation
 - [x] Order service implementation
 - [x] User service with JWT authentication
+- [x] **API Gateway (Spring Cloud Gateway)**
+- [x] **Service Discovery (Netflix Eureka)**
+- [x] **Service-to-service communication via Eureka**
 - [x] Docker containerization with health checks
 - [x] Database initialization scripts
 - [x] Integration tests and test scripts
 - [x] Swagger/OpenAPI documentation
-- [x] Service-to-service communication
 - [x] Comprehensive documentation
 
 ### 🔄 Future Enhancements
-- [ ] API Gateway (Spring Cloud Gateway)
-- [ ] Service Discovery (Eureka)
 - [ ] Circuit Breaker (Resilience4j)
 - [ ] Distributed Tracing (Sleuth + Zipkin)
 - [ ] Message Queue (RabbitMQ/Kafka)

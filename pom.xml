@@ -22,6 +22,8 @@
 
     <modules>
         <module>shared-common</module>
+        <module>eureka-server</module>
+        <module>api-gateway</module>
         <module>catalog-service</module>
         <module>order-service</module>
         <module>user-service</module>
@@ -36,6 +38,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependency Versions -->
+        <spring-cloud.version>2021.0.8</spring-cloud.version>
         <springdoc-openapi.version>1.7.0</springdoc-openapi.version>
         <jjwt.version>0.11.5</jjwt.version>
         <lombok.version>1.18.30</lombok.version>
@@ -50,6 +53,15 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Internal Modules -->
             <dependency>
                 <groupId>com.bookstore</groupId>

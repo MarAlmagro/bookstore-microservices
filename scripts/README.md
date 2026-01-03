@@ -131,41 +131,49 @@ exit
 
 ## Testing with API Endpoints
 
-### Test Authentication (User Service - Port 8083)
+**Phase 7 Update**: All requests now go through API Gateway on port 8080.
+
+### Test Authentication (via API Gateway - Port 8080)
 ```bash
 # Login as admin
-curl -X POST http://localhost:8083/api/v1/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@bookstore.com","password":"admin123"}'
 
 # Login as customer
-curl -X POST http://localhost:8083/api/v1/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john.doe@bookstore.com","password":"customer123"}'
 ```
 
-### Test Catalog Service (Port 8081)
+### Test Catalog Service (via API Gateway - Port 8080)
 ```bash
 # Get all books
-curl http://localhost:8081/api/v1/books
+curl http://localhost:8080/api/v1/books
 
 # Get book by ID
-curl http://localhost:8081/api/v1/books/1
+curl http://localhost:8080/api/v1/books/1
 
 # Search books by category
-curl "http://localhost:8081/api/v1/books/search?category=Programming"
+curl "http://localhost:8080/api/v1/books/search?category=Programming"
 ```
 
-### Test Order Service (Port 8082)
+### Test Order Service (via API Gateway - Port 8080)
 ```bash
 # Get all orders (requires authentication)
-curl http://localhost:8082/api/v1/orders \
+curl http://localhost:8080/api/v1/orders \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
 # Get order by ID
-curl http://localhost:8082/api/v1/orders/ORDER_ID \
+curl http://localhost:8080/api/v1/orders/ORDER_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
+
+### Direct Service Access (for testing without Gateway)
+If you need to test services directly (bypassing Gateway):
+- User Service: http://localhost:8083/api/v1
+- Catalog Service: http://localhost:8081/api/v1
+- Order Service: http://localhost:8082/api/v1
 
 ## Resetting Sample Data
 

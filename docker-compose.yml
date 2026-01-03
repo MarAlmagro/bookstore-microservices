@@ -1,6 +1,47 @@
 version: '3.8'
 
 services:
+  # Eureka Server - Service Discovery
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: bookstore-eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: bookstore-api-gateway
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    networks:
+      - bookstore-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
   # MySQL Database for Catalog Service
   mysql-catalog:
     image: mysql:8.0
@@ -72,11 +113,14 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-password}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8081:8081"
     networks:
       - bookstore-network
     depends_on:
+      eureka-server:
+        condition: service_healthy
       mysql-catalog:
         condition: service_healthy
     restart: unless-stopped
@@ -95,12 +139,15 @@ services:
     container_name: bookstore-order-service
     environment:
       MONGODB_URI: mongodb://mongodb-order:27017/bookstore_orders
-      CATALOG_SERVICE_URL: http://catalog-service:8081
+      CATALOG_SERVICE_URL: http://catalog-service
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8082:8082"
     networks:
       - bookstore-network
     depends_on:
+      eureka-server:
+        condition: service_healthy
       mongodb-order:
         condition: service_healthy
       catalog-service:
@@ -126,11 +173,14 @@ services:
       DB_USERNAME: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
       JWT_SECRET: ${JWT_SECRET:-mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8083:8083"
     networks:
       - bookstore-network
     depends_on:
+      eureka-server:
+        condition: service_healthy
       postgres-user:
         condition: service_healthy
     restart: unless-stopped

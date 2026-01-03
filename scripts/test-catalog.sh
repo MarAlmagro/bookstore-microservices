@@ -2,9 +2,14 @@
 
 # Catalog Service Test Script
 # Tests all CRUD operations for the Catalog Service
-# Base URL: http://localhost:8081
+# Updated for Phase 7: Uses API Gateway (port 8080) by default
 
-BASE_URL="http://localhost:8081/api/v1"
+# Use API Gateway (Phase 7) - recommended
+BASE_URL="http://localhost:8080/api/v1"
+
+# Direct service access (for testing without Gateway)
+# BASE_URL="http://localhost:8081/api/v1"
+
 CONTENT_TYPE="Content-Type: application/json"
 
 echo "========================================="
