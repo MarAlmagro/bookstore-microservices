@@ -11,6 +11,19 @@
 --   - sarah.jones@bookstore.com / customer123
 --   - alex.brown@bookstore.com / customer123
 
+-- Create users table if not exists (matches JPA entity structure)
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
 -- Insert Admin Account
 -- Password: admin123 (BCrypt hashed)
 INSERT INTO users (email, password, first_name, last_name, role, created_at, updated_at, enabled)

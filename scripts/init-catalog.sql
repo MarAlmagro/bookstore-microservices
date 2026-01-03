@@ -3,8 +3,22 @@
 
 USE bookstore_catalog;
 
--- Clear existing data (for fresh initialization)
--- Note: This will be executed when the database is first created or reset
+-- Create books table if not exists (matches JPA entity structure)
+CREATE TABLE IF NOT EXISTS books (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    isbn VARCHAR(20) NOT NULL UNIQUE,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL,
+    category VARCHAR(100),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    INDEX idx_isbn (isbn),
+    INDEX idx_category (category),
+    INDEX idx_author (author)
+);
 
 -- Insert 20 sample books with varied genres, authors, and prices
 INSERT INTO books (isbn, title, author, description, price, stock, category, created_at, updated_at) VALUES
