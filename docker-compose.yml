@@ -12,6 +12,7 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./scripts/init-catalog.sql:/docker-entrypoint-initdb.d/init-catalog.sql
     networks:
       - bookstore-network
     healthcheck:
@@ -30,6 +31,7 @@ services:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
       - mongodb-data:/data/db
+      - ./scripts/init-orders.js:/docker-entrypoint-initdb.d/init-orders.js
     networks:
       - bookstore-network
     healthcheck:
@@ -50,6 +52,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-users.sql:/docker-entrypoint-initdb.d/init-users.sql
     networks:
       - bookstore-network
     healthcheck:
@@ -76,7 +79,13 @@ services:
     depends_on:
       mysql-catalog:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   # Order Service
   order-service:
@@ -95,8 +104,14 @@ services:
       mongodb-order:
         condition: service_healthy
       catalog-service:
-        condition: service_started
-    restart: on-failure
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   # User Service
   user-service:
@@ -118,7 +133,13 @@ services:
     depends_on:
       postgres-user:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 networks:
   bookstore-network:

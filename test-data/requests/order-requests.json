@@ -1,0 +1,65 @@
+{
+  "createOrder": {
+    "userId": 1,
+    "items": [
+      {
+        "bookId": 1,
+        "quantity": 2
+      },
+      {
+        "bookId": 2,
+        "quantity": 1
+      }
+    ]
+  },
+  "createOrderSingleItem": {
+    "userId": 1,
+    "items": [
+      {
+        "bookId": 1,
+        "quantity": 1
+      }
+    ]
+  },
+  "createOrderInvalidBook": {
+    "userId": 1,
+    "items": [
+      {
+        "bookId": 99999,
+        "quantity": 1
+      }
+    ]
+  },
+  "createOrderInsufficientStock": {
+    "userId": 1,
+    "items": [
+      {
+        "bookId": 1,
+        "quantity": 10000
+      }
+    ]
+  },
+  "createOrderInvalidQuantity": {
+    "userId": 1,
+    "items": [
+      {
+        "bookId": 1,
+        "quantity": -5
+      }
+    ]
+  },
+  "createOrderMissingUserId": {
+    "items": [
+      {
+        "bookId": 1,
+        "quantity": 1
+      }
+    ]
+  },
+  "updateOrderStatus": {
+    "status": "SHIPPED"
+  },
+  "updateOrderStatusInvalid": {
+    "status": "INVALID_STATUS"
+  }
+}

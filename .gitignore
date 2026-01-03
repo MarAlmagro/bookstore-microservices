@@ -36,6 +36,11 @@ logs/
 *.log
 hs_err_pid*
 
+# Test Results (exclude execution logs, keep test artifacts)
+test-results/
+test-logs/
+*.test.log
+
 # Environment
 .env
 *.env
