@@ -24,8 +24,7 @@
         <module>shared-common</module>
         <module>catalog-service</module>
         <module>order-service</module>
-        <!-- TODO: Uncomment as services are created -->
-        <!-- <module>user-service</module> -->
+        <module>user-service</module>
     </modules>
 
     <properties>

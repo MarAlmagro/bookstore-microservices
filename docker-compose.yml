@@ -98,6 +98,28 @@ services:
         condition: service_started
     restart: on-failure
 
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: bookstore-user-service
+    environment:
+      DB_HOST: postgres-user
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DATABASE:-bookstore_users}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      JWT_SECRET: ${JWT_SECRET:-mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm}
+    ports:
+      - "8083:8083"
+    networks:
+      - bookstore-network
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+    restart: on-failure
+
 networks:
   bookstore-network:
     driver: bridge
