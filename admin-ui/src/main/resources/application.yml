@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: admin-ui
+  
+  messages:
+    basename: classpath:i18n/messages
+    encoding: UTF-8
+    cache-duration: 3600
+  
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+  
+  security:
+    user:
+      name: admin
+      password: admin123
+
+server:
+  port: 8090
+  servlet:
+    context-path: /admin
+    session:
+      timeout: 30m
+      cookie:
+        name: ADMIN_SESSION
+        http-only: true
+        secure: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+jwt:
+  secret: ${JWT_SECRET:bookstore-secret-key-for-jwt-token-generation-minimum-256-bits}
+  expiration: 86400000
+
+logging:
+  level:
+    com.bookstore: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
