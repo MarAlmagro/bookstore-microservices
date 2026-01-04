@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{login.title}">Admin Login</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+</head>
+<body class="bg-neutral-100 dark:bg-neutral-900">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Logo and Title -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-brand-primary" th:text="#{app.name}">Bookstore Admin</h1>
+                <h2 class="mt-6 text-2xl font-semibold text-neutral-900 dark:text-neutral-50" th:text="#{login.title}">Admin Login</h2>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" 
+                 class="p-4 bg-status-error bg-opacity-10 border border-status-error rounded-md"
+                 data-testid="login-error">
+                <p class="text-status-error text-sm" th:text="#{${error}}">Invalid credentials</p>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${message}" 
+                 class="p-4 bg-status-success bg-opacity-10 border border-status-success rounded-md"
+                 data-testid="login-message">
+                <p class="text-status-success text-sm" th:text="${message}">Success message</p>
+            </div>
+
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post" class="mt-8 space-y-6" data-testid="login-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{login.username}">Username</label>
+                        <input id="username" 
+                               name="username" 
+                               type="text" 
+                               required 
+                               class="input-field mt-1"
+                               data-testid="login-username"
+                               placeholder="admin">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{login.password}">Password</label>
+                        <input id="password" 
+                               name="password" 
+                               type="password" 
+                               required 
+                               class="input-field mt-1"
+                               data-testid="login-password"
+                               placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" 
+                               name="remember-me" 
+                               type="checkbox" 
+                               class="h-4 w-4 text-brand-primary focus:ring-brand-primary border-neutral-300 rounded"
+                               data-testid="login-remember">
+                        <label for="remember-me" class="ml-2 block text-sm text-neutral-900 dark:text-neutral-300" th:text="#{login.remember}">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="btn-primary w-full"
+                            data-testid="login-submit">
+                        <span th:text="#{login.submit}">Sign In</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
