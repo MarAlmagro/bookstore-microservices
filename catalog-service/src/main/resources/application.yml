@@ -35,13 +35,19 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus,metrics
   endpoint:
     health:
       show-details: always
+    prometheus:
+      enabled: true
   health:
     defaults:
       enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 # OpenAPI/Swagger Configuration
 springdoc:
@@ -61,7 +67,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [traceId=%X{traceId}, spanId=%X{spanId}] - %msg%n"
 
 # Application Information
 info:
@@ -80,3 +86,13 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+
+# Sleuth Configuration
+spring.sleuth:
+  sampler:
+    probability: 1.0
+
+# Zipkin Configuration
+spring.zipkin:
+  base-url: http://localhost:9411
+  enabled: true

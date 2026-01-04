@@ -191,6 +191,76 @@ services:
       retries: 5
       start_period: 60s
 
+  # Zipkin - Distributed Tracing
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    networks:
+      - bookstore-network
+    restart: unless-stopped
+
+  # Prometheus - Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-server
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./test-data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - bookstore-network
+    restart: unless-stopped
+
+  # Loki - Log Aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: loki-server
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+    networks:
+      - bookstore-network
+    restart: unless-stopped
+
+  # Promtail - Log Shipper
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail-agent
+    volumes:
+      - ./test-data/promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - bookstore-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  # Grafana - Visualization Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - bookstore-network
+    depends_on:
+      - prometheus
+      - loki
+    restart: unless-stopped
+
 networks:
   bookstore-network:
     driver: bridge
@@ -199,3 +269,6 @@ volumes:
   mysql-data:
   mongodb-data:
   postgres-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:
