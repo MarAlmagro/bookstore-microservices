@@ -6,6 +6,7 @@ import com.bookstore.common.dto.OrderDTO;
 import com.bookstore.common.dto.OrderItemDTO;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
+import com.bookstore.order.client.CatalogClient;
 import com.bookstore.order.document.Order;
 import com.bookstore.order.document.OrderItem;
 import com.bookstore.order.mapper.OrderMapper;
@@ -16,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,7 +38,7 @@ class OrderServiceTest {
     private OrderMapper orderMapper;
 
     @Mock
-    private RestTemplate restTemplate;
+    private CatalogClient catalogClient;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -50,8 +49,6 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(orderService, "catalogServiceUrl", "http://localhost:8081");
-
         testBook = BookDTO.builder()
                 .id(1L)
                 .isbn("9780134685991")
@@ -99,7 +96,7 @@ class OrderServiceTest {
 
     @Test
     void shouldCreateOrderSuccessfully() {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
         when(orderMapper.toDocument(any(OrderDTO.class))).thenReturn(testOrder);
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
         when(orderMapper.toDTO(any(Order.class))).thenReturn(testOrderDTO);
@@ -121,7 +118,7 @@ class OrderServiceTest {
                 .title("Effective Java")
                 .build();
 
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(bookWithLowStock);
+        when(catalogClient.getBookById(anyLong())).thenReturn(bookWithLowStock);
 
         assertThrows(InvalidRequestException.class, () -> orderService.createOrder(testOrderDTO));
         verify(orderRepository, never()).save(any(Order.class));

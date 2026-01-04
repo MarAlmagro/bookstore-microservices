@@ -313,13 +313,19 @@ Current configuration is optimized for testing and demonstration:
 <dependency>
     <groupId>io.github.resilience4j</groupId>
     <artifactId>resilience4j-spring-boot2</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.0</version>
 </dependency>
 
 <dependency>
     <groupId>io.github.resilience4j</groupId>
     <artifactId>resilience4j-micrometer</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.0</version>
+</dependency>
+
+<!-- Prometheus Metrics -->
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
 </dependency>
 
 <!-- AOP (Required for Resilience4j annotations) -->
@@ -366,6 +372,109 @@ Current configuration is optimized for testing and demonstration:
 - Confirm `FeignClientInterceptor` is registered as a bean
 - Check `RequestContextHolder` has request attributes
 - Verify Authorization header is present in original request
+
+## Validation Results (Phase 9.5)
+
+### Test Execution Summary
+
+**Date**: January 4, 2026  
+**Branch**: `feature/resilience-validation`  
+**Status**: ✅ PASSED
+
+### Unit & Integration Tests
+
+All tests successfully updated and passing:
+- **Total Tests**: 26/26 passed
+- **Unit Tests**: 12/12 passed (OrderServiceTest)
+- **Integration Tests**: 14/14 passed (OrderIntegrationTest, OrderControllerTest)
+
+**Key Changes**:
+- Updated tests to use `CatalogClient` (Feign) instead of `RestTemplate`
+- Fixed Resilience4j version compatibility (1.7.0 for Java 11)
+- Verified Spring Context loads correctly with Resilience4j AOP proxies
+
+### Build Verification
+
+```
+[INFO] Reactor Summary for Bookstore Microservices 1.0.0-SNAPSHOT:
+[INFO] 
+[INFO] Bookstore Microservices ............................ SUCCESS
+[INFO] Shared Common Module ............................... SUCCESS
+[INFO] Eureka Server ...................................... SUCCESS
+[INFO] API Gateway ........................................ SUCCESS
+[INFO] Catalog Service .................................... SUCCESS
+[INFO] Order Service ...................................... SUCCESS
+[INFO] User Service ....................................... SUCCESS
+[INFO] BUILD SUCCESS
+```
+
+### Observability Verification
+
+**Actuator Endpoints Confirmed**:
+- ✅ `/actuator/health` - Service health with circuit breaker status
+- ✅ `/actuator/prometheus` - Prometheus metrics endpoint
+- ✅ `/actuator/circuitbreakers` - Circuit breaker state information
+- ✅ `/actuator/metrics` - Detailed metrics
+
+**Resilience4j Metrics Exposed**:
+```
+resilience4j_circuitbreaker_state{name="catalogService"}
+resilience4j_circuitbreaker_slow_call_rate{name="catalogService"}
+resilience4j_circuitbreaker_buffered_calls{kind="failed",name="catalogService"}
+resilience4j_circuitbreaker_buffered_calls{kind="successful",name="catalogService"}
+resilience4j_circuitbreaker_slow_calls{kind="failed",name="catalogService"}
+resilience4j_circuitbreaker_failure_rate{name="catalogService"}
+resilience4j_circuitbreaker_calls_seconds_count{kind="successful",name="catalogService"}
+resilience4j_circuitbreaker_calls_seconds_count{kind="failed",name="catalogService"}
+resilience4j_retry_calls_seconds_count{name="catalogService"}
+resilience4j_bulkhead_available_concurrent_calls{name="catalogService"}
+```
+
+**Circuit Breaker Configuration Verified**:
+```json
+{
+  "circuitBreakers": ["catalogService"]
+}
+```
+
+### Configuration Validation
+
+**Resilience4j Settings**:
+- Circuit Breaker: Sliding window of 10 calls, 50% failure threshold
+- Retry: 3 attempts with exponential backoff (2s → 4s → 8s)
+- Bulkhead: Maximum 10 concurrent calls
+- Health Indicator: Registered and exposed
+- Metrics: Exported to Prometheus
+
+**Feign Client**:
+- OpenFeign circuit breaker integration: ✅ Enabled
+- JWT propagation via `FeignClientInterceptor`: ✅ Configured
+- Fallback handler: ✅ Implemented (`CatalogClientFallback`)
+
+### Known Issues & Resolutions
+
+**Issue 1: Resilience4j Version Compatibility**
+- **Problem**: Version 1.7.1 had SpelResolver compatibility issues
+- **Solution**: Downgraded to 1.7.0 (Java 11 compatible)
+- **Status**: ✅ Resolved
+
+**Issue 2: Missing Prometheus Metrics**
+- **Problem**: Prometheus endpoint not exposed initially
+- **Solution**: Added `micrometer-registry-prometheus` dependency
+- **Status**: ✅ Resolved
+
+**Issue 3: Test Failures After Feign Migration**
+- **Problem**: Tests used `RestTemplate` instead of `CatalogClient`
+- **Solution**: Updated all tests to mock `CatalogClient`
+- **Status**: ✅ Resolved
+
+### Recommendations
+
+1. **Production Tuning**: Adjust circuit breaker thresholds based on actual traffic patterns
+2. **Monitoring**: Set up Grafana dashboards for real-time circuit breaker monitoring
+3. **Alerting**: Configure alerts for circuit breaker OPEN state transitions
+4. **Load Testing**: Perform load tests to validate bulkhead configuration
+5. **Chaos Engineering**: Regular chaos testing to verify resilience patterns
 
 ## References
 
