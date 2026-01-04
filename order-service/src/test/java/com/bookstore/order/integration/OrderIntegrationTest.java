@@ -4,6 +4,7 @@ import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.common.dto.BookDTO;
 import com.bookstore.common.dto.OrderDTO;
 import com.bookstore.common.dto.OrderItemDTO;
+import com.bookstore.order.client.CatalogClient;
 import com.bookstore.order.document.Order;
 import com.bookstore.order.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -24,8 +24,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,7 +43,7 @@ class OrderIntegrationTest {
     private OrderRepository orderRepository;
 
     @MockBean
-    private RestTemplate restTemplate;
+    private CatalogClient catalogClient;
 
     private BookDTO testBook;
     private OrderDTO testOrderDTO;
@@ -81,7 +80,7 @@ class OrderIntegrationTest {
 
     @Test
     void shouldCreateAndRetrieveOrderSuccessfully() throws Exception {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +103,7 @@ class OrderIntegrationTest {
 
     @Test
     void shouldGetUserOrdersSuccessfully() throws Exception {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +118,7 @@ class OrderIntegrationTest {
 
     @Test
     void shouldUpdateOrderStatusSuccessfully() throws Exception {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +138,7 @@ class OrderIntegrationTest {
 
     @Test
     void shouldDeleteOrderSuccessfully() throws Exception {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +159,7 @@ class OrderIntegrationTest {
 
     @Test
     void shouldGetOrdersByStatusSuccessfully() throws Exception {
-        when(restTemplate.getForObject(anyString(), eq(BookDTO.class))).thenReturn(testBook);
+        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
