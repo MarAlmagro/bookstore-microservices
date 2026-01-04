@@ -231,5 +231,4 @@ To modify the sample data:
 ## See Also
 
 - Parent directory: Test credentials documented in `../.env.example`
-- Test data JSON files in project root: `test-register.json`, `test-login.json`, etc.
 - API documentation: Access Swagger UI at `http://localhost:808[1-3]/swagger-ui.html`

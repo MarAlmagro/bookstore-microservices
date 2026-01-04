@@ -1,9 +1,0 @@
-{
-  "isbn": "9780134685991",
-  "title": "Effective Java",
-  "author": "Joshua Bloch",
-  "description": "Best practices for Java programming",
-  "price": 45.99,
-  "stock": 100,
-  "category": "Programming"
-}
