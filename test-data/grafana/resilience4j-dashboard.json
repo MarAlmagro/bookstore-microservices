@@ -1,0 +1,92 @@
+{
+  "dashboard": {
+    "title": "Resilience4j Metrics - Order Service",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Circuit Breaker State",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_state{name=\"catalogService\"}",
+            "legendFormat": "State: {{state}}"
+          }
+        ],
+        "description": "Current state of the catalogService circuit breaker (0=CLOSED, 1=OPEN, 2=HALF_OPEN)"
+      },
+      {
+        "id": 2,
+        "title": "Circuit Breaker Failure Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_failure_rate{name=\"catalogService\"}",
+            "legendFormat": "Failure Rate %"
+          }
+        ],
+        "description": "Failure rate percentage for catalog service calls"
+      },
+      {
+        "id": 3,
+        "title": "Circuit Breaker Calls",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"catalogService\"}[5m])",
+            "legendFormat": "{{kind}}"
+          }
+        ],
+        "description": "Rate of successful, failed, and not permitted calls"
+      },
+      {
+        "id": 4,
+        "title": "Retry Attempts",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(resilience4j_retry_calls_seconds_count{name=\"catalogService\"}[5m])",
+            "legendFormat": "{{kind}}"
+          }
+        ],
+        "description": "Retry attempts for catalog service calls"
+      },
+      {
+        "id": 5,
+        "title": "Bulkhead Concurrent Calls",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "resilience4j_bulkhead_available_concurrent_calls{name=\"catalogService\"}",
+            "legendFormat": "Available"
+          },
+          {
+            "expr": "resilience4j_bulkhead_max_allowed_concurrent_calls{name=\"catalogService\"}",
+            "legendFormat": "Max Allowed"
+          }
+        ],
+        "description": "Bulkhead concurrent call limits and availability"
+      },
+      {
+        "id": 6,
+        "title": "Call Duration",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(resilience4j_circuitbreaker_calls_seconds_bucket{name=\"catalogService\"}[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(resilience4j_circuitbreaker_calls_seconds_bucket{name=\"catalogService\"}[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "description": "95th and 99th percentile call duration"
+      }
+    ],
+    "refresh": "5s",
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    }
+  }
+}

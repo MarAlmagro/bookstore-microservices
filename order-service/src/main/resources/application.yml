@@ -7,6 +7,10 @@ spring:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/bookstore_orders}
       auto-index-creation: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 server:
   port: 8082
@@ -17,7 +21,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus,metrics
+        include: health,info,prometheus,metrics,circuitbreakers
   endpoint:
     health:
       show-details: always
@@ -25,6 +29,8 @@ management:
       enabled: true
   health:
     defaults:
+      enabled: true
+    circuitbreakers:
       enabled: true
   metrics:
     export:
@@ -69,3 +75,27 @@ spring.sleuth:
 spring.zipkin:
   base-url: http://localhost:9411
   enabled: true
+
+# Resilience4j Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      catalogService:
+        slidingWindowSize: 10
+        failureRateThreshold: 50.0
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      catalogService:
+        maxAttempts: 3
+        waitDuration: 2000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  bulkhead:
+    instances:
+      catalogService:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 0
