@@ -11,6 +11,9 @@ import com.bookstore.order.document.Order;
 import com.bookstore.order.document.OrderItem;
 import com.bookstore.order.mapper.OrderMapper;
 import com.bookstore.order.repository.OrderRepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -131,6 +134,9 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @CircuitBreaker(name = "catalogService")
+    @Retry(name = "catalogService")
+    @Bulkhead(name = "catalogService")
     private BookDTO fetchBookFromCatalog(Long bookId) {
         try {
             log.debug("Fetching book from catalog service with id: {}", bookId);
