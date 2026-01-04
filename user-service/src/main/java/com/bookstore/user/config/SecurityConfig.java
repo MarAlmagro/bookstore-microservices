@@ -53,6 +53,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .exceptionHandling()
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        response.setStatus(403);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"Access Denied\"}");
+                    })
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(401);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                    })
+                .and()
                 .authorizeRequests()
                     .antMatchers("/api/v1/auth/**").permitAll()
                     .antMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()

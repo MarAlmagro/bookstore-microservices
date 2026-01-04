@@ -60,6 +60,12 @@ class UserServiceIntegrationTest {
         assertNotNull(loginResponse.getToken());
         assertEquals("integration@test.com", loginResponse.getUser().getEmail());
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         AuthResponseDTO refreshResponse = authService.refreshToken(loginResponse.getRefreshToken());
         assertNotNull(refreshResponse);
         assertNotNull(refreshResponse.getToken());
