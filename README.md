@@ -49,6 +49,24 @@ This project implements a **polyglot persistence microservices architecture** wi
 │             │    │             │    │             │
 │   MySQL     │    │   MongoDB   │    │ PostgreSQL  │
 └─────────────┘    └─────────────┘    └─────────────┘
+        │                  │                  │
+        └──────────────────┴──────────────────┘
+                           │
+                  Observability Stack
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+  ┌──────────┐      ┌──────────┐      ┌──────────┐
+  │  Zipkin  │      │Prometheus│      │   Loki   │
+  │  :9411   │      │  :9090   │      │  :3100   │
+  └────┬─────┘      └────┬─────┘      └────┬─────┘
+       │                 │                  │
+       └─────────────────┴──────────────────┘
+                         │
+                         ▼
+                  ┌──────────────┐
+                  │   Grafana    │  ← Unified Dashboard
+                  │   Port 3000  │
+                  └──────────────┘
 ```
 
 ### Infrastructure Services
@@ -64,6 +82,32 @@ This project implements a **polyglot persistence microservices architecture** wi
   - Health monitoring
   - Load balancing support
   - Service instance management
+
+### Observability Stack (LGTM)
+
+- **Zipkin** (Port 9411) - Distributed tracing
+  - End-to-end request tracing across services
+  - Trace visualization and analysis
+  - Service dependency mapping
+  - Performance bottleneck identification
+
+- **Prometheus** (Port 9090) - Metrics collection
+  - Time-series metrics database
+  - Service health metrics
+  - Custom application metrics
+  - Alerting capabilities
+
+- **Loki** (Port 3100) - Log aggregation
+  - Centralized log storage
+  - Trace ID correlation with logs
+  - Efficient log querying
+  - Docker container log collection
+
+- **Grafana** (Port 3000) - Unified observability dashboard
+  - Metrics visualization from Prometheus
+  - Log exploration from Loki
+  - Trace analysis from Zipkin
+  - Custom dashboards and alerts
 
 ### Core Services
 
@@ -95,6 +139,10 @@ This project implements a **polyglot persistence microservices architecture** wi
 - **Security**: Spring Security + JWT
 - **API Gateway**: Spring Cloud Gateway
 - **Service Discovery**: Netflix Eureka
+- **Distributed Tracing**: Spring Cloud Sleuth + Zipkin
+- **Metrics**: Micrometer + Prometheus
+- **Logging**: Loki + Promtail
+- **Monitoring**: Grafana
 - **API Documentation**: SpringDoc OpenAPI 3 (Swagger)
 - **Containerization**: Docker & Docker Compose
 
@@ -110,6 +158,9 @@ bookstore-microservices/
 ├── order-service/                   # Order management microservice
 ├── user-service/                    # User authentication microservice
 ├── docker-compose.yml               # Full stack orchestration
+├── test-data/                       # Test scenarios and configs
+│   ├── promtail/                    # Promtail configuration
+│   └── scenarios/                   # Observability test scenarios
 └── .env.example                     # Environment variables template
 ```
 
@@ -180,6 +231,15 @@ curl http://localhost:8761/actuator/health
 |---------|-----|-------------|
 | **API Gateway** | http://localhost:8080 | Single entry point for all API requests |
 | **Eureka Dashboard** | http://localhost:8761 | Service registry and health monitoring |
+
+**Observability Stack**:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Grafana** | http://localhost:3000 | Unified observability dashboard (admin/admin) |
+| **Zipkin** | http://localhost:9411 | Distributed tracing UI |
+| **Prometheus** | http://localhost:9090 | Metrics and monitoring |
+| **Loki** | http://localhost:3100 | Log aggregation (API only) |
 
 **Direct Service Access** (for development/debugging):
 
@@ -430,6 +490,7 @@ For more troubleshooting help, see **[docs/TESTING.md](docs/TESTING.md#troublesh
 
 ## Documentation
 
+- **[Observability Guide](docs/OBSERVABILITY.md)** - Distributed tracing, logging, and metrics setup
 - **[Testing Guide](docs/TESTING.md)** - Comprehensive testing instructions
 - **[Architecture](docs/ARCHITECTURE.md)** - Detailed system design and patterns
 - **[API Gateway Guide](docs/GATEWAY.md)** - Gateway configuration and routing
@@ -459,6 +520,11 @@ See `.env.example` for complete list.
 - [x] **API Gateway (Spring Cloud Gateway)**
 - [x] **Service Discovery (Netflix Eureka)**
 - [x] **Service-to-service communication via Eureka**
+- [x] **Observability Stack (LGTM)**
+  - [x] Distributed Tracing (Sleuth + Zipkin)
+  - [x] Metrics Collection (Prometheus)
+  - [x] Log Aggregation (Loki + Promtail)
+  - [x] Unified Dashboard (Grafana)
 - [x] Docker containerization with health checks
 - [x] Database initialization scripts
 - [x] Integration tests and test scripts
@@ -467,11 +533,11 @@ See `.env.example` for complete list.
 
 ### 🔄 Future Enhancements
 - [ ] Circuit Breaker (Resilience4j)
-- [ ] Distributed Tracing (Sleuth + Zipkin)
 - [ ] Message Queue (RabbitMQ/Kafka)
 - [ ] Caching Layer (Redis)
 - [ ] Admin UI (Thymeleaf + Tailwind)
 - [ ] Customer Frontend (Angular SPA)
+- [ ] Kubernetes Deployment
 
 ## Contributing
 
