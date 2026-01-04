@@ -6,15 +6,17 @@ import com.bookstore.common.dto.OrderDTO;
 import com.bookstore.common.dto.OrderItemDTO;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
+import com.bookstore.order.client.CatalogClient;
 import com.bookstore.order.document.Order;
 import com.bookstore.order.document.OrderItem;
 import com.bookstore.order.mapper.OrderMapper;
 import com.bookstore.order.repository.OrderRepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,10 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final RestTemplate restTemplate;
-
-    @Value("${catalog.service.url}")
-    private String catalogServiceUrl;
+    private final CatalogClient catalogClient;
 
     @Override
     public OrderDTO createOrder(OrderDTO orderDTO) {
@@ -135,12 +134,14 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @CircuitBreaker(name = "catalogService")
+    @Retry(name = "catalogService")
+    @Bulkhead(name = "catalogService")
     private BookDTO fetchBookFromCatalog(Long bookId) {
         try {
-            String url = catalogServiceUrl + "/api/v1/books/" + bookId;
-            log.debug("Fetching book from catalog service: {}", url);
+            log.debug("Fetching book from catalog service with id: {}", bookId);
             
-            BookDTO book = restTemplate.getForObject(url, BookDTO.class);
+            BookDTO book = catalogClient.getBookById(bookId);
             
             if (book == null) {
                 throw new ResourceNotFoundException("Book not found with id: " + bookId);

@@ -119,7 +119,8 @@ This project implements a **polyglot persistence microservices architecture** wi
   
 - **Order Service** (Port 8082) - Order lifecycle management using MongoDB
   - Order creation with stock validation
-  - Service-to-service communication via Eureka
+  - Service-to-service communication via OpenFeign
+  - Resilience patterns (Circuit Breaker, Retry, Bulkhead)
   - Order history and status tracking
   - Registered with Eureka
   
@@ -139,6 +140,8 @@ This project implements a **polyglot persistence microservices architecture** wi
 - **Security**: Spring Security + JWT
 - **API Gateway**: Spring Cloud Gateway
 - **Service Discovery**: Netflix Eureka
+- **Resilience**: Resilience4j (Circuit Breaker, Retry, Bulkhead)
+- **Service Communication**: OpenFeign
 - **Distributed Tracing**: Spring Cloud Sleuth + Zipkin
 - **Metrics**: Micrometer + Prometheus
 - **Logging**: Loki + Promtail
@@ -348,6 +351,9 @@ Comprehensive test scripts are provided in the `scripts/` directory:
 ./scripts/test-catalog.sh    # Book CRUD operations
 ./scripts/test-user.sh        # Authentication flow
 ./scripts/test-order.sh       # Order creation & validation
+
+# Resilience testing (chaos engineering)
+./scripts/test-resilience.sh  # Circuit breaker, retry, and bulkhead patterns
 ```
 
 ### Test Credentials
@@ -490,6 +496,7 @@ For more troubleshooting help, see **[docs/TESTING.md](docs/TESTING.md#troublesh
 
 ## Documentation
 
+- **[Resilience Guide](docs/RESILIENCE.md)** - Circuit breaker, retry, and bulkhead patterns
 - **[Observability Guide](docs/OBSERVABILITY.md)** - Distributed tracing, logging, and metrics setup
 - **[Testing Guide](docs/TESTING.md)** - Comprehensive testing instructions
 - **[Architecture](docs/ARCHITECTURE.md)** - Detailed system design and patterns
@@ -519,7 +526,12 @@ See `.env.example` for complete list.
 - [x] User service with JWT authentication
 - [x] **API Gateway (Spring Cloud Gateway)**
 - [x] **Service Discovery (Netflix Eureka)**
-- [x] **Service-to-service communication via Eureka**
+- [x] **Service-to-service communication via OpenFeign**
+- [x] **Resilience Patterns (Resilience4j)**
+  - [x] Circuit Breaker with fallback
+  - [x] Retry with exponential backoff
+  - [x] Bulkhead for concurrent call limiting
+  - [x] Resilience metrics in Grafana
 - [x] **Observability Stack (LGTM)**
   - [x] Distributed Tracing (Sleuth + Zipkin)
   - [x] Metrics Collection (Prometheus)
@@ -528,11 +540,11 @@ See `.env.example` for complete list.
 - [x] Docker containerization with health checks
 - [x] Database initialization scripts
 - [x] Integration tests and test scripts
+- [x] Chaos engineering tests
 - [x] Swagger/OpenAPI documentation
 - [x] Comprehensive documentation
 
 ### 🔄 Future Enhancements
-- [ ] Circuit Breaker (Resilience4j)
 - [ ] Message Queue (RabbitMQ/Kafka)
 - [ ] Caching Layer (Redis)
 - [ ] Admin UI (Thymeleaf + Tailwind)
