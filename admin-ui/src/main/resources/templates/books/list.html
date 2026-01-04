@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{books.title}">Book Management</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0" data-testid="sidebar">
+            <div class="flex flex-col w-64 bg-brand-secondary dark:bg-neutral-800">
+                <div class="flex items-center justify-center h-16 px-4 bg-brand-primary">
+                    <h1 class="text-xl font-bold text-white" th:text="#{app.name}">Bookstore Admin</h1>
+                </div>
+                
+                <nav class="flex-1 px-2 py-4 space-y-1">
+                    <a th:href="@{/dashboard}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                       data-testid="nav-dashboard">
+                        <span th:text="#{nav.dashboard}">Dashboard</span>
+                    </a>
+                    <a th:href="@{/books}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-md"
+                       data-testid="nav-books">
+                        <span th:text="#{nav.books}">Books</span>
+                    </a>
+                </nav>
+                
+                <div class="px-2 py-4 border-t border-neutral-700">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" 
+                                class="flex items-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                                data-testid="nav-logout">
+                            <span th:text="#{nav.logout}">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" data-testid="topbar">
+                <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50" th:text="#{books.title}">Book Management</h2>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/books(lang='en')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-en">EN</a>
+                    <a th:href="@{/books(lang='es')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-es">ES</a>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Flash Messages -->
+                <div th:if="${success}" class="mb-4 p-4 bg-status-success bg-opacity-10 border border-status-success rounded-md" data-testid="flash-success">
+                    <p class="text-status-success" th:text="#{${success}}"></p>
+                </div>
+                <div th:if="${error}" class="mb-4 p-4 bg-status-error bg-opacity-10 border border-status-error rounded-md" data-testid="flash-error">
+                    <p class="text-status-error" th:text="${error}"></p>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <form th:action="@{/books}" method="get" class="flex gap-2 w-full sm:w-auto">
+                        <input type="text" 
+                               name="query" 
+                               th:value="${query}"
+                               th:placeholder="#{books.search}"
+                               class="input-field flex-1 sm:w-64"
+                               data-testid="books-search-input">
+                        <button type="submit" class="btn-secondary" data-testid="books-search-button">
+                            <span th:text="#{action.search}">Search</span>
+                        </button>
+                    </form>
+                    <a th:href="@{/books/new}" class="btn-primary" data-testid="books-add-button">
+                        <span th:text="#{books.add}">Add Book</span>
+                    </a>
+                </div>
+
+                <!-- Books Table -->
+                <div class="card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700" data-testid="books-table">
+                            <thead class="bg-neutral-50 dark:bg-neutral-800">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.isbn}">ISBN</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.title}">Title</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.author}">Author</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.price}">Price</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.stock}">Stock</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider" th:text="#{books.table.actions}">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-neutral-800 divide-y divide-neutral-200 dark:divide-neutral-700">
+                                <tr th:if="${#lists.isEmpty(books)}">
+                                    <td colspan="6" class="px-6 py-4 text-center text-neutral-500 dark:text-neutral-400" th:text="#{message.noData}">No data available</td>
+                                </tr>
+                                <tr th:each="book : ${books}" class="table-row" th:data-testid="'book-row-' + ${book.id}">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900 dark:text-neutral-50" th:text="${book.isbn}">ISBN</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900 dark:text-neutral-50" th:text="${book.title}">Title</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900 dark:text-neutral-50" th:text="${book.author}">Author</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900 dark:text-neutral-50" th:text="'$' + ${book.price}">Price</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900 dark:text-neutral-50" th:text="${book.stockQuantity}">Stock</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                        <a th:href="@{/books/{id}/edit(id=${book.id})}" 
+                                           class="text-brand-primary hover:text-indigo-700"
+                                           th:data-testid="'book-edit-' + ${book.id}">
+                                            <span th:text="#{action.edit}">Edit</span>
+                                        </a>
+                                        <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" class="inline">
+                                            <button type="submit" 
+                                                    class="text-status-error hover:text-red-600"
+                                                    th:data-testid="'book-delete-' + ${book.id}"
+                                                    onclick="return confirm(/*[[#{message.confirm.delete}]]*/ 'Are you sure?')">
+                                                <span th:text="#{action.delete}">Delete</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
