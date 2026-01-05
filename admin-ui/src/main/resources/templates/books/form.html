@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.id != null ? #{books.edit} : #{books.add}}">Book Form</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0" data-testid="sidebar">
+            <div class="flex flex-col w-64 bg-brand-secondary dark:bg-neutral-800">
+                <div class="flex items-center justify-center h-16 px-4 bg-brand-primary">
+                    <h1 class="text-xl font-bold text-white" th:text="#{app.name}">Bookstore Admin</h1>
+                </div>
+                
+                <nav class="flex-1 px-2 py-4 space-y-1">
+                    <a th:href="@{/dashboard}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                       data-testid="nav-dashboard">
+                        <span th:text="#{nav.dashboard}">Dashboard</span>
+                    </a>
+                    <a th:href="@{/books}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-md"
+                       data-testid="nav-books">
+                        <span th:text="#{nav.books}">Books</span>
+                    </a>
+                </nav>
+                
+                <div class="px-2 py-4 border-t border-neutral-700">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" 
+                                class="flex items-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                                data-testid="nav-logout">
+                            <span th:text="#{nav.logout}">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" data-testid="topbar">
+                <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50" th:text="${book.id != null ? #{books.edit} : #{books.add}}">Book Form</h2>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{${#httpServletRequest.requestURI}(lang='en')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-en">EN</a>
+                    <a th:href="@{${#httpServletRequest.requestURI}(lang='es')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-es">ES</a>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="max-w-2xl mx-auto">
+                    <div class="card">
+                        <form th:action="${book.id != null ? '/admin/books/' + book.id : '/admin/books'}" 
+                              method="post" 
+                              th:object="${book}"
+                              data-testid="book-form">
+                            
+                            <div class="space-y-6">
+                                <!-- ISBN -->
+                                <div>
+                                    <label for="isbn" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.isbn}">ISBN</label>
+                                    <input type="text" 
+                                           id="isbn" 
+                                           th:field="*{isbn}"
+                                           required
+                                           class="input-field mt-1"
+                                           data-testid="book-isbn">
+                                </div>
+
+                                <!-- Title -->
+                                <div>
+                                    <label for="title" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.title}">Title</label>
+                                    <input type="text" 
+                                           id="title" 
+                                           th:field="*{title}"
+                                           required
+                                           class="input-field mt-1"
+                                           data-testid="book-title">
+                                </div>
+
+                                <!-- Author -->
+                                <div>
+                                    <label for="author" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.author}">Author</label>
+                                    <input type="text" 
+                                           id="author" 
+                                           th:field="*{author}"
+                                           required
+                                           class="input-field mt-1"
+                                           data-testid="book-author">
+                                </div>
+
+                                <!-- Description -->
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.description}">Description</label>
+                                    <textarea id="description" 
+                                              th:field="*{description}"
+                                              rows="4"
+                                              class="input-field mt-1"
+                                              data-testid="book-description"></textarea>
+                                </div>
+
+                                <!-- Price -->
+                                <div>
+                                    <label for="price" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.price}">Price</label>
+                                    <input type="number" 
+                                           id="price" 
+                                           th:field="*{price}"
+                                           step="0.01"
+                                           required
+                                           class="input-field mt-1"
+                                           data-testid="book-price">
+                                </div>
+
+                                <!-- Stock Quantity -->
+                                <div>
+                                    <label for="stockQuantity" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.stock}">Stock Quantity</label>
+                                    <input type="number" 
+                                           id="stockQuantity" 
+                                           th:field="*{stockQuantity}"
+                                           required
+                                           class="input-field mt-1"
+                                           data-testid="book-stock">
+                                </div>
+
+                                <!-- Category -->
+                                <div>
+                                    <label for="category" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300" th:text="#{books.form.category}">Category</label>
+                                    <input type="text" 
+                                           id="category" 
+                                           th:field="*{category}"
+                                           class="input-field mt-1"
+                                           data-testid="book-category">
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex justify-end space-x-4 pt-4">
+                                    <a th:href="@{/books}" class="btn-secondary" data-testid="book-cancel">
+                                        <span th:text="#{books.form.cancel}">Cancel</span>
+                                    </a>
+                                    <button type="submit" class="btn-primary" data-testid="book-save">
+                                        <span th:text="#{books.form.save}">Save</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

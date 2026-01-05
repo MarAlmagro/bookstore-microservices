@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{dashboard.title}">Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0" data-testid="sidebar">
+            <div class="flex flex-col w-64 bg-brand-secondary dark:bg-neutral-800">
+                <div class="flex items-center justify-center h-16 px-4 bg-brand-primary">
+                    <h1 class="text-xl font-bold text-white" th:text="#{app.name}">Bookstore Admin</h1>
+                </div>
+                
+                <nav class="flex-1 px-2 py-4 space-y-1">
+                    <a th:href="@{/dashboard}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-md"
+                       data-testid="nav-dashboard">
+                        <span th:text="#{nav.dashboard}">Dashboard</span>
+                    </a>
+                    <a th:href="@{/books}" 
+                       class="flex items-center px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                       data-testid="nav-books">
+                        <span th:text="#{nav.books}">Books</span>
+                    </a>
+                </nav>
+                
+                <div class="px-2 py-4 border-t border-neutral-700">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" 
+                                class="flex items-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-neutral-700 transition-colors"
+                                data-testid="nav-logout">
+                            <span th:text="#{nav.logout}">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" data-testid="topbar">
+                <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50" th:text="#{dashboard.title}">Dashboard</h2>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/dashboard(lang='en')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-en">EN</a>
+                    <a th:href="@{/dashboard(lang='es')}" class="px-3 py-1 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700" data-testid="lang-es">ES</a>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <div th:if="${error}" class="mb-4 p-4 bg-status-error bg-opacity-10 border border-status-error rounded-md" data-testid="dashboard-error">
+                    <p class="text-status-error" th:text="${error}"></p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card" data-testid="stat-books">
+                        <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400" th:text="#{dashboard.stats.totalBooks}">Total Books</h3>
+                        <p class="mt-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50" th:text="${stats?.totalBooks ?: 0}">0</p>
+                    </div>
+                    <div class="card" data-testid="stat-orders">
+                        <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400" th:text="#{dashboard.stats.totalOrders}">Total Orders</h3>
+                        <p class="mt-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50" th:text="${stats?.totalOrders ?: 0}">0</p>
+                    </div>
+                    <div class="card" data-testid="stat-users">
+                        <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400" th:text="#{dashboard.stats.totalUsers}">Total Users</h3>
+                        <p class="mt-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50" th:text="${stats?.totalUsers ?: 0}">0</p>
+                    </div>
+                    <div class="card" data-testid="stat-revenue">
+                        <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400" th:text="#{dashboard.stats.revenue}">Revenue</h3>
+                        <p class="mt-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50" th:text="'$' + ${stats?.totalRevenue ?: 0}">$0</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card">
+                        <h3 class="text-lg font-semibold mb-4" th:text="#{dashboard.recentOrders}">Recent Orders</h3>
+                        <canvas id="ordersChart" data-testid="orders-chart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-semibold mb-4" th:text="#{dashboard.topBooks}">Top Selling Books</h3>
+                        <canvas id="booksChart" data-testid="books-chart"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const ordersData = /*[[${recentOrders}]]*/ [];
+        const booksData = /*[[${topBooks}]]*/ [];
+        
+        const ordersCtx = document.getElementById('ordersChart');
+        if (ordersCtx) {
+            new Chart(ordersCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [12, 19, 3, 5, 2, 3, 7],
+                        borderColor: '#4F46E5',
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+        
+        const booksCtx = document.getElementById('booksChart');
+        if (booksCtx) {
+            new Chart(booksCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Book 1', 'Book 2', 'Book 3', 'Book 4', 'Book 5'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [12, 19, 3, 5, 2],
+                        backgroundColor: '#4F46E5'
+                    }]
+                }
+            });
+        }
+    </script>
+</body>
+</html>

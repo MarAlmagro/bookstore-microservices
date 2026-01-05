@@ -36,6 +36,11 @@ logs/
 *.log
 hs_err_pid*
 
+# Test Results (exclude execution logs, keep test artifacts)
+test-results/
+test-logs/
+*.test.log
+
 # Environment
 .env
 *.env
@@ -58,6 +63,19 @@ spring-boot-devtools.properties
 .grok/
 .perplexity/
 .grok/
+.windsurf/
+AGENT*.md
+CLAUDE.md
+
+# Node.js / Frontend (admin-ui specific)
+admin-ui/node/
+admin-ui/node_modules/
+admin-ui/npm-debug.log*
+admin-ui/yarn-debug.log*
+admin-ui/yarn-error.log*
+admin-ui/package-lock.json
+admin-ui/.npm
+admin-ui/.eslintcache
 
 # Temporary files
 *.tmp

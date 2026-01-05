@@ -1,0 +1,24 @@
+{
+  "phase": 8,
+  "infrastructure": {
+    "network_name": "bookstore-network",
+    "services": {
+      "zipkin": { "port": 9411, "container_name": "zipkin-server" },
+      "prometheus": { "port": 9090, "container_name": "prometheus-server" },
+      "loki": { "port": 3100, "container_name": "loki-server" },
+      "grafana": { "port": 3000, "container_name": "grafana-dashboard" }
+    }
+  },
+  "spring_boot_config": {
+    "logging_pattern": "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [traceId=%X{traceId}, spanId=%X{spanId}] - %msg%n",
+    "sleuth_sample_rate": 1.0,
+    "prometheus_endpoint": "/actuator/prometheus"
+  },
+  "validation_scenarios": [
+    {
+      "id": "SCN-801",
+      "description": "Trace propagation from Gateway to Catalog",
+      "expected_header": "X-B3-TraceId"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: order-service-test
+  data:
+    mongodb:
+      auto-index-creation: true
+
+server:
+  port: 0
+
+logging:
+  level:
+    com.bookstore.order: DEBUG
+    org.springframework.data.mongodb: INFO
+
+catalog:
+  service:
+    url: http://localhost:8081

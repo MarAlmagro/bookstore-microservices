@@ -1,0 +1,50 @@
+{
+  "createBook": {
+    "isbn": "9780134685991",
+    "title": "Effective Java",
+    "author": "Joshua Bloch",
+    "description": "Best practices for the Java programming language",
+    "price": 45.99,
+    "stock": 100,
+    "category": "Programming"
+  },
+  "createBookInvalid": {
+    "isbn": "",
+    "title": "",
+    "author": "Joshua Bloch",
+    "description": "Missing required fields",
+    "price": -10.00,
+    "stock": -5,
+    "category": "Programming"
+  },
+  "updateBook": {
+    "isbn": "9780134685991",
+    "title": "Effective Java - Third Edition",
+    "author": "Joshua Bloch",
+    "description": "Updated best practices for Java 7, 8, and 9",
+    "price": 49.99,
+    "stock": 150,
+    "category": "Programming"
+  },
+  "updateBookPartial": {
+    "price": 39.99,
+    "stock": 200
+  },
+  "searchParams": {
+    "byCategory": {
+      "category": "Programming"
+    },
+    "byAuthor": {
+      "author": "Joshua Bloch"
+    },
+    "byPriceRange": {
+      "minPrice": 20.00,
+      "maxPrice": 50.00
+    },
+    "combined": {
+      "category": "Programming",
+      "minPrice": 30.00,
+      "maxPrice": 60.00
+    }
+  }
+}
