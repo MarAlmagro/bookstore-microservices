@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class OrderSkipListener implements SkipListener<Order, Object> {
 
-    private static final String REJECTED_DIR = "order-service/exports/rejected";
+    private static final String REJECTED_DIR = "exports/rejected";
     private static final DateTimeFormatter FILE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Override

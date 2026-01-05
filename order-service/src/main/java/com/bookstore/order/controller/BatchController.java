@@ -50,7 +50,7 @@ public class BatchController {
             
             String output = outputFile != null
                 ? outputFile
-                : String.format("order-service/exports/sales_report_%s.txt", 
+                : String.format("exports/sales_report_%s.txt", 
                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
             
             log.info("Starting sales report job from {} to {}", start, end);
