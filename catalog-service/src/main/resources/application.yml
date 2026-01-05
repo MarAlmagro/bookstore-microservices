@@ -30,6 +30,13 @@ spring:
       write-dates-as-timestamps: false
     time-zone: UTC
 
+  # Spring Batch Configuration
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
 # Actuator Configuration
 management:
   endpoints:
