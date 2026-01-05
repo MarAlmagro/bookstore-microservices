@@ -11,6 +11,9 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+  batch:
+    job:
+      enabled: false
 
 server:
   port: 8082
