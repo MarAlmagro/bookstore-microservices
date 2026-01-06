@@ -1,0 +1,22 @@
+# Task: Quality and Security Integration
+
+- [x] Planning Phase
+    - [x] Analyze codebase tech stack
+    - [x] Create implementation plan
+    - [x] Get user approval
+- [/] Setup & Git Workflow
+    - [x] Create branch `feature/quality-security-integration`
+    - [x] Move `task.md` and `implementation_plan.md` to `docs/planning/`
+    - [/] Initialize documentation in `docs/quality-and-security.md`
+- [ ] Preparation Phase
+    - [ ] Configure parent `pom.xml` with atomized profiles
+    - [ ] Set up JaCoCo, Checkstyle, SpotBugs, and OWASP Dependency-Check
+- [ ] Sonar Integration
+    - [ ] Add Sonar Maven Plugin
+    - [ ] Create `docker-compose.quality.yml` for local SonarQube
+- [ ] Workflow Creation
+    - [ ] Create `.agent/workflows/check-quality.md`
+- [ ] Verification Phase
+    - [ ] Run quality checks and address immediate warnings
+    - [ ] Commit changes with atomic messages
+    - [ ] Generate reports and final summary
