@@ -3,6 +3,7 @@ package com.bookstore.common.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 public class OrderDto {
 
@@ -56,7 +56,8 @@ public class OrderDto {
      */
     private LocalDateTime createdAt;
 
-    public OrderDto(String id, Long userId, List<OrderItemDto> items, BigDecimal totalAmount, String status,
+    @Builder
+    public OrderDto(String id, Long userId, @Singular List<OrderItemDto> items, BigDecimal totalAmount, String status,
             LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;

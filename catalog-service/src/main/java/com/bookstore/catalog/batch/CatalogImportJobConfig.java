@@ -10,6 +10,9 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -36,25 +39,25 @@ public class CatalogImportJobConfig {
     @StepScope
     public FlatFileItemReader<BookImportDto> catalogReader(
             @Value("#{jobParameters['inputFile']}") String inputFile) {
-        
+
         FlatFileItemReader<BookImportDto> reader = new FlatFileItemReader<>();
         reader.setResource(new FileSystemResource(inputFile));
         reader.setLinesToSkip(1);
-        
+
         DefaultLineMapper<BookImportDto> lineMapper = new DefaultLineMapper<>();
-        
+
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
         tokenizer.setNames("isbn", "title", "author", "description", "price", "stock", "category");
         tokenizer.setDelimiter(",");
-        
+
         BeanWrapperFieldSetMapper<BookImportDto> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(BookImportDto.class);
-        
+
         lineMapper.setLineTokenizer(tokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
-        
+
         reader.setLineMapper(lineMapper);
-        
+
         return reader;
     }
 
@@ -66,20 +69,22 @@ public class CatalogImportJobConfig {
     }
 
     @Bean
-    public Step catalogImportStep() {
+    public Step catalogImportStep(
+            ItemReader<BookImportDto> catalogReader,
+            ItemWriter<Book> catalogWriter) {
         return stepBuilderFactory.get("catalogImportStep")
                 .<BookImportDto, Book>chunk(100)
-                .reader(catalogReader(null))
+                .reader(catalogReader)
                 .processor(bookImportProcessor)
-                .writer(catalogWriter())
+                .writer(catalogWriter)
                 .build();
     }
 
     @Bean
-    public Job catalogImportJob() {
+    public Job catalogImportJob(Step catalogImportStep) {
         return jobBuilderFactory.get("catalogImportJob")
                 .incrementer(new RunIdIncrementer())
-                .start(catalogImportStep())
+                .start(catalogImportStep)
                 .build();
     }
 }

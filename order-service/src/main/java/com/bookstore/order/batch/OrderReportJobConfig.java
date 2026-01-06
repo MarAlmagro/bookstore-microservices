@@ -11,6 +11,9 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,11 +41,11 @@ public class OrderReportJobConfig {
     public MongoOrderItemReader orderReader(
             @Value("#{jobParameters['startDate']}") String startDateStr,
             @Value("#{jobParameters['endDate']}") String endDateStr) {
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
         LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
-        
+
         return new MongoOrderItemReader(mongoTemplate, startDate, endDate);
     }
 
@@ -50,13 +53,13 @@ public class OrderReportJobConfig {
     @StepScope
     public FlatFileItemWriter<OrderReportDto> orderReportWriter(
             @Value("#{jobParameters['outputFile']}") String outputFile) {
-        
+
         FlatFileItemWriter<OrderReportDto> writer = new FlatFileItemWriter<>();
         writer.setResource(new FileSystemResource(outputFile));
         writer.setEncoding(StandardCharsets.UTF_8.name());
         writer.setLineSeparator("\r\n");
         writer.setLineAggregator(mainframeLineAggregator());
-        
+
         return writer;
     }
 
@@ -66,12 +69,14 @@ public class OrderReportJobConfig {
     }
 
     @Bean
-    public Step orderReportStep() {
+    public Step orderReportStep(
+            ItemReader<Order> orderReader,
+            ItemWriter<OrderReportDto> orderReportWriter) {
         return stepBuilderFactory.get("orderReportStep")
                 .<Order, OrderReportDto>chunk(100)
-                .reader(orderReader(null, null))
+                .reader(orderReader)
                 .processor(mainframeOrderProcessor)
-                .writer(orderReportWriter(null))
+                .writer(orderReportWriter)
                 .faultTolerant()
                 .skip(MalformedDataException.class)
                 .skipLimit(10)
@@ -81,10 +86,10 @@ public class OrderReportJobConfig {
     }
 
     @Bean
-    public Job orderReportJob() {
+    public Job orderReportJob(Step orderReportStep) {
         return jobBuilderFactory.get("orderReportJob")
                 .incrementer(new RunIdIncrementer())
-                .start(orderReportStep())
+                .start(orderReportStep)
                 .build();
     }
 

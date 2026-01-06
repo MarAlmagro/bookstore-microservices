@@ -17,6 +17,10 @@
 - [x] Workflow Creation
     - [x] Create `.agent/workflows/check-quality.md`
 - [/] Verification Phase
-    - [/] Run quality checks and address immediate warnings
-    - [ ] Commit changes with atomic messages
+    - [x] Run quality checks and address immediate warnings
+        - [x] `shared-common`
+            - [x] Fix SpotBugs `EI_EXPOSE_REP2` in DTOs
+            - [x] Fix Checkstyle naming (`*DTO` -> `*Dto`)
+            - [x] Fix Checkstyle indentation (core files)
+    - [x] Commit changes with atomic messages
     - [ ] Generate reports and final summary

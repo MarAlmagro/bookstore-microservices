@@ -6,8 +6,10 @@ import org.springframework.batch.core.SkipListener;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -29,9 +31,9 @@ public class OrderSkipListener implements SkipListener<Order, Object> {
 
     @Override
     public void onSkipInProcess(Order order, Throwable t) {
-        log.warn("Skipped order during processing: orderId={}, error={}", 
-                 order != null ? order.getId() : "unknown", t.getMessage());
-        
+        log.warn("Skipped order during processing: orderId={}, error={}",
+                order != null ? order.getId() : "unknown", t.getMessage());
+
         if (order != null) {
             writeToDeadLetterFile(order, t);
         }
@@ -40,23 +42,25 @@ public class OrderSkipListener implements SkipListener<Order, Object> {
     private void writeToDeadLetterFile(Order order, Throwable t) {
         try {
             File rejectedDir = new File(REJECTED_DIR);
-            if (!rejectedDir.exists()) {
-                rejectedDir.mkdirs();
+            if (!rejectedDir.exists() && !rejectedDir.mkdirs()) {
+                log.error("Failed to create directory: {}", REJECTED_DIR);
+                return;
             }
 
-            String fileName = String.format("rejected_orders_%s.log", 
-                                          LocalDateTime.now().format(FILE_DATE_FORMATTER));
+            String fileName = String.format("rejected_orders_%s.log",
+                    LocalDateTime.now().format(FILE_DATE_FORMATTER));
             File deadLetterFile = new File(rejectedDir, fileName);
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(deadLetterFile, true))) {
+            try (BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(deadLetterFile, true), StandardCharsets.UTF_8))) {
                 writer.write(String.format("[%s] OrderId: %s, Error: %s, Details: %s%n",
-                                         LocalDateTime.now(),
-                                         order.getId(),
-                                         t.getClass().getSimpleName(),
-                                         t.getMessage()));
+                        LocalDateTime.now(),
+                        order.getId(),
+                        t.getClass().getSimpleName(),
+                        t.getMessage()));
             }
 
-            log.info("Written rejected order {} to dead letter file: {}", 
+            log.info("Written rejected order {} to dead letter file: {}",
                     order.getId(), deadLetterFile.getAbsolutePath());
 
         } catch (IOException e) {
