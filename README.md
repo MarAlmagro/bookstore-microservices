@@ -11,11 +11,12 @@ Portfolio project demonstrating real-world microservices architecture using **Ja
 
 - [Architecture Overview](#architecture-overview)
 - [Quick Start](#quick-start)
-- [Testing](#testing)
-- [API Endpoints](#api-endpoints)
-- [Documentation](#documentation)
-- [Troubleshooting](#troubleshooting)
-- [Project Status](#project-status)
+- [x] [Security Audit & Hardening](SECURITY.md)
+- [x] [Testing](#testing)
+- [x] [API Endpoints](#api-endpoints)
+- [x] [Documentation](#documentation)
+- [x] [Troubleshooting](#troubleshooting)
+- [x] [Project Status](#project-status)
 
 ---
 
@@ -543,6 +544,11 @@ See `.env.example` for complete list.
 - [x] Chaos engineering tests
 - [x] Swagger/OpenAPI documentation
 - [x] Comprehensive documentation
+- [x] **Security Audit & Hardening (NVD Verified)**
+  - [x] SnakeYAML 2.x upgrade (0 CVEs)
+  - [x] Tomcat 9.0.x hardening
+  - [x] Dependency-Check Maven integration
+  - [x] [SECURITY.md](SECURITY.md) documentation
 
 ### 🔄 Future Enhancements
 - [ ] Message Queue (RabbitMQ/Kafka)
