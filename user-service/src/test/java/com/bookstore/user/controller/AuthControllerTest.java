@@ -1,6 +1,5 @@
 package com.bookstore.user.controller;
 
-import com.bookstore.common.constants.UserRole;
 import com.bookstore.common.dto.AuthRequestDto;
 import com.bookstore.common.dto.AuthResponseDto;
 import com.bookstore.common.dto.UserDto;
@@ -31,84 +30,84 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private AuthService authService;
+        @MockBean
+        private AuthService authService;
 
-    private AuthResponseDto authResponse;
-    private UserDto userDto;
+        private AuthResponseDto authResponse;
+        private UserDto userDto;
 
-    @BeforeEach
-    void setUp() {
-        userDto = UserDto.builder()
-                .id(1L)
-                .email("test@example.com")
-                .firstName("John")
-                .lastName("Doe")
-                .role("CUSTOMER")
-                .build();
+        @BeforeEach
+        void setUp() {
+                userDto = UserDto.builder()
+                                .id(1L)
+                                .email("test@example.com")
+                                .firstName("John")
+                                .lastName("Doe")
+                                .role("CUSTOMER")
+                                .build();
 
-        authResponse = AuthResponseDto.builder()
-                .token("accessToken")
-                .refreshToken("refreshToken")
-                .user(userDto)
-                .build();
-    }
+                authResponse = AuthResponseDto.builder()
+                                .token("accessToken")
+                                .refreshToken("refreshToken")
+                                .user(userDto)
+                                .build();
+        }
 
-    @Test
-    void register_Success() throws Exception {
-        Map<String, Object> registerRequest = new HashMap<>();
-        registerRequest.put("email", "test@example.com");
-        registerRequest.put("password", "password123");
-        registerRequest.put("firstName", "John");
-        registerRequest.put("lastName", "Doe");
+        @Test
+        void register_Success() throws Exception {
+                Map<String, Object> registerRequest = new HashMap<>();
+                registerRequest.put("email", "test@example.com");
+                registerRequest.put("password", "password123");
+                registerRequest.put("firstName", "John");
+                registerRequest.put("lastName", "Doe");
 
-        when(authService.register(any(UserDto.class), anyString())).thenReturn(authResponse);
+                when(authService.register(any(UserDto.class), anyString())).thenReturn(authResponse);
 
-        mockMvc.perform(post("/api/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token").value("accessToken"))
-                .andExpect(jsonPath("$.refreshToken").value("refreshToken"))
-                .andExpect(jsonPath("$.user.email").value("test@example.com"));
-    }
+                mockMvc.perform(post("/api/v1/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(registerRequest)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.token").value("accessToken"))
+                                .andExpect(jsonPath("$.refreshToken").value("refreshToken"))
+                                .andExpect(jsonPath("$.user.email").value("test@example.com"));
+        }
 
-    @Test
-    void login_Success() throws Exception {
-        AuthRequestDto loginRequest = AuthRequestDto.builder()
-                .email("test@example.com")
-                .password("password123")
-                .build();
+        @Test
+        void login_Success() throws Exception {
+                AuthRequestDto loginRequest = AuthRequestDto.builder()
+                                .email("test@example.com")
+                                .password("password123")
+                                .build();
 
-        when(authService.login(any(AuthRequestDto.class))).thenReturn(authResponse);
+                when(authService.login(any(AuthRequestDto.class))).thenReturn(authResponse);
 
-        mockMvc.perform(post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("accessToken"))
-                .andExpect(jsonPath("$.refreshToken").value("refreshToken"))
-                .andExpect(jsonPath("$.user.email").value("test@example.com"));
-    }
+                mockMvc.perform(post("/api/v1/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(loginRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.token").value("accessToken"))
+                                .andExpect(jsonPath("$.refreshToken").value("refreshToken"))
+                                .andExpect(jsonPath("$.user.email").value("test@example.com"));
+        }
 
-    @Test
-    void refreshToken_Success() throws Exception {
-        Map<String, String> refreshRequest = new HashMap<>();
-        refreshRequest.put("refreshToken", "validRefreshToken");
+        @Test
+        void refreshToken_Success() throws Exception {
+                Map<String, String> refreshRequest = new HashMap<>();
+                refreshRequest.put("refreshToken", "validRefreshToken");
 
-        when(authService.refreshToken(anyString())).thenReturn(authResponse);
+                when(authService.refreshToken(anyString())).thenReturn(authResponse);
 
-        mockMvc.perform(post("/api/v1/auth/refresh")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(refreshRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("accessToken"))
-                .andExpect(jsonPath("$.refreshToken").value("refreshToken"));
-    }
+                mockMvc.perform(post("/api/v1/auth/refresh")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(refreshRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.token").value("accessToken"))
+                                .andExpect(jsonPath("$.refreshToken").value("refreshToken"));
+        }
 }

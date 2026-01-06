@@ -11,16 +11,19 @@
 - [/] Preparation Phase
     - [x] Configure parent `pom.xml` with atomized profiles
     - [x] Set up JaCoCo, Checkstyle, SpotBugs, and OWASP Dependency-Check
-- [/] Sonar Integration
+- [x] Sonar Integration
     - [x] Add Sonar Maven Plugin
     - [x] Create `docker-compose.quality.yml` for local SonarQube
 - [x] Workflow Creation
     - [x] Create `.agent/workflows/check-quality.md`
-- [/] Verification Phase
+- [x] Verification Phase
     - [x] Run quality checks and address immediate warnings
         - [x] `shared-common`
             - [x] Fix SpotBugs `EI_EXPOSE_REP2` in DTOs
             - [x] Fix Checkstyle naming (`*DTO` -> `*Dto`)
             - [x] Fix Checkstyle indentation (core files)
+        - [x] `user-service`
+        - [x] `order-service`
+        - [x] `catalog-service`
     - [x] Commit changes with atomic messages
-    - [ ] Generate reports and final summary
+    - [x] Generate reports and final summary

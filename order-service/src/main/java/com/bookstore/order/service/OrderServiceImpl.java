@@ -8,7 +8,6 @@ import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.order.client.CatalogClient;
 import com.bookstore.order.document.Order;
-import com.bookstore.order.document.OrderItem;
 import com.bookstore.order.mapper.OrderMapper;
 import com.bookstore.order.repository.OrderRepository;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
@@ -121,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderItemDto item : orderDto.getItems()) {
             BookDto book = fetchBookFromCatalog(item.getBookId());
-            
+
             if (book.getStock() < item.getQuantity()) {
                 throw new InvalidRequestException(
                         String.format("Insufficient stock for book: %s. Available: %d, Requested: %d",
@@ -140,13 +139,13 @@ public class OrderServiceImpl implements OrderService {
     private BookDto fetchBookFromCatalog(Long bookId) {
         try {
             log.debug("Fetching book from catalog service with id: {}", bookId);
-            
+
             BookDto book = catalogClient.getBookById(bookId);
-            
+
             if (book == null) {
                 throw new ResourceNotFoundException("Book not found with id: " + bookId);
             }
-            
+
             return book;
         } catch (Exception e) {
             log.error("Error fetching book from catalog service: {}", e.getMessage());

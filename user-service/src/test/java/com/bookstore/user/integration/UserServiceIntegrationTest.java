@@ -1,6 +1,5 @@
 package com.bookstore.user.integration;
 
-import com.bookstore.common.constants.UserRole;
 import com.bookstore.common.dto.AuthRequestDto;
 import com.bookstore.common.dto.AuthResponseDto;
 import com.bookstore.common.dto.UserDto;

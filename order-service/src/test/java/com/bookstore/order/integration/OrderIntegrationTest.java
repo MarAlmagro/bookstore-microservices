@@ -1,6 +1,5 @@
 package com.bookstore.order.integration;
 
-import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.common.dto.BookDto;
 import com.bookstore.common.dto.OrderDto;
 import com.bookstore.common.dto.OrderItemDto;
@@ -33,148 +32,148 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class OrderIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Autowired
-    private OrderRepository orderRepository;
+        @Autowired
+        private OrderRepository orderRepository;
 
-    @MockBean
-    private CatalogClient catalogClient;
+        @MockBean
+        private CatalogClient catalogClient;
 
-    private BookDto testBook;
-    private OrderDto testOrderDto;
+        private BookDto testBook;
+        private OrderDto testOrderDto;
 
-    @BeforeEach
-    void setUp() {
-        orderRepository.deleteAll();
+        @BeforeEach
+        void setUp() {
+                orderRepository.deleteAll();
 
-        testBook = BookDto.builder()
-                .id(1L)
-                .isbn("9780134685991")
-                .title("Effective Java")
-                .author("Joshua Bloch")
-                .price(new BigDecimal("45.99"))
-                .stock(100)
-                .category("Programming")
-                .build();
+                testBook = BookDto.builder()
+                                .id(1L)
+                                .isbn("9780134685991")
+                                .title("Effective Java")
+                                .author("Joshua Bloch")
+                                .price(new BigDecimal("45.99"))
+                                .stock(100)
+                                .category("Programming")
+                                .build();
 
-        OrderItemDto orderItemDto = OrderItemDto.builder()
-                .bookId(1L)
-                .quantity(2)
-                .build();
+                OrderItemDto orderItemDto = OrderItemDto.builder()
+                                .bookId(1L)
+                                .quantity(2)
+                                .build();
 
-        testOrderDto = OrderDto.builder()
-                .userId(1L)
-                .items(Arrays.asList(orderItemDto))
-                .build();
-    }
+                testOrderDto = OrderDto.builder()
+                                .userId(1L)
+                                .items(Arrays.asList(orderItemDto))
+                                .build();
+        }
 
-    @AfterEach
-    void tearDown() {
-        orderRepository.deleteAll();
-    }
+        @AfterEach
+        void tearDown() {
+                orderRepository.deleteAll();
+        }
 
-    @Test
-    void shouldCreateAndRetrieveOrderSuccessfully() throws Exception {
-        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
+        @Test
+        void shouldCreateAndRetrieveOrderSuccessfully() throws Exception {
+                when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-        String response = mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value(1))
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.totalAmount").value(91.98))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                String response = mockMvc.perform(post("/api/v1/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderDto)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.userId").value(1))
+                                .andExpect(jsonPath("$.status").value("PENDING"))
+                                .andExpect(jsonPath("$.totalAmount").value(91.98))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
 
-        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
+                OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-        mockMvc.perform(get("/api/v1/orders/" + createdOrder.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(createdOrder.getId()))
-                .andExpect(jsonPath("$.userId").value(1));
-    }
+                mockMvc.perform(get("/api/v1/orders/" + createdOrder.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(createdOrder.getId()))
+                                .andExpect(jsonPath("$.userId").value(1));
+        }
 
-    @Test
-    void shouldGetUserOrdersSuccessfully() throws Exception {
-        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
+        @Test
+        void shouldGetUserOrdersSuccessfully() throws Exception {
+                when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-        mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDto)))
-                .andExpect(status().isCreated());
+                mockMvc.perform(post("/api/v1/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderDto)))
+                                .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/v1/orders/user/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].userId").value(1));
-    }
+                mockMvc.perform(get("/api/v1/orders/user/1"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", hasSize(1)))
+                                .andExpect(jsonPath("$[0].userId").value(1));
+        }
 
-    @Test
-    void shouldUpdateOrderStatusSuccessfully() throws Exception {
-        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
+        @Test
+        void shouldUpdateOrderStatusSuccessfully() throws Exception {
+                when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-        String response = mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDto)))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                String response = mockMvc.perform(post("/api/v1/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderDto)))
+                                .andExpect(status().isCreated())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
 
-        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
+                OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-        mockMvc.perform(put("/api/v1/orders/" + createdOrder.getId() + "/status")
-                        .param("status", "CONFIRMED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CONFIRMED"));
-    }
+                mockMvc.perform(put("/api/v1/orders/" + createdOrder.getId() + "/status")
+                                .param("status", "CONFIRMED"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.status").value("CONFIRMED"));
+        }
 
-    @Test
-    void shouldDeleteOrderSuccessfully() throws Exception {
-        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
+        @Test
+        void shouldDeleteOrderSuccessfully() throws Exception {
+                when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-        String response = mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDto)))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                String response = mockMvc.perform(post("/api/v1/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderDto)))
+                                .andExpect(status().isCreated())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
 
-        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
+                OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-        mockMvc.perform(delete("/api/v1/orders/" + createdOrder.getId()))
-                .andExpect(status().isNoContent());
+                mockMvc.perform(delete("/api/v1/orders/" + createdOrder.getId()))
+                                .andExpect(status().isNoContent());
 
-        List<Order> orders = orderRepository.findAll();
-        assertEquals(0, orders.size());
-    }
+                List<Order> orders = orderRepository.findAll();
+                assertEquals(0, orders.size());
+        }
 
-    @Test
-    void shouldGetOrdersByStatusSuccessfully() throws Exception {
-        when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
+        @Test
+        void shouldGetOrdersByStatusSuccessfully() throws Exception {
+                when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-        mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDto)))
-                .andExpect(status().isCreated());
+                mockMvc.perform(post("/api/v1/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderDto)))
+                                .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/v1/orders/status/PENDING"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].status").value("PENDING"));
-    }
+                mockMvc.perform(get("/api/v1/orders/status/PENDING"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", hasSize(1)))
+                                .andExpect(jsonPath("$[0].status").value("PENDING"));
+        }
 
-    @Test
-    void shouldReturnNotFoundForNonExistentOrder() throws Exception {
-        mockMvc.perform(get("/api/v1/orders/nonexistent"))
-                .andExpect(status().isNotFound());
-    }
+        @Test
+        void shouldReturnNotFoundForNonExistentOrder() throws Exception {
+                mockMvc.perform(get("/api/v1/orders/nonexistent"))
+                                .andExpect(status().isNotFound());
+        }
 }

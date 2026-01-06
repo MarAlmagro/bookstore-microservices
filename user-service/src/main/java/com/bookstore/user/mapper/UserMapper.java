@@ -1,5 +1,6 @@
 package com.bookstore.user.mapper;
 
+import com.bookstore.common.constants.UserRole;
 import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.entity.User;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class UserMapper {
                 .email(dto.getEmail())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
-                .role(dto.getRole() != null ? com.bookstore.common.constants.UserRole.valueOf(dto.getRole()) : null)
+                .role(dto.getRole() != null ? UserRole.valueOf(dto.getRole()) : null)
                 .build();
     }
 }

@@ -22,7 +22,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -57,12 +56,10 @@ class BookServiceTest {
         // Arrange
         List<Book> books = Arrays.asList(
                 BookTestFixtures.createSampleBook(),
-                BookTestFixtures.createSecondSampleBook()
-        );
+                BookTestFixtures.createSecondSampleBook());
         List<BookDto> bookDtos = Arrays.asList(
                 BookTestFixtures.createSampleBookDto(),
-                BookTestFixtures.createSampleBookDto()
-        );
+                BookTestFixtures.createSampleBookDto());
 
         when(bookRepository.findAll()).thenReturn(books);
         when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
@@ -229,7 +226,7 @@ class BookServiceTest {
         // Arrange
         Long bookId = 1L;
         BookDto updateDto = BookTestFixtures.createUpdateBookDto();
-        updateDto.setIsbn("978-9999999999");  // Different ISBN
+        updateDto.setIsbn("978-9999999999"); // Different ISBN
         Book existingBook = BookTestFixtures.createSampleBook();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));

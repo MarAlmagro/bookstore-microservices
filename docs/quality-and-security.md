@@ -30,6 +30,16 @@ mvn spotbugs:check -Pspotbugs
 mvn dependency-check:check -Psecurity
 ```
 
+### Note on Security Scans (NVD API)
+The `dependency-check` tool requires access to the National Vulnerability Database (NVD). Due to strict rate limiting, it is **highly recommended** to use an NVD API Key:
+
+1. Request a free API Key at [nvd.nist.gov](https://nvd.nist.gov/developers/api-key-request).
+2. Once you have the key, run the scan using:
+   ```bash
+   mvn dependency-check:check -Psecurity -DnvdApiKey=YOUR_API_KEY
+   ```
+   Alternatively, you can set `nvdApiKey` in your `pom.xml` properties or as an environment variable.
+
 ### Run SonarQube Locally
 1. Start the SonarQube environment:
    ```bash

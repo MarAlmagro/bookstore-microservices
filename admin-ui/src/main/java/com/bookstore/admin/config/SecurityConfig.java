@@ -4,35 +4,37 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
+                .csrf().disable()
+                .authorizeRequests()
                 .antMatchers("/admin/login", "/admin/css/**", "/admin/js/**", "/admin/images/**").permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .formLogin()
+                .and()
+                .formLogin()
                 .loginPage("/admin/login")
                 .loginProcessingUrl("/admin/login")
                 .defaultSuccessUrl("/admin/dashboard", true)
                 .failureUrl("/admin/login?error=true")
                 .permitAll()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/admin/login?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("ADMIN_SESSION")
                 .permitAll();
+
+        return http.build();
     }
 
     @Bean
