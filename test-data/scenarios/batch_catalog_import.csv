@@ -1,0 +1,11 @@
+isbn,title,author,description,price,stock,category
+978-0-13-468599-1,Effective Java,Joshua Bloch,A comprehensive guide to Java best practices,45.99,100,PROGRAMMING
+978-0-13-235088-4,Clean Code,Robert C. Martin,A handbook of agile software craftsmanship,42.50,150,PROGRAMMING
+978-0-13-468599-2,Design Patterns,Gang of Four,Elements of reusable object-oriented software,54.99,75,PROGRAMMING
+978-0-13-468599-3,The Pragmatic Programmer,Andrew Hunt,Your journey to mastery,39.99,120,PROGRAMMING
+978-0-13-468599-4,Introduction to Algorithms,Thomas H. Cormen,A comprehensive introduction to algorithms,89.99,50,COMPUTER_SCIENCE
+978-0-13-468599-5,The Art of Computer Programming,Donald Knuth,Fundamental algorithms volume 1,79.99,30,COMPUTER_SCIENCE
+978-0-13-468599-6,Structure and Interpretation,Harold Abelson,Computer programs interpretation,65.99,60,COMPUTER_SCIENCE
+978-0-13-468599-7,Code Complete,Steve McConnell,A practical handbook of software construction,49.99,90,PROGRAMMING
+978-0-13-468599-8,Refactoring,Martin Fowler,Improving the design of existing code,44.99,110,PROGRAMMING
+978-0-13-468599-9,Head First Design Patterns,Eric Freeman,A brain-friendly guide to design patterns,39.99,140,PROGRAMMING
