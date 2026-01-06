@@ -11,7 +11,8 @@ import javax.validation.constraints.Size;
 
 /**
  * Data Transfer Object for User information.
- * Used for transferring user profile data (without sensitive information like password).
+ * Used for transferring user profile data (without sensitive information like
+ * password).
  */
 @Data
 @Builder
