@@ -154,7 +154,7 @@ This project implements a **polyglot persistence microservices architecture** wi
 ```
 bookstore-microservices/
 ├── pom.xml                          # Parent POM with Spring Cloud
-├── shared-common/                   # Shared DTOs, exceptions, constants
+├── shared-common/                   # Shared Dtos, exceptions, constants
 ├── eureka-server/                   # Service discovery server
 ├── api-gateway/                     # API Gateway (entry point)
 ├── catalog-service/                 # Book catalog microservice
@@ -520,7 +520,7 @@ See `.env.example` for complete list.
 
 ### ✅ Completed
 - [x] Parent POM configuration with Spring Cloud
-- [x] Shared common module (DTOs, exceptions, constants)
+- [x] Shared common module (Dtos, exceptions, constants)
 - [x] Catalog service implementation
 - [x] Order service implementation
 - [x] User service with JWT authentication

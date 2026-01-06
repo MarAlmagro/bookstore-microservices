@@ -1,9 +1,9 @@
 package com.bookstore.order.service;
 
 import com.bookstore.common.constants.OrderStatus;
-import com.bookstore.common.dto.BookDTO;
-import com.bookstore.common.dto.OrderDTO;
-import com.bookstore.common.dto.OrderItemDTO;
+import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.OrderItemDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.order.client.CatalogClient;
@@ -31,24 +31,24 @@ public class OrderServiceImpl implements OrderService {
     private final CatalogClient catalogClient;
 
     @Override
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        log.debug("Creating new order for user: {}", orderDTO.getUserId());
+    public OrderDto createOrder(OrderDto orderDto) {
+        log.debug("Creating new order for user: {}", orderDto.getUserId());
 
-        validateAndEnrichOrderItems(orderDTO);
+        validateAndEnrichOrderItems(orderDto);
 
-        BigDecimal totalAmount = calculateTotalAmount(orderDTO.getItems());
-        orderDTO.setTotalAmount(totalAmount);
-        orderDTO.setStatus(OrderStatus.PENDING.name());
+        BigDecimal totalAmount = calculateTotalAmount(orderDto.getItems());
+        orderDto.setTotalAmount(totalAmount);
+        orderDto.setStatus(OrderStatus.PENDING.name());
 
-        Order order = orderMapper.toDocument(orderDTO);
+        Order order = orderMapper.toDocument(orderDto);
         Order savedOrder = orderRepository.save(order);
 
         log.info("Created order with id: {} for user: {}", savedOrder.getId(), savedOrder.getUserId());
-        return orderMapper.toDTO(savedOrder);
+        return orderMapper.toDto(savedOrder);
     }
 
     @Override
-    public OrderDTO getOrderById(String id) {
+    public OrderDto getOrderById(String id) {
         log.debug("Fetching order with id: {}", id);
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> {
@@ -56,27 +56,27 @@ public class OrderServiceImpl implements OrderService {
                     return new ResourceNotFoundException("Order not found with id: " + id);
                 });
         log.info("Found order: {}", order.getId());
-        return orderMapper.toDTO(order);
+        return orderMapper.toDto(order);
     }
 
     @Override
-    public List<OrderDTO> getUserOrders(Long userId) {
+    public List<OrderDto> getUserOrders(Long userId) {
         log.debug("Fetching orders for user: {}", userId);
         List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
         log.info("Found {} orders for user: {}", orders.size(), userId);
-        return orderMapper.toDTOList(orders);
+        return orderMapper.toDtoList(orders);
     }
 
     @Override
-    public List<OrderDTO> getOrdersByStatus(OrderStatus status) {
+    public List<OrderDto> getOrdersByStatus(OrderStatus status) {
         log.debug("Fetching orders with status: {}", status);
         List<Order> orders = orderRepository.findByStatus(status);
         log.info("Found {} orders with status: {}", orders.size(), status);
-        return orderMapper.toDTOList(orders);
+        return orderMapper.toDtoList(orders);
     }
 
     @Override
-    public OrderDTO updateOrderStatus(String id, OrderStatus status) {
+    public OrderDto updateOrderStatus(String id, OrderStatus status) {
         log.debug("Updating order {} status to: {}", id, status);
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> {
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
         log.info("Updated order {} status to: {}", id, status);
-        return orderMapper.toDTO(updatedOrder);
+        return orderMapper.toDto(updatedOrder);
     }
 
     @Override
@@ -102,11 +102,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderDto> getAllOrders() {
         log.debug("Fetching all orders");
         List<Order> orders = orderRepository.findAll();
         log.info("Found {} total orders", orders.size());
-        return orderMapper.toDTOList(orders);
+        return orderMapper.toDtoList(orders);
     }
 
     @Override
@@ -114,13 +114,13 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.existsByIdAndUserId(orderId, userId);
     }
 
-    private void validateAndEnrichOrderItems(OrderDTO orderDTO) {
-        if (orderDTO.getItems() == null || orderDTO.getItems().isEmpty()) {
+    private void validateAndEnrichOrderItems(OrderDto orderDto) {
+        if (orderDto.getItems() == null || orderDto.getItems().isEmpty()) {
             throw new InvalidRequestException("Order must contain at least one item");
         }
 
-        for (OrderItemDTO item : orderDTO.getItems()) {
-            BookDTO book = fetchBookFromCatalog(item.getBookId());
+        for (OrderItemDto item : orderDto.getItems()) {
+            BookDto book = fetchBookFromCatalog(item.getBookId());
             
             if (book.getStock() < item.getQuantity()) {
                 throw new InvalidRequestException(
@@ -137,11 +137,11 @@ public class OrderServiceImpl implements OrderService {
     @CircuitBreaker(name = "catalogService")
     @Retry(name = "catalogService")
     @Bulkhead(name = "catalogService")
-    private BookDTO fetchBookFromCatalog(Long bookId) {
+    private BookDto fetchBookFromCatalog(Long bookId) {
         try {
             log.debug("Fetching book from catalog service with id: {}", bookId);
             
-            BookDTO book = catalogClient.getBookById(bookId);
+            BookDto book = catalogClient.getBookById(bookId);
             
             if (book == null) {
                 throw new ResourceNotFoundException("Book not found with id: " + bookId);
@@ -154,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private BigDecimal calculateTotalAmount(List<OrderItemDTO> items) {
+    private BigDecimal calculateTotalAmount(List<OrderItemDto> items) {
         return items.stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

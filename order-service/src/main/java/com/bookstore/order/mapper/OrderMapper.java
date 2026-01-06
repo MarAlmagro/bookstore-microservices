@@ -1,7 +1,7 @@
 package com.bookstore.order.mapper;
 
-import com.bookstore.common.dto.OrderDTO;
-import com.bookstore.common.dto.OrderItemDTO;
+import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.OrderItemDto;
 import com.bookstore.order.document.Order;
 import com.bookstore.order.document.OrderItem;
 import org.modelmapper.ModelMapper;
@@ -19,24 +19,24 @@ public class OrderMapper {
         this.modelMapper = new ModelMapper();
     }
 
-    public OrderDTO toDTO(Order order) {
+    public OrderDto toDto(Order order) {
         if (order == null) {
             return null;
         }
         
-        OrderDTO dto = modelMapper.map(order, OrderDTO.class);
+        OrderDto dto = modelMapper.map(order, OrderDto.class);
         
         if (order.getItems() != null) {
-            List<OrderItemDTO> itemDTOs = order.getItems().stream()
-                    .map(this::toItemDTO)
+            List<OrderItemDto> itemDtos = order.getItems().stream()
+                    .map(this::toItemDto)
                     .collect(Collectors.toList());
-            dto.setItems(itemDTOs);
+            dto.setItems(itemDtos);
         }
         
         return dto;
     }
 
-    public Order toDocument(OrderDTO dto) {
+    public Order toDocument(OrderDto dto) {
         if (dto == null) {
             return null;
         }
@@ -53,17 +53,17 @@ public class OrderMapper {
         return order;
     }
 
-    public OrderItemDTO toItemDTO(OrderItem item) {
-        return modelMapper.map(item, OrderItemDTO.class);
+    public OrderItemDto toItemDto(OrderItem item) {
+        return modelMapper.map(item, OrderItemDto.class);
     }
 
-    public OrderItem toItemDocument(OrderItemDTO dto) {
+    public OrderItem toItemDocument(OrderItemDto dto) {
         return modelMapper.map(dto, OrderItem.class);
     }
 
-    public List<OrderDTO> toDTOList(List<Order> orders) {
+    public List<OrderDto> toDtoList(List<Order> orders) {
         return orders.stream()
-                .map(this::toDTO)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 }

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItemDTO {
+public class OrderItemDto {
 
     /**
      * Identifier of the book being ordered.

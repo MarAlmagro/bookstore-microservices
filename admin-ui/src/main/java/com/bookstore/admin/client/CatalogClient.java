@@ -1,6 +1,6 @@
 package com.bookstore.admin.client;
 
-import com.bookstore.admin.dto.BookDTO;
+import com.bookstore.admin.dto.BookDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,20 +10,20 @@ import java.util.List;
 public interface CatalogClient {
 
     @GetMapping
-    List<BookDTO> getAllBooks();
+    List<BookDto> getAllBooks();
 
     @GetMapping("/{id}")
-    BookDTO getBookById(@PathVariable("id") Long id);
+    BookDto getBookById(@PathVariable("id") Long id);
 
     @PostMapping
-    BookDTO createBook(@RequestBody BookDTO book);
+    BookDto createBook(@RequestBody BookDto book);
 
     @PutMapping("/{id}")
-    BookDTO updateBook(@PathVariable("id") Long id, @RequestBody BookDTO book);
+    BookDto updateBook(@PathVariable("id") Long id, @RequestBody BookDto book);
 
     @DeleteMapping("/{id}")
     void deleteBook(@PathVariable("id") Long id);
 
     @GetMapping("/search")
-    List<BookDTO> searchBooks(@RequestParam("query") String query);
+    List<BookDto> searchBooks(@RequestParam("query") String query);
 }

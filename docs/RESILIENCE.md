@@ -95,7 +95,7 @@ resilience4j:
 @FeignClient(name = "catalog-service", fallback = CatalogClientFallback.class)
 public interface CatalogClient {
     @GetMapping("/api/v1/books/{id}")
-    BookDTO getBookById(@PathVariable("id") Long id);
+    BookDto getBookById(@PathVariable("id") Long id);
 }
 ```
 
@@ -109,7 +109,7 @@ When the circuit breaker is OPEN or calls fail, the fallback returns a user-frie
 @Component
 public class CatalogClientFallback implements CatalogClient {
     @Override
-    public BookDTO getBookById(Long id) {
+    public BookDto getBookById(Long id) {
         log.error("Catalog service is unavailable. Circuit breaker activated for book id: {}", id);
         throw new InvalidRequestException("Catalog service is temporarily unavailable. Please try again later.");
     }
@@ -124,7 +124,7 @@ public class CatalogClientFallback implements CatalogClient {
 @CircuitBreaker(name = "catalogService")
 @Retry(name = "catalogService")
 @Bulkhead(name = "catalogService")
-private BookDTO fetchBookFromCatalog(Long bookId) {
+private BookDto fetchBookFromCatalog(Long bookId) {
     // Feign client call with resilience patterns applied
 }
 ```

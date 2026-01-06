@@ -1,9 +1,9 @@
 package com.bookstore.user.integration;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.repository.UserRepository;
 import com.bookstore.user.service.AuthService;
@@ -32,14 +32,14 @@ class UserServiceIntegrationTest {
 
     @Test
     void fullAuthenticationFlow_Success() {
-        UserDTO registerDTO = UserDTO.builder()
+        UserDto registerDto = UserDto.builder()
                 .email("integration@test.com")
                 .firstName("Integration")
                 .lastName("Test")
                 .role("CUSTOMER")
                 .build();
 
-        AuthResponseDTO registerResponse = authService.register(registerDTO, "password123");
+        AuthResponseDto registerResponse = authService.register(registerDto, "password123");
         assertNotNull(registerResponse);
         assertNotNull(registerResponse.getToken());
         assertNotNull(registerResponse.getRefreshToken());
@@ -50,12 +50,12 @@ class UserServiceIntegrationTest {
         assertEquals("Integration", savedUser.getFirstName());
         assertTrue(savedUser.getEnabled());
 
-        AuthRequestDTO loginRequest = AuthRequestDTO.builder()
+        AuthRequestDto loginRequest = AuthRequestDto.builder()
                 .email("integration@test.com")
                 .password("password123")
                 .build();
 
-        AuthResponseDTO loginResponse = authService.login(loginRequest);
+        AuthResponseDto loginResponse = authService.login(loginRequest);
         assertNotNull(loginResponse);
         assertNotNull(loginResponse.getToken());
         assertEquals("integration@test.com", loginResponse.getUser().getEmail());
@@ -66,7 +66,7 @@ class UserServiceIntegrationTest {
             Thread.currentThread().interrupt();
         }
 
-        AuthResponseDTO refreshResponse = authService.refreshToken(loginResponse.getRefreshToken());
+        AuthResponseDto refreshResponse = authService.refreshToken(loginResponse.getRefreshToken());
         assertNotNull(refreshResponse);
         assertNotNull(refreshResponse.getToken());
         assertNotEquals(loginResponse.getToken(), refreshResponse.getToken());
@@ -74,20 +74,20 @@ class UserServiceIntegrationTest {
 
     @Test
     void register_DuplicateEmail_ThrowsException() {
-        UserDTO userDTO = UserDTO.builder()
+        UserDto userDto = UserDto.builder()
                 .email("duplicate@test.com")
                 .firstName("First")
                 .lastName("User")
                 .build();
 
-        authService.register(userDTO, "password123");
+        authService.register(userDto, "password123");
 
-        UserDTO duplicateDTO = UserDTO.builder()
+        UserDto duplicateDto = UserDto.builder()
                 .email("duplicate@test.com")
                 .firstName("Second")
                 .lastName("User")
                 .build();
 
-        assertThrows(Exception.class, () -> authService.register(duplicateDTO, "password123"));
+        assertThrows(Exception.class, () -> authService.register(duplicateDto, "password123"));
     }
 }

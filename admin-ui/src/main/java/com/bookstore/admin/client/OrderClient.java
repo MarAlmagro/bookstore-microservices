@@ -1,6 +1,6 @@
 package com.bookstore.admin.client;
 
-import com.bookstore.admin.dto.OrderDTO;
+import com.bookstore.admin.dto.OrderDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,14 +10,14 @@ import java.util.List;
 public interface OrderClient {
 
     @GetMapping
-    List<OrderDTO> getAllOrders();
+    List<OrderDto> getAllOrders();
 
     @GetMapping("/{id}")
-    OrderDTO getOrderById(@PathVariable("id") String id);
+    OrderDto getOrderById(@PathVariable("id") String id);
 
     @GetMapping("/user/{userId}")
-    List<OrderDTO> getOrdersByUserId(@PathVariable("userId") Long userId);
+    List<OrderDto> getOrdersByUserId(@PathVariable("userId") Long userId);
 
     @PutMapping("/{id}/status")
-    OrderDTO updateOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status);
+    OrderDto updateOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status);
 }

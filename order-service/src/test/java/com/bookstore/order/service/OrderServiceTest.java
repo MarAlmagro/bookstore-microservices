@@ -1,9 +1,9 @@
 package com.bookstore.order.service;
 
 import com.bookstore.common.constants.OrderStatus;
-import com.bookstore.common.dto.BookDTO;
-import com.bookstore.common.dto.OrderDTO;
-import com.bookstore.common.dto.OrderItemDTO;
+import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.OrderItemDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.order.client.CatalogClient;
@@ -44,12 +44,12 @@ class OrderServiceTest {
     private OrderServiceImpl orderService;
 
     private Order testOrder;
-    private OrderDTO testOrderDTO;
-    private BookDTO testBook;
+    private OrderDto testOrderDto;
+    private BookDto testBook;
 
     @BeforeEach
     void setUp() {
-        testBook = BookDTO.builder()
+        testBook = BookDto.builder()
                 .id(1L)
                 .isbn("9780134685991")
                 .title("Effective Java")
@@ -76,7 +76,7 @@ class OrderServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        OrderItemDTO orderItemDTO = OrderItemDTO.builder()
+        OrderItemDto orderItemDto = OrderItemDto.builder()
                 .bookId(1L)
                 .quantity(2)
                 .price(new BigDecimal("45.99"))
@@ -84,10 +84,10 @@ class OrderServiceTest {
                 .bookIsbn("9780134685991")
                 .build();
 
-        testOrderDTO = OrderDTO.builder()
+        testOrderDto = OrderDto.builder()
                 .id("order123")
                 .userId(1L)
-                .items(Arrays.asList(orderItemDTO))
+                .items(Arrays.asList(orderItemDto))
                 .totalAmount(new BigDecimal("91.98"))
                 .status(OrderStatus.PENDING.name())
                 .createdAt(LocalDateTime.now())
@@ -97,21 +97,21 @@ class OrderServiceTest {
     @Test
     void shouldCreateOrderSuccessfully() {
         when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
-        when(orderMapper.toDocument(any(OrderDTO.class))).thenReturn(testOrder);
+        when(orderMapper.toDocument(any(OrderDto.class))).thenReturn(testOrder);
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        when(orderMapper.toDTO(any(Order.class))).thenReturn(testOrderDTO);
+        when(orderMapper.toDto(any(Order.class))).thenReturn(testOrderDto);
 
-        OrderDTO result = orderService.createOrder(testOrderDTO);
+        OrderDto result = orderService.createOrder(testOrderDto);
 
         assertNotNull(result);
-        assertEquals(testOrderDTO.getId(), result.getId());
-        assertEquals(testOrderDTO.getUserId(), result.getUserId());
+        assertEquals(testOrderDto.getId(), result.getId());
+        assertEquals(testOrderDto.getUserId(), result.getUserId());
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
     @Test
     void shouldThrowExceptionWhenCreatingOrderWithInsufficientStock() {
-        BookDTO bookWithLowStock = BookDTO.builder()
+        BookDto bookWithLowStock = BookDto.builder()
                 .id(1L)
                 .stock(1)
                 .price(new BigDecimal("45.99"))
@@ -120,16 +120,16 @@ class OrderServiceTest {
 
         when(catalogClient.getBookById(anyLong())).thenReturn(bookWithLowStock);
 
-        assertThrows(InvalidRequestException.class, () -> orderService.createOrder(testOrderDTO));
+        assertThrows(InvalidRequestException.class, () -> orderService.createOrder(testOrderDto));
         verify(orderRepository, never()).save(any(Order.class));
     }
 
     @Test
     void shouldGetOrderByIdSuccessfully() {
         when(orderRepository.findById("order123")).thenReturn(Optional.of(testOrder));
-        when(orderMapper.toDTO(testOrder)).thenReturn(testOrderDTO);
+        when(orderMapper.toDto(testOrder)).thenReturn(testOrderDto);
 
-        OrderDTO result = orderService.getOrderById("order123");
+        OrderDto result = orderService.getOrderById("order123");
 
         assertNotNull(result);
         assertEquals("order123", result.getId());
@@ -147,9 +147,9 @@ class OrderServiceTest {
     void shouldGetUserOrdersSuccessfully() {
         List<Order> orders = Arrays.asList(testOrder);
         when(orderRepository.findByUserIdOrderByCreatedAtDesc(1L)).thenReturn(orders);
-        when(orderMapper.toDTOList(orders)).thenReturn(Arrays.asList(testOrderDTO));
+        when(orderMapper.toDtoList(orders)).thenReturn(Arrays.asList(testOrderDto));
 
-        List<OrderDTO> result = orderService.getUserOrders(1L);
+        List<OrderDto> result = orderService.getUserOrders(1L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -160,9 +160,9 @@ class OrderServiceTest {
     void shouldGetOrdersByStatusSuccessfully() {
         List<Order> orders = Arrays.asList(testOrder);
         when(orderRepository.findByStatus(OrderStatus.PENDING)).thenReturn(orders);
-        when(orderMapper.toDTOList(orders)).thenReturn(Arrays.asList(testOrderDTO));
+        when(orderMapper.toDtoList(orders)).thenReturn(Arrays.asList(testOrderDto));
 
-        List<OrderDTO> result = orderService.getOrdersByStatus(OrderStatus.PENDING);
+        List<OrderDto> result = orderService.getOrdersByStatus(OrderStatus.PENDING);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -173,9 +173,9 @@ class OrderServiceTest {
     void shouldUpdateOrderStatusSuccessfully() {
         when(orderRepository.findById("order123")).thenReturn(Optional.of(testOrder));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        when(orderMapper.toDTO(any(Order.class))).thenReturn(testOrderDTO);
+        when(orderMapper.toDto(any(Order.class))).thenReturn(testOrderDto);
 
-        OrderDTO result = orderService.updateOrderStatus("order123", OrderStatus.CONFIRMED);
+        OrderDto result = orderService.updateOrderStatus("order123", OrderStatus.CONFIRMED);
 
         assertNotNull(result);
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -203,9 +203,9 @@ class OrderServiceTest {
     void shouldGetAllOrdersSuccessfully() {
         List<Order> orders = Arrays.asList(testOrder);
         when(orderRepository.findAll()).thenReturn(orders);
-        when(orderMapper.toDTOList(orders)).thenReturn(Arrays.asList(testOrderDTO));
+        when(orderMapper.toDtoList(orders)).thenReturn(Arrays.asList(testOrderDto));
 
-        List<OrderDTO> result = orderService.getAllOrders();
+        List<OrderDto> result = orderService.getAllOrders();
 
         assertNotNull(result);
         assertEquals(1, result.size());

@@ -11,9 +11,12 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderReportDTO {
-    private Long numericId;
+public class BookImportDto {
+    private String isbn;
+    private String title;
+    private String author;
+    private String description;
+    private BigDecimal price;
+    private Integer stock;
     private String category;
-    private BigDecimal totalAmount;
-    private String formattedDate;
 }

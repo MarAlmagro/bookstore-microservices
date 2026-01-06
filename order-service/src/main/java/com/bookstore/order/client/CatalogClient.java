@@ -1,6 +1,6 @@
 package com.bookstore.order.client;
 
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface CatalogClient {
 
     @GetMapping("/api/v1/books/{id}")
-    BookDTO getBookById(@PathVariable("id") Long id);
+    BookDto getBookById(@PathVariable("id") Long id);
 }

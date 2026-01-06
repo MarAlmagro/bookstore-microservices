@@ -1,9 +1,9 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.UnauthorizedException;
 import com.bookstore.user.entity.User;
@@ -48,12 +48,12 @@ class AuthServiceTest {
     @InjectMocks
     private AuthServiceImpl authService;
 
-    private UserDTO testUserDTO;
+    private UserDto testUserDto;
     private User testUser;
 
     @BeforeEach
     void setUp() {
-        testUserDTO = UserDTO.builder()
+        testUserDto = UserDto.builder()
                 .email("test@example.com")
                 .firstName("John")
                 .lastName("Doe")
@@ -73,36 +73,36 @@ class AuthServiceTest {
 
     @Test
     void register_Success() {
-        when(userRepository.existsByEmail(testUserDTO.getEmail())).thenReturn(false);
+        when(userRepository.existsByEmail(testUserDto.getEmail())).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(tokenProvider.generateTokenFromUsername(testUser.getEmail())).thenReturn("accessToken");
         when(tokenProvider.generateRefreshToken(testUser.getEmail())).thenReturn("refreshToken");
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
-        AuthResponseDTO result = authService.register(testUserDTO, "password123");
+        AuthResponseDto result = authService.register(testUserDto, "password123");
 
         assertNotNull(result);
         assertEquals("accessToken", result.getToken());
         assertEquals("refreshToken", result.getRefreshToken());
         assertNotNull(result.getUser());
-        verify(userRepository).existsByEmail(testUserDTO.getEmail());
+        verify(userRepository).existsByEmail(testUserDto.getEmail());
         verify(userRepository).save(any(User.class));
     }
 
     @Test
     void register_EmailAlreadyExists() {
-        when(userRepository.existsByEmail(testUserDTO.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(testUserDto.getEmail())).thenReturn(true);
 
         assertThrows(InvalidRequestException.class, 
-                () -> authService.register(testUserDTO, "password123"));
-        verify(userRepository).existsByEmail(testUserDTO.getEmail());
+                () -> authService.register(testUserDto, "password123"));
+        verify(userRepository).existsByEmail(testUserDto.getEmail());
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void login_Success() {
-        AuthRequestDTO authRequest = AuthRequestDTO.builder()
+        AuthRequestDto authRequest = AuthRequestDto.builder()
                 .email("test@example.com")
                 .password("password123")
                 .build();
@@ -113,9 +113,9 @@ class AuthServiceTest {
         when(tokenProvider.generateToken(authentication)).thenReturn("accessToken");
         when(tokenProvider.generateRefreshToken(authRequest.getEmail())).thenReturn("refreshToken");
         when(userRepository.findByEmail(authRequest.getEmail())).thenReturn(Optional.of(testUser));
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
-        AuthResponseDTO result = authService.login(authRequest);
+        AuthResponseDto result = authService.login(authRequest);
 
         assertNotNull(result);
         assertEquals("accessToken", result.getToken());
@@ -125,7 +125,7 @@ class AuthServiceTest {
 
     @Test
     void login_InvalidCredentials() {
-        AuthRequestDTO authRequest = AuthRequestDTO.builder()
+        AuthRequestDto authRequest = AuthRequestDto.builder()
                 .email("test@example.com")
                 .password("wrongPassword")
                 .build();
@@ -144,9 +144,9 @@ class AuthServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(tokenProvider.generateTokenFromUsername("test@example.com")).thenReturn("newAccessToken");
         when(tokenProvider.generateRefreshToken("test@example.com")).thenReturn("newRefreshToken");
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
-        AuthResponseDTO result = authService.refreshToken(refreshToken);
+        AuthResponseDto result = authService.refreshToken(refreshToken);
 
         assertNotNull(result);
         assertEquals("newAccessToken", result.getToken());

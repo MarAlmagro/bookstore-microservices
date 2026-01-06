@@ -2,7 +2,7 @@ package com.bookstore.catalog.controller;
 
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.service.BookService;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,20 +45,20 @@ class BookControllerTest {
     @MockBean
     private BookService bookService;
 
-    private BookDTO sampleBookDTO;
+    private BookDto sampleBookDto;
 
     @BeforeEach
     void setUp() {
-        sampleBookDTO = BookTestFixtures.createSampleBookDTO();
+        sampleBookDto = BookTestFixtures.createSampleBookDto();
     }
 
     @Test
     @DisplayName("GET /api/v1/books should return all books")
     void getAllBooks_ShouldReturnBooksList() throws Exception {
         // Arrange
-        List<BookDTO> books = Arrays.asList(
-                sampleBookDTO,
-                BookTestFixtures.createSampleBookDTO()
+        List<BookDto> books = Arrays.asList(
+                sampleBookDto,
+                BookTestFixtures.createSampleBookDto()
         );
         when(bookService.findAll()).thenReturn(books);
 
@@ -92,17 +92,17 @@ class BookControllerTest {
     void getBookById_WhenBookExists_ShouldReturnBook() throws Exception {
         // Arrange
         Long bookId = 1L;
-        when(bookService.findById(bookId)).thenReturn(sampleBookDTO);
+        when(bookService.findById(bookId)).thenReturn(sampleBookDto);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/books/{id}", bookId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(sampleBookDTO.getId().intValue())))
-                .andExpect(jsonPath("$.isbn", is(sampleBookDTO.getIsbn())))
-                .andExpect(jsonPath("$.title", is(sampleBookDTO.getTitle())))
-                .andExpect(jsonPath("$.author", is(sampleBookDTO.getAuthor())));
+                .andExpect(jsonPath("$.id", is(sampleBookDto.getId().intValue())))
+                .andExpect(jsonPath("$.isbn", is(sampleBookDto.getIsbn())))
+                .andExpect(jsonPath("$.title", is(sampleBookDto.getTitle())))
+                .andExpect(jsonPath("$.author", is(sampleBookDto.getAuthor())));
 
         verify(bookService, times(1)).findById(bookId);
     }
@@ -127,13 +127,13 @@ class BookControllerTest {
     void getBookByIsbn_WhenBookExists_ShouldReturnBook() throws Exception {
         // Arrange
         String isbn = "9780134685";
-        when(bookService.findByIsbn(isbn)).thenReturn(sampleBookDTO);
+        when(bookService.findByIsbn(isbn)).thenReturn(sampleBookDto);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/books/isbn/{isbn}", isbn))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isbn", is(isbn)))
-                .andExpect(jsonPath("$.title", is(sampleBookDTO.getTitle())));
+                .andExpect(jsonPath("$.title", is(sampleBookDto.getTitle())));
 
         verify(bookService, times(1)).findByIsbn(isbn);
     }
@@ -142,56 +142,56 @@ class BookControllerTest {
     @DisplayName("POST /api/v1/books should create and return new book")
     void createBook_WithValidData_ShouldReturnCreatedBook() throws Exception {
         // Arrange
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
-        BookDTO createdBookDTO = BookTestFixtures.createNewBookDTO();
-        createdBookDTO.setId(1L);
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
+        BookDto createdBookDto = BookTestFixtures.createNewBookDto();
+        createdBookDto.setId(1L);
 
-        when(bookService.create(any(BookDTO.class))).thenReturn(createdBookDTO);
+        when(bookService.create(any(BookDto.class))).thenReturn(createdBookDto);
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newBookDTO)))
+                        .content(objectMapper.writeValueAsString(newBookDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(createdBookDTO.getId().intValue())))
-                .andExpect(jsonPath("$.isbn", is(newBookDTO.getIsbn())))
-                .andExpect(jsonPath("$.title", is(newBookDTO.getTitle())));
+                .andExpect(jsonPath("$.id", is(createdBookDto.getId().intValue())))
+                .andExpect(jsonPath("$.isbn", is(newBookDto.getIsbn())))
+                .andExpect(jsonPath("$.title", is(newBookDto.getTitle())));
 
-        verify(bookService, times(1)).create(any(BookDTO.class));
+        verify(bookService, times(1)).create(any(BookDto.class));
     }
 
     @Test
     @DisplayName("POST /api/v1/books should return 400 when validation fails")
     void createBook_WithInvalidData_ShouldReturn400() throws Exception {
         // Arrange
-        BookDTO invalidBookDTO = BookTestFixtures.createInvalidBookDTO();
+        BookDto invalidBookDto = BookTestFixtures.createInvalidBookDto();
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidBookDTO)))
+                        .content(objectMapper.writeValueAsString(invalidBookDto)))
                 .andExpect(status().isBadRequest());
 
-        verify(bookService, never()).create(any(BookDTO.class));
+        verify(bookService, never()).create(any(BookDto.class));
     }
 
     @Test
     @DisplayName("POST /api/v1/books should return 400 when ISBN already exists")
     void createBook_WithDuplicateIsbn_ShouldReturn400() throws Exception {
         // Arrange
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
-        when(bookService.create(any(BookDTO.class)))
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
+        when(bookService.create(any(BookDto.class)))
                 .thenThrow(new InvalidRequestException("Book with ISBN already exists"));
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newBookDTO)))
+                        .content(objectMapper.writeValueAsString(newBookDto)))
                 .andExpect(status().isBadRequest());
 
-        verify(bookService, times(1)).create(any(BookDTO.class));
+        verify(bookService, times(1)).create(any(BookDto.class));
     }
 
     @Test
@@ -199,21 +199,21 @@ class BookControllerTest {
     void updateBook_WithValidData_ShouldReturnUpdatedBook() throws Exception {
         // Arrange
         Long bookId = 1L;
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
 
-        when(bookService.update(eq(bookId), any(BookDTO.class))).thenReturn(updateDTO);
+        when(bookService.update(eq(bookId), any(BookDto.class))).thenReturn(updateDto);
 
         // Act & Assert
         mockMvc.perform(put("/api/v1/books/{id}", bookId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(updateDTO.getTitle())));
+                .andExpect(jsonPath("$.title", is(updateDto.getTitle())));
 
-        verify(bookService, times(1)).update(eq(bookId), any(BookDTO.class));
+        verify(bookService, times(1)).update(eq(bookId), any(BookDto.class));
     }
 
     @Test
@@ -221,18 +221,18 @@ class BookControllerTest {
     void updateBook_WhenBookNotFound_ShouldReturn404() throws Exception {
         // Arrange
         Long bookId = 999L;
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
 
-        when(bookService.update(eq(bookId), any(BookDTO.class)))
+        when(bookService.update(eq(bookId), any(BookDto.class)))
                 .thenThrow(new ResourceNotFoundException("Book not found with id: " + bookId));
 
         // Act & Assert
         mockMvc.perform(put("/api/v1/books/{id}", bookId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isNotFound());
 
-        verify(bookService, times(1)).update(eq(bookId), any(BookDTO.class));
+        verify(bookService, times(1)).update(eq(bookId), any(BookDto.class));
     }
 
     @Test
@@ -270,7 +270,7 @@ class BookControllerTest {
     void searchBooks_ShouldReturnMatchingBooks() throws Exception {
         // Arrange
         String searchTerm = "Java";
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.search(searchTerm)).thenReturn(books);
 
@@ -280,7 +280,7 @@ class BookControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is(sampleBookDTO.getTitle())));
+                .andExpect(jsonPath("$[0].title", is(sampleBookDto.getTitle())));
 
         verify(bookService, times(1)).search(searchTerm);
     }
@@ -290,7 +290,7 @@ class BookControllerTest {
     void getBooksByCategory_ShouldReturnBooksInCategory() throws Exception {
         // Arrange
         String category = "Programming";
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.findByCategory(category)).thenReturn(books);
 
@@ -308,7 +308,7 @@ class BookControllerTest {
     void getBooksByAuthor_ShouldReturnBooksByAuthor() throws Exception {
         // Arrange
         String author = "Joshua";
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.findByAuthor(author)).thenReturn(books);
 
@@ -316,7 +316,7 @@ class BookControllerTest {
         mockMvc.perform(get("/api/v1/books/author/{author}", author))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].author", is(sampleBookDTO.getAuthor())));
+                .andExpect(jsonPath("$[0].author", is(sampleBookDto.getAuthor())));
 
         verify(bookService, times(1)).findByAuthor(author);
     }
@@ -325,7 +325,7 @@ class BookControllerTest {
     @DisplayName("GET /api/v1/books/available should return available books")
     void getAvailableBooks_ShouldReturnBooksInStock() throws Exception {
         // Arrange
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.findAvailableBooks()).thenReturn(books);
 
@@ -342,7 +342,7 @@ class BookControllerTest {
     void getLowStockBooks_ShouldReturnLowStockBooks() throws Exception {
         // Arrange
         Integer threshold = 10;
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.findLowStockBooks(threshold)).thenReturn(books);
 
@@ -359,7 +359,7 @@ class BookControllerTest {
     @DisplayName("GET /api/v1/books/low-stock should use default threshold when not provided")
     void getLowStockBooks_WithoutThreshold_ShouldUseDefault() throws Exception {
         // Arrange
-        List<BookDTO> books = Arrays.asList(sampleBookDTO);
+        List<BookDto> books = Arrays.asList(sampleBookDto);
 
         when(bookService.findLowStockBooks(10)).thenReturn(books);
 
@@ -377,7 +377,7 @@ class BookControllerTest {
         // Arrange
         Long bookId = 1L;
         Integer quantity = 50;
-        BookDTO updatedBook = BookTestFixtures.createSampleBookDTO();
+        BookDto updatedBook = BookTestFixtures.createSampleBookDto();
         updatedBook.setStock(150);
 
         when(bookService.updateStock(bookId, quantity)).thenReturn(updatedBook);

@@ -1,12 +1,12 @@
 package com.bookstore.order.batch;
 
-import com.bookstore.common.dto.OrderReportDTO;
+import com.bookstore.common.dto.OrderReportDto;
 import org.springframework.batch.item.file.transform.LineAggregator;
 
-public class MainframeOrderLineAggregator implements LineAggregator<OrderReportDTO> {
+public class MainframeOrderLineAggregator implements LineAggregator<OrderReportDto> {
     
     @Override
-    public String aggregate(OrderReportDTO item) {
+    public String aggregate(OrderReportDto item) {
         return String.format(
             "01" +                          
             "%010d" +                       

@@ -1,7 +1,7 @@
 package com.bookstore.catalog.batch;
 
 import com.bookstore.catalog.entity.Book;
-import com.bookstore.common.dto.BookImportDTO;
+import com.bookstore.common.dto.BookImportDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -34,21 +34,21 @@ public class CatalogImportJobConfig {
 
     @Bean
     @StepScope
-    public FlatFileItemReader<BookImportDTO> catalogReader(
+    public FlatFileItemReader<BookImportDto> catalogReader(
             @Value("#{jobParameters['inputFile']}") String inputFile) {
         
-        FlatFileItemReader<BookImportDTO> reader = new FlatFileItemReader<>();
+        FlatFileItemReader<BookImportDto> reader = new FlatFileItemReader<>();
         reader.setResource(new FileSystemResource(inputFile));
         reader.setLinesToSkip(1);
         
-        DefaultLineMapper<BookImportDTO> lineMapper = new DefaultLineMapper<>();
+        DefaultLineMapper<BookImportDto> lineMapper = new DefaultLineMapper<>();
         
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
         tokenizer.setNames("isbn", "title", "author", "description", "price", "stock", "category");
         tokenizer.setDelimiter(",");
         
-        BeanWrapperFieldSetMapper<BookImportDTO> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(BookImportDTO.class);
+        BeanWrapperFieldSetMapper<BookImportDto> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(BookImportDto.class);
         
         lineMapper.setLineTokenizer(tokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
@@ -68,7 +68,7 @@ public class CatalogImportJobConfig {
     @Bean
     public Step catalogImportStep() {
         return stepBuilderFactory.get("catalogImportStep")
-                .<BookImportDTO, Book>chunk(100)
+                .<BookImportDto, Book>chunk(100)
                 .reader(catalogReader(null))
                 .processor(bookImportProcessor)
                 .writer(catalogWriter())

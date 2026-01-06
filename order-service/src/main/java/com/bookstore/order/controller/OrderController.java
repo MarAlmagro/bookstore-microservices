@@ -1,7 +1,7 @@
 package com.bookstore.order.controller;
 
 import com.bookstore.common.constants.OrderStatus;
-import com.bookstore.common.dto.OrderDTO;
+import com.bookstore.common.dto.OrderDto;
 import com.bookstore.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,9 +32,9 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
-        log.info("Received request to create order for user: {}", orderDTO.getUserId());
-        OrderDTO createdOrder = orderService.createOrder(orderDTO);
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody OrderDto orderDto) {
+        log.info("Received request to create order for user: {}", orderDto.getUserId());
+        OrderDto createdOrder = orderService.createOrder(orderDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
@@ -45,9 +45,9 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable String id) {
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable String id) {
         log.info("Received request to get order: {}", id);
-        OrderDTO order = orderService.getOrderById(id);
+        OrderDto order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 
@@ -57,9 +57,9 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
         log.info("Received request to get all orders");
-        List<OrderDTO> orders = orderService.getAllOrders();
+        List<OrderDto> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
 
@@ -69,9 +69,9 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderDTO>> getUserOrders(@PathVariable Long userId) {
+    public ResponseEntity<List<OrderDto>> getUserOrders(@PathVariable Long userId) {
         log.info("Received request to get orders for user: {}", userId);
-        List<OrderDTO> orders = orderService.getUserOrders(userId);
+        List<OrderDto> orders = orderService.getUserOrders(userId);
         return ResponseEntity.ok(orders);
     }
 
@@ -81,9 +81,9 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByStatus(@PathVariable OrderStatus status) {
+    public ResponseEntity<List<OrderDto>> getOrdersByStatus(@PathVariable OrderStatus status) {
         log.info("Received request to get orders with status: {}", status);
-        List<OrderDTO> orders = orderService.getOrdersByStatus(status);
+        List<OrderDto> orders = orderService.getOrdersByStatus(status);
         return ResponseEntity.ok(orders);
     }
 
@@ -94,11 +94,11 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}/status")
-    public ResponseEntity<OrderDTO> updateOrderStatus(
+    public ResponseEntity<OrderDto> updateOrderStatus(
             @PathVariable String id,
             @RequestParam OrderStatus status) {
         log.info("Received request to update order {} status to: {}", id, status);
-        OrderDTO updatedOrder = orderService.updateOrderStatus(id, status);
+        OrderDto updatedOrder = orderService.updateOrderStatus(id, status);
         return ResponseEntity.ok(updatedOrder);
     }
 

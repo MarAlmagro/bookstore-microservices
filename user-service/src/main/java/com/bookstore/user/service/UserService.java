@@ -1,14 +1,14 @@
 package com.bookstore.user.service;
 
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 
 public interface UserService {
 
-    UserDTO getUserById(Long id);
+    UserDto getUserById(Long id);
 
-    UserDTO getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 
-    UserDTO updateUser(Long id, UserDTO userDTO);
+    UserDto updateUser(Long id, UserDto userDto);
 
     void deleteUser(Long id);
 

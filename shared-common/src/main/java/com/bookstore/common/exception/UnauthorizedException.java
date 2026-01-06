@@ -19,22 +19,22 @@ package com.bookstore.common.exception;
  */
 public class UnauthorizedException extends RuntimeException {
 
-    /**
-     * Constructs a new UnauthorizedException with the specified detail message.
-     *
-     * @param message the detail message explaining the authorization failure
-     */
-    public UnauthorizedException(String message) {
-        super(message);
-    }
+/**
+ * Constructs a new UnauthorizedException with the specified detail message.
+ *
+ * @param message the detail message explaining the authorization failure
+ */
+public UnauthorizedException(String message) {
+super(message);
+}
 
-    /**
-     * Constructs a new UnauthorizedException with the specified detail message and cause.
-     *
-     * @param message the detail message explaining the authorization failure
-     * @param cause   the cause of the exception
-     */
-    public UnauthorizedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+/**
+ * Constructs a new UnauthorizedException with the specified detail message and cause.
+ *
+ * @param message the detail message explaining the authorization failure
+ * @param cause   the cause of the exception
+ */
+public UnauthorizedException(String message, Throwable cause) {
+super(message, cause);
+}
 }

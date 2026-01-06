@@ -1,9 +1,9 @@
 package com.bookstore.order.integration;
 
 import com.bookstore.common.constants.OrderStatus;
-import com.bookstore.common.dto.BookDTO;
-import com.bookstore.common.dto.OrderDTO;
-import com.bookstore.common.dto.OrderItemDTO;
+import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.OrderItemDto;
 import com.bookstore.order.client.CatalogClient;
 import com.bookstore.order.document.Order;
 import com.bookstore.order.repository.OrderRepository;
@@ -45,14 +45,14 @@ class OrderIntegrationTest {
     @MockBean
     private CatalogClient catalogClient;
 
-    private BookDTO testBook;
-    private OrderDTO testOrderDTO;
+    private BookDto testBook;
+    private OrderDto testOrderDto;
 
     @BeforeEach
     void setUp() {
         orderRepository.deleteAll();
 
-        testBook = BookDTO.builder()
+        testBook = BookDto.builder()
                 .id(1L)
                 .isbn("9780134685991")
                 .title("Effective Java")
@@ -62,14 +62,14 @@ class OrderIntegrationTest {
                 .category("Programming")
                 .build();
 
-        OrderItemDTO orderItemDTO = OrderItemDTO.builder()
+        OrderItemDto orderItemDto = OrderItemDto.builder()
                 .bookId(1L)
                 .quantity(2)
                 .build();
 
-        testOrderDTO = OrderDTO.builder()
+        testOrderDto = OrderDto.builder()
                 .userId(1L)
-                .items(Arrays.asList(orderItemDTO))
+                .items(Arrays.asList(orderItemDto))
                 .build();
     }
 
@@ -84,7 +84,7 @@ class OrderIntegrationTest {
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDTO)))
+                        .content(objectMapper.writeValueAsString(testOrderDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.status").value("PENDING"))
@@ -93,7 +93,7 @@ class OrderIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        OrderDTO createdOrder = objectMapper.readValue(response, OrderDTO.class);
+        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
         mockMvc.perform(get("/api/v1/orders/" + createdOrder.getId()))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class OrderIntegrationTest {
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDTO)))
+                        .content(objectMapper.writeValueAsString(testOrderDto)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/orders/user/1"))
@@ -122,13 +122,13 @@ class OrderIntegrationTest {
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDTO)))
+                        .content(objectMapper.writeValueAsString(testOrderDto)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        OrderDTO createdOrder = objectMapper.readValue(response, OrderDTO.class);
+        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
         mockMvc.perform(put("/api/v1/orders/" + createdOrder.getId() + "/status")
                         .param("status", "CONFIRMED"))
@@ -142,13 +142,13 @@ class OrderIntegrationTest {
 
         String response = mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDTO)))
+                        .content(objectMapper.writeValueAsString(testOrderDto)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        OrderDTO createdOrder = objectMapper.readValue(response, OrderDTO.class);
+        OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
         mockMvc.perform(delete("/api/v1/orders/" + createdOrder.getId()))
                 .andExpect(status().isNoContent());
@@ -163,7 +163,7 @@ class OrderIntegrationTest {
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderDTO)))
+                        .content(objectMapper.writeValueAsString(testOrderDto)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/orders/status/PENDING"))

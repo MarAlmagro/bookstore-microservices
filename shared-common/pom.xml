@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <name>Shared Common Module</name>
-    <description>Shared DTOs, exceptions, constants, and utilities for all microservices</description>
+    <description>Shared Dtos, exceptions, constants, and utilities for all microservices</description>
 
     <dependencies>
         <!-- Spring Web for @ControllerAdvice -->

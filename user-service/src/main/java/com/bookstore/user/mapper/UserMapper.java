@@ -1,18 +1,18 @@
 package com.bookstore.user.mapper;
 
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
-    public UserDTO toDTO(User user) {
+    public UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
 
-        return UserDTO.builder()
+        return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
@@ -21,7 +21,7 @@ public class UserMapper {
                 .build();
     }
 
-    public User toEntity(UserDTO dto) {
+    public User toEntity(UserDto dto) {
         if (dto == null) {
             return null;
         }

@@ -1,17 +1,17 @@
 package com.bookstore.catalog.mapper;
 
 import com.bookstore.catalog.entity.Book;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Mapper class for converting between Book entity and BookDTO.
+ * Mapper class for converting between Book entity and BookDto.
  * <p>
  * This class provides manual mapping methods to transform data between
- * the persistence layer (Entity) and the presentation layer (DTO).
+ * the persistence layer (Entity) and the presentation layer (Dto).
  * </p>
  * <p>
  * Manual mapping is used instead of MapStruct to maintain simplicity
@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
 public class BookMapper {
 
     /**
-     * Convert a Book entity to BookDTO
+     * Convert a Book entity to BookDto
      *
      * @param book the book entity
-     * @return the book DTO, or null if input is null
+     * @return the book Dto, or null if input is null
      */
-    public BookDTO toDTO(Book book) {
+    public BookDto toDto(Book book) {
         if (book == null) {
             return null;
         }
 
-        return BookDTO.builder()
+        return BookDto.builder()
                 .id(book.getId())
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
@@ -45,81 +45,81 @@ public class BookMapper {
     }
 
     /**
-     * Convert a BookDTO to Book entity
+     * Convert a BookDto to Book entity
      *
-     * @param bookDTO the book DTO
+     * @param bookDto the book Dto
      * @return the book entity, or null if input is null
      */
-    public Book toEntity(BookDTO bookDTO) {
-        if (bookDTO == null) {
+    public Book toEntity(BookDto bookDto) {
+        if (bookDto == null) {
             return null;
         }
 
         return Book.builder()
-                .id(bookDTO.getId())
-                .isbn(bookDTO.getIsbn())
-                .title(bookDTO.getTitle())
-                .author(bookDTO.getAuthor())
-                .description(bookDTO.getDescription())
-                .price(bookDTO.getPrice())
-                .stock(bookDTO.getStock())
-                .category(bookDTO.getCategory())
+                .id(bookDto.getId())
+                .isbn(bookDto.getIsbn())
+                .title(bookDto.getTitle())
+                .author(bookDto.getAuthor())
+                .description(bookDto.getDescription())
+                .price(bookDto.getPrice())
+                .stock(bookDto.getStock())
+                .category(bookDto.getCategory())
                 .build();
     }
 
     /**
-     * Convert a list of Book entities to a list of BookDTOs
+     * Convert a list of Book entities to a list of BookDtos
      *
      * @param books the list of book entities
-     * @return the list of book DTOs
+     * @return the list of book Dtos
      */
-    public List<BookDTO> toDTOList(List<Book> books) {
+    public List<BookDto> toDtoList(List<Book> books) {
         if (books == null) {
             return null;
         }
 
         return books.stream()
-                .map(this::toDTO)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Convert a list of BookDTOs to a list of Book entities
+     * Convert a list of BookDtos to a list of Book entities
      *
-     * @param bookDTOs the list of book DTOs
+     * @param bookDtos the list of book Dtos
      * @return the list of book entities
      */
-    public List<Book> toEntityList(List<BookDTO> bookDTOs) {
-        if (bookDTOs == null) {
+    public List<Book> toEntityList(List<BookDto> bookDtos) {
+        if (bookDtos == null) {
             return null;
         }
 
-        return bookDTOs.stream()
+        return bookDtos.stream()
                 .map(this::toEntity)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Update an existing Book entity with data from BookDTO
+     * Update an existing Book entity with data from BookDto
      * <p>
      * This method updates only the modifiable fields and preserves
      * the ID and audit fields (createdAt, updatedAt).
      * </p>
      *
-     * @param bookDTO the source DTO with updated data
+     * @param bookDto the source Dto with updated data
      * @param book the target entity to update
      */
-    public void updateEntityFromDTO(BookDTO bookDTO, Book book) {
-        if (bookDTO == null || book == null) {
+    public void updateEntityFromDto(BookDto bookDto, Book book) {
+        if (bookDto == null || book == null) {
             return;
         }
 
-        book.setIsbn(bookDTO.getIsbn());
-        book.setTitle(bookDTO.getTitle());
-        book.setAuthor(bookDTO.getAuthor());
-        book.setDescription(bookDTO.getDescription());
-        book.setPrice(bookDTO.getPrice());
-        book.setStock(bookDTO.getStock());
-        book.setCategory(bookDTO.getCategory());
+        book.setIsbn(bookDto.getIsbn());
+        book.setTitle(bookDto.getTitle());
+        book.setAuthor(bookDto.getAuthor());
+        book.setDescription(bookDto.getDescription());
+        book.setPrice(bookDto.getPrice());
+        book.setStock(bookDto.getStock());
+        book.setCategory(bookDto.getCategory());
     }
 }

@@ -1,25 +1,25 @@
 package com.bookstore.order.service;
 
 import com.bookstore.common.constants.OrderStatus;
-import com.bookstore.common.dto.OrderDTO;
+import com.bookstore.common.dto.OrderDto;
 
 import java.util.List;
 
 public interface OrderService {
 
-    OrderDTO createOrder(OrderDTO orderDTO);
+    OrderDto createOrder(OrderDto orderDto);
 
-    OrderDTO getOrderById(String id);
+    OrderDto getOrderById(String id);
 
-    List<OrderDTO> getUserOrders(Long userId);
+    List<OrderDto> getUserOrders(Long userId);
 
-    List<OrderDTO> getOrdersByStatus(OrderStatus status);
+    List<OrderDto> getOrdersByStatus(OrderStatus status);
 
-    OrderDTO updateOrderStatus(String id, OrderStatus status);
+    OrderDto updateOrderStatus(String id, OrderStatus status);
 
     void deleteOrder(String id);
 
-    List<OrderDTO> getAllOrders();
+    List<OrderDto> getAllOrders();
 
     boolean validateOrderOwnership(String orderId, Long userId);
 }

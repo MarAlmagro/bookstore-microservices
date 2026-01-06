@@ -59,7 +59,7 @@ git commit -m "chore(shared-common): create module structure and pom.xml"
 
 # Step 2.2
 git add shared-common/src/main/java/com/bookstore/common/dto/
-git commit -m "feat(shared-common): add all DTO classes with validation"
+git commit -m "feat(shared-common): add all Dto classes with validation"
 
 # Step 2.3
 git add shared-common/src/main/java/com/bookstore/common/exception/
@@ -250,7 +250,7 @@ docker-compose up --build
 - Package structure: com.bookstore.<service>.<layer>
 - Layers: controller, service, repository, entity/document, mapper, config
 - REST endpoints: /api/v1/<resource>
-- Use DTOs for API responses (no entity exposure)
+- Use Dtos for API responses (no entity exposure)
 
 ## File Boundaries
 - DO modify: src/main/java/, src/test/java/, pom.xml

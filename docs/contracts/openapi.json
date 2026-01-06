@@ -51,7 +51,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -69,7 +69,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BookDTO"
+                "$ref": "#/components/schemas/BookDto"
               }
             }
           }
@@ -80,7 +80,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BookDTO"
+                  "$ref": "#/components/schemas/BookDto"
                 }
               }
             }
@@ -123,7 +123,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BookDTO"
+                  "$ref": "#/components/schemas/BookDto"
                 }
               }
             }
@@ -163,7 +163,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BookDTO"
+                "$ref": "#/components/schemas/BookDto"
               }
             }
           }
@@ -174,7 +174,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BookDTO"
+                  "$ref": "#/components/schemas/BookDto"
                 }
               }
             }
@@ -259,7 +259,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BookDTO"
+                  "$ref": "#/components/schemas/BookDto"
                 }
               }
             }
@@ -302,7 +302,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -336,7 +336,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -370,7 +370,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -393,7 +393,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -429,7 +429,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BookDTO"
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -472,7 +472,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BookDTO"
+                  "$ref": "#/components/schemas/BookDto"
                 }
               }
             }
@@ -574,7 +574,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrderDTO"
+                    "$ref": "#/components/schemas/OrderDto"
                   }
                 }
               }
@@ -602,7 +602,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrderDTO"
+                "$ref": "#/components/schemas/OrderDto"
               }
             }
           }
@@ -613,7 +613,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderDTO"
+                  "$ref": "#/components/schemas/OrderDto"
                 }
               }
             }
@@ -664,7 +664,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderDTO"
+                  "$ref": "#/components/schemas/OrderDto"
                 }
               }
             }
@@ -760,7 +760,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrderDTO"
+                    "$ref": "#/components/schemas/OrderDto"
                   }
                 }
               }
@@ -805,7 +805,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrderDTO"
+                    "$ref": "#/components/schemas/OrderDto"
                   }
                 }
               }
@@ -857,7 +857,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderDTO"
+                  "$ref": "#/components/schemas/OrderDto"
                 }
               }
             }
@@ -1010,7 +1010,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDTO"
+                  "$ref": "#/components/schemas/AuthResponseDto"
                 }
               }
             }
@@ -1039,7 +1039,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDTO"
+                "$ref": "#/components/schemas/AuthRequestDto"
               }
             }
           }
@@ -1050,7 +1050,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDTO"
+                  "$ref": "#/components/schemas/AuthResponseDto"
                 }
               }
             }
@@ -1096,7 +1096,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDTO"
+                  "$ref": "#/components/schemas/AuthResponseDto"
                 }
               }
             }
@@ -1131,7 +1131,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -1163,7 +1163,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             }
           }
@@ -1174,7 +1174,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -1231,7 +1231,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -1338,7 +1338,7 @@
       }
     },
     "schemas": {
-      "BookDTO": {
+      "BookDto": {
         "type": "object",
         "required": ["isbn", "title", "author", "price", "stock", "category"],
         "properties": {
@@ -1394,7 +1394,7 @@
           }
         }
       },
-      "OrderDTO": {
+      "OrderDto": {
         "type": "object",
         "required": ["userId", "items"],
         "properties": {
@@ -1415,7 +1415,7 @@
             "minItems": 1,
             "description": "List of items in the order",
             "items": {
-              "$ref": "#/components/schemas/OrderItemDTO"
+              "$ref": "#/components/schemas/OrderItemDto"
             }
           },
           "totalAmount": {
@@ -1440,7 +1440,7 @@
           }
         }
       },
-      "OrderItemDTO": {
+      "OrderItemDto": {
         "type": "object",
         "required": ["bookId", "quantity"],
         "properties": {
@@ -1477,7 +1477,7 @@
           }
         }
       },
-      "UserDTO": {
+      "UserDto": {
         "type": "object",
         "required": ["email", "firstName", "lastName", "role"],
         "properties": {
@@ -1515,7 +1515,7 @@
           }
         }
       },
-      "AuthRequestDTO": {
+      "AuthRequestDto": {
         "type": "object",
         "required": ["email", "password"],
         "properties": {
@@ -1533,7 +1533,7 @@
           }
         }
       },
-      "AuthResponseDTO": {
+      "AuthResponseDto": {
         "type": "object",
         "properties": {
           "token": {
@@ -1547,7 +1547,7 @@
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           },
           "user": {
-            "$ref": "#/components/schemas/UserDTO"
+            "$ref": "#/components/schemas/UserDto"
           }
         }
       },

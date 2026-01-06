@@ -1,7 +1,7 @@
 package com.bookstore.admin.controller;
 
 import com.bookstore.admin.client.CatalogClient;
-import com.bookstore.admin.dto.BookDTO;
+import com.bookstore.admin.dto.BookDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -38,8 +38,8 @@ class BookControllerTest {
 
     @Test
     void testListBooks() {
-        List<BookDTO> books = new ArrayList<>();
-        books.add(new BookDTO(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction"));
+        List<BookDto> books = new ArrayList<>();
+        books.add(new BookDto(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction"));
 
         when(catalogClient.getAllBooks()).thenReturn(books);
 
@@ -54,12 +54,12 @@ class BookControllerTest {
         String viewName = bookController.newBookForm(model);
 
         assertEquals("books/form", viewName);
-        verify(model).addAttribute(eq("book"), any(BookDTO.class));
+        verify(model).addAttribute(eq("book"), any(BookDto.class));
     }
 
     @Test
     void testCreateBook() {
-        BookDTO book = new BookDTO(null, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction");
+        BookDto book = new BookDto(null, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction");
 
         when(catalogClient.createBook(book)).thenReturn(book);
 
@@ -71,7 +71,7 @@ class BookControllerTest {
 
     @Test
     void testUpdateBook() {
-        BookDTO book = new BookDTO(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction");
+        BookDto book = new BookDto(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction");
 
         when(catalogClient.updateBook(1L, book)).thenReturn(book);
 

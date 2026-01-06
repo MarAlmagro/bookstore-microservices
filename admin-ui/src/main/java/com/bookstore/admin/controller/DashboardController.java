@@ -2,9 +2,9 @@ package com.bookstore.admin.controller;
 
 import com.bookstore.admin.client.CatalogClient;
 import com.bookstore.admin.client.OrderClient;
-import com.bookstore.admin.dto.BookDTO;
-import com.bookstore.admin.dto.DashboardStatsDTO;
-import com.bookstore.admin.dto.OrderDTO;
+import com.bookstore.admin.dto.BookDto;
+import com.bookstore.admin.dto.DashboardStatsDto;
+import com.bookstore.admin.dto.OrderDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,14 +23,14 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         try {
-            List<BookDTO> books = catalogClient.getAllBooks();
-            List<OrderDTO> orders = orderClient.getAllOrders();
+            List<BookDto> books = catalogClient.getAllBooks();
+            List<OrderDto> orders = orderClient.getAllOrders();
             
             BigDecimal totalRevenue = orders.stream()
-                    .map(OrderDTO::getTotalAmount)
+                    .map(OrderDto::getTotalAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             
-            DashboardStatsDTO stats = new DashboardStatsDTO(
+            DashboardStatsDto stats = new DashboardStatsDto(
                     (long) books.size(),
                     (long) orders.size(),
                     0L,

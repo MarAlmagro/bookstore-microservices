@@ -2,7 +2,7 @@ package com.bookstore.catalog.batch;
 
 import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.repository.BookRepository;
-import com.bookstore.common.dto.BookImportDTO;
+import com.bookstore.common.dto.BookImportDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -13,12 +13,12 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BookImportProcessor implements ItemProcessor<BookImportDTO, Book> {
+public class BookImportProcessor implements ItemProcessor<BookImportDto, Book> {
 
     private final BookRepository bookRepository;
 
     @Override
-    public Book process(BookImportDTO dto) throws Exception {
+    public Book process(BookImportDto dto) throws Exception {
         log.debug("Processing book import for ISBN: {}", dto.getIsbn());
         
         Optional<Book> existingBook = bookRepository.findByIsbn(dto.getIsbn());

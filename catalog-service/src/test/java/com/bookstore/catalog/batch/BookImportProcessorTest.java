@@ -2,7 +2,7 @@ package com.bookstore.catalog.batch;
 
 import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.repository.BookRepository;
-import com.bookstore.common.dto.BookImportDTO;
+import com.bookstore.common.dto.BookImportDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +26,11 @@ class BookImportProcessorTest {
     @InjectMocks
     private BookImportProcessor processor;
 
-    private BookImportDTO importDTO;
+    private BookImportDto importDto;
 
     @BeforeEach
     void setUp() {
-        importDTO = BookImportDTO.builder()
+        importDto = BookImportDto.builder()
                 .isbn("978-0-123456-78-9")
                 .title("Test Book")
                 .author("Test Author")
@@ -45,18 +45,18 @@ class BookImportProcessorTest {
     void process_ShouldCreateNewBook_WhenIsbnDoesNotExist() throws Exception {
         when(bookRepository.findByIsbn(anyString())).thenReturn(Optional.empty());
 
-        Book result = processor.process(importDTO);
+        Book result = processor.process(importDto);
 
         assertNotNull(result);
-        assertEquals(importDTO.getIsbn(), result.getIsbn());
-        assertEquals(importDTO.getTitle(), result.getTitle());
-        assertEquals(importDTO.getAuthor(), result.getAuthor());
-        assertEquals(importDTO.getDescription(), result.getDescription());
-        assertEquals(importDTO.getPrice(), result.getPrice());
-        assertEquals(importDTO.getStock(), result.getStock());
-        assertEquals(importDTO.getCategory(), result.getCategory());
+        assertEquals(importDto.getIsbn(), result.getIsbn());
+        assertEquals(importDto.getTitle(), result.getTitle());
+        assertEquals(importDto.getAuthor(), result.getAuthor());
+        assertEquals(importDto.getDescription(), result.getDescription());
+        assertEquals(importDto.getPrice(), result.getPrice());
+        assertEquals(importDto.getStock(), result.getStock());
+        assertEquals(importDto.getCategory(), result.getCategory());
         
-        verify(bookRepository, times(1)).findByIsbn(importDTO.getIsbn());
+        verify(bookRepository, times(1)).findByIsbn(importDto.getIsbn());
     }
 
     @Test
@@ -72,21 +72,21 @@ class BookImportProcessorTest {
                 .category("NonFiction")
                 .build();
 
-        when(bookRepository.findByIsbn(importDTO.getIsbn())).thenReturn(Optional.of(existingBook));
+        when(bookRepository.findByIsbn(importDto.getIsbn())).thenReturn(Optional.of(existingBook));
 
-        Book result = processor.process(importDTO);
+        Book result = processor.process(importDto);
 
         assertNotNull(result);
         assertEquals(existingBook.getId(), result.getId());
-        assertEquals(importDTO.getIsbn(), result.getIsbn());
-        assertEquals(importDTO.getTitle(), result.getTitle());
-        assertEquals(importDTO.getAuthor(), result.getAuthor());
-        assertEquals(importDTO.getDescription(), result.getDescription());
-        assertEquals(importDTO.getPrice(), result.getPrice());
-        assertEquals(importDTO.getStock(), result.getStock());
-        assertEquals(importDTO.getCategory(), result.getCategory());
+        assertEquals(importDto.getIsbn(), result.getIsbn());
+        assertEquals(importDto.getTitle(), result.getTitle());
+        assertEquals(importDto.getAuthor(), result.getAuthor());
+        assertEquals(importDto.getDescription(), result.getDescription());
+        assertEquals(importDto.getPrice(), result.getPrice());
+        assertEquals(importDto.getStock(), result.getStock());
+        assertEquals(importDto.getCategory(), result.getCategory());
         
-        verify(bookRepository, times(1)).findByIsbn(importDTO.getIsbn());
+        verify(bookRepository, times(1)).findByIsbn(importDto.getIsbn());
     }
 
     @Test
@@ -102,7 +102,7 @@ class BookImportProcessorTest {
                 .category("Science")
                 .build();
 
-        BookImportDTO updatedDTO = BookImportDTO.builder()
+        BookImportDto updatedDto = BookImportDto.builder()
                 .isbn("978-0-123456-78-9")
                 .title("Updated Title")
                 .author("Updated Author")
@@ -112,9 +112,9 @@ class BookImportProcessorTest {
                 .category("Technology")
                 .build();
 
-        when(bookRepository.findByIsbn(updatedDTO.getIsbn())).thenReturn(Optional.of(existingBook));
+        when(bookRepository.findByIsbn(updatedDto.getIsbn())).thenReturn(Optional.of(existingBook));
 
-        Book result = processor.process(updatedDTO);
+        Book result = processor.process(updatedDto);
 
         assertEquals(new BigDecimal("35.00"), result.getPrice());
         assertEquals(150, result.getStock());
@@ -126,10 +126,10 @@ class BookImportProcessorTest {
 
     @Test
     void process_ShouldHandleZeroStock_ForNewBook() throws Exception {
-        importDTO.setStock(0);
+        importDto.setStock(0);
         when(bookRepository.findByIsbn(anyString())).thenReturn(Optional.empty());
 
-        Book result = processor.process(importDTO);
+        Book result = processor.process(importDto);
 
         assertNotNull(result);
         assertEquals(0, result.getStock());
@@ -137,10 +137,10 @@ class BookImportProcessorTest {
 
     @Test
     void process_ShouldHandleZeroPrice_ForNewBook() throws Exception {
-        importDTO.setPrice(BigDecimal.ZERO);
+        importDto.setPrice(BigDecimal.ZERO);
         when(bookRepository.findByIsbn(anyString())).thenReturn(Optional.empty());
 
-        Book result = processor.process(importDTO);
+        Book result = processor.process(importDto);
 
         assertNotNull(result);
         assertEquals(BigDecimal.ZERO, result.getPrice());
@@ -160,9 +160,9 @@ class BookImportProcessorTest {
                 .category("Original")
                 .build();
 
-        when(bookRepository.findByIsbn(importDTO.getIsbn())).thenReturn(Optional.of(existingBook));
+        when(bookRepository.findByIsbn(importDto.getIsbn())).thenReturn(Optional.of(existingBook));
 
-        Book result = processor.process(importDTO);
+        Book result = processor.process(importDto);
 
         assertEquals(originalId, result.getId());
     }

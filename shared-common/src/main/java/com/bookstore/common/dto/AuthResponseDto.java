@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDTO {
+public class AuthResponseDto {
 
     /**
      * JWT access token for authenticating API requests.
@@ -31,5 +31,5 @@ public class AuthResponseDTO {
      * User information for the authenticated user.
      * Contains profile details without sensitive data.
      */
-    private UserDTO user;
+    private UserDto user;
 }

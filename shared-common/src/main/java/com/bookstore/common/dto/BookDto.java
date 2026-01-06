@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDTO {
+public class BookDto {
 
     /**
      * Unique identifier for the book.

@@ -1,9 +1,9 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.UnauthorizedException;
 import com.bookstore.user.entity.User;
@@ -43,37 +43,37 @@ public class AuthServiceImpl implements AuthService {
     private UserMapper userMapper;
 
     @Override
-    public AuthResponseDTO register(UserDTO userDTO, String password) {
-        logger.debug("Registering new user with email: {}", userDTO.getEmail());
+    public AuthResponseDto register(UserDto userDto, String password) {
+        logger.debug("Registering new user with email: {}", userDto.getEmail());
 
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new InvalidRequestException("Email already exists: " + userDTO.getEmail());
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new InvalidRequestException("Email already exists: " + userDto.getEmail());
         }
 
         User user = User.builder()
-                .email(userDTO.getEmail())
+                .email(userDto.getEmail())
                 .password(passwordEncoder.encode(password))
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .role(userDTO.getRole() != null ? UserRole.valueOf(userDTO.getRole()) : UserRole.CUSTOMER)
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .role(userDto.getRole() != null ? UserRole.valueOf(userDto.getRole()) : UserRole.CUSTOMER)
                 .enabled(true)
                 .build();
 
         User savedUser = userRepository.save(user);
-        logger.info("User registered successfully with email: {}", userDTO.getEmail());
+        logger.info("User registered successfully with email: {}", userDto.getEmail());
 
         String token = tokenProvider.generateTokenFromUsername(savedUser.getEmail());
         String refreshToken = tokenProvider.generateRefreshToken(savedUser.getEmail());
 
-        return AuthResponseDTO.builder()
+        return AuthResponseDto.builder()
                 .token(token)
                 .refreshToken(refreshToken)
-                .user(userMapper.toDTO(savedUser))
+                .user(userMapper.toDto(savedUser))
                 .build();
     }
 
     @Override
-    public AuthResponseDTO login(AuthRequestDTO authRequest) {
+    public AuthResponseDto login(AuthRequestDto authRequest) {
         logger.debug("User login attempt with email: {}", authRequest.getEmail());
 
         try {
@@ -92,10 +92,10 @@ public class AuthServiceImpl implements AuthService {
 
             logger.info("User logged in successfully with email: {}", authRequest.getEmail());
 
-            return AuthResponseDTO.builder()
+            return AuthResponseDto.builder()
                     .token(token)
                     .refreshToken(refreshToken)
-                    .user(userMapper.toDTO(user))
+                    .user(userMapper.toDto(user))
                     .build();
 
         } catch (AuthenticationException e) {
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDTO refreshToken(String refreshToken) {
+    public AuthResponseDto refreshToken(String refreshToken) {
         logger.debug("Refreshing token");
 
         if (!tokenProvider.validateToken(refreshToken)) {
@@ -121,10 +121,10 @@ public class AuthServiceImpl implements AuthService {
 
         logger.info("Token refreshed successfully for email: {}", email);
 
-        return AuthResponseDTO.builder()
+        return AuthResponseDto.builder()
                 .token(newToken)
                 .refreshToken(newRefreshToken)
-                .user(userMapper.toDTO(user))
+                .user(userMapper.toDto(user))
                 .build();
     }
 }

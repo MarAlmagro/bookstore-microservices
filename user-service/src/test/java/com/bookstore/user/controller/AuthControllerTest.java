@@ -1,9 +1,9 @@
 package com.bookstore.user.controller;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,12 +40,12 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
-    private AuthResponseDTO authResponse;
-    private UserDTO userDTO;
+    private AuthResponseDto authResponse;
+    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        userDTO = UserDTO.builder()
+        userDto = UserDto.builder()
                 .id(1L)
                 .email("test@example.com")
                 .firstName("John")
@@ -53,10 +53,10 @@ class AuthControllerTest {
                 .role("CUSTOMER")
                 .build();
 
-        authResponse = AuthResponseDTO.builder()
+        authResponse = AuthResponseDto.builder()
                 .token("accessToken")
                 .refreshToken("refreshToken")
-                .user(userDTO)
+                .user(userDto)
                 .build();
     }
 
@@ -68,7 +68,7 @@ class AuthControllerTest {
         registerRequest.put("firstName", "John");
         registerRequest.put("lastName", "Doe");
 
-        when(authService.register(any(UserDTO.class), anyString())).thenReturn(authResponse);
+        when(authService.register(any(UserDto.class), anyString())).thenReturn(authResponse);
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,12 +81,12 @@ class AuthControllerTest {
 
     @Test
     void login_Success() throws Exception {
-        AuthRequestDTO loginRequest = AuthRequestDTO.builder()
+        AuthRequestDto loginRequest = AuthRequestDto.builder()
                 .email("test@example.com")
                 .password("password123")
                 .build();
 
-        when(authService.login(any(AuthRequestDTO.class))).thenReturn(authResponse);
+        when(authService.login(any(AuthRequestDto.class))).thenReturn(authResponse);
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

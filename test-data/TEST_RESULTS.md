@@ -12,7 +12,7 @@
 ✅ **E2E workflow successful**  
 ✅ **Service-to-service communication verified**  
 ✅ **JWT authentication working**  
-⚠️ **DTO validation issues fixed during testing**
+⚠️ **Dto validation issues fixed during testing**
 
 ---
 
@@ -203,11 +203,11 @@ curl http://localhost:8083/actuator/health
 
 ## Issues Found and Fixed
 
-### Issue 1: DTO Validation Preventing Order Creation
+### Issue 1: Dto Validation Preventing Order Creation
 
 **Problem**:
-- `OrderDTO` had `@NotNull` validation on `totalAmount` and `status` fields
-- `OrderItemDTO` had `@NotNull` validation on `price` field
+- `OrderDto` had `@NotNull` validation on `totalAmount` and `status` fields
+- `OrderItemDto` had `@NotNull` validation on `price` field
 - These fields should be auto-populated by the service, not provided by the client
 - Validation was rejecting valid order creation requests
 
@@ -219,18 +219,18 @@ items[0].price: Price is required"
 ```
 
 **Root Cause**:
-- DTOs were designed for both request and response
+- Dtos were designed for both request and response
 - Validation annotations didn't distinguish between creation and retrieval
 
 **Fix Applied**:
-1. Removed `@NotNull` from `OrderDTO.totalAmount`
-2. Removed `@NotNull` from `OrderDTO.status`
-3. Removed `@NotNull` and `@DecimalMin` from `OrderItemDTO.price`
+1. Removed `@NotNull` from `OrderDto.totalAmount`
+2. Removed `@NotNull` from `OrderDto.status`
+3. Removed `@NotNull` and `@DecimalMin` from `OrderItemDto.price`
 4. Updated Javadoc to indicate fields are auto-populated
 
 **Files Modified**:
-- `shared-common/src/main/java/com/bookstore/common/dto/OrderDTO.java`
-- `shared-common/src/main/java/com/bookstore/common/dto/OrderItemDTO.java`
+- `shared-common/src/main/java/com/bookstore/common/dto/OrderDto.java`
+- `shared-common/src/main/java/com/bookstore/common/dto/OrderItemDto.java`
 
 **Rebuild Steps**:
 ```bash
@@ -408,7 +408,7 @@ Consider adding automated integration tests using:
 - ✅ E2E workflow validated
 - ✅ Service-to-service communication working
 - ✅ JWT authentication functional
-- ✅ Critical DTO validation bug fixed
+- ✅ Critical Dto validation bug fixed
 
 **Next Steps**:
 1. Complete error scenario testing

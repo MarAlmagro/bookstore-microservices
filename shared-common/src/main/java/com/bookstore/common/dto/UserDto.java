@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDto {
 
     /**
      * Unique identifier for the user.

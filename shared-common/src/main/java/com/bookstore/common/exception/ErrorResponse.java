@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Standard error response DTO for consistent error formatting across all microservices.
+ * Standard error response Dto for consistent error formatting across all microservices.
  *
  * This class is returned by the GlobalExceptionHandler when any exception occurs,
  * providing clients with structured error information including timestamp, HTTP status,

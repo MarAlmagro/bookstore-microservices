@@ -344,9 +344,9 @@ public class OrderServiceImpl {
     @Value("${catalog.service.url}")
     private String catalogServiceUrl;
     
-    private BookDTO fetchBookFromCatalog(Long bookId) {
+    private BookDto fetchBookFromCatalog(Long bookId) {
         String url = catalogServiceUrl + "/api/v1/books/" + bookId;
-        return restTemplate.getForObject(url, BookDTO.class);
+        return restTemplate.getForObject(url, BookDto.class);
     }
 }
 ```
@@ -464,8 +464,8 @@ public class OrderServiceImpl {
 public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     
-    public void registerUser(UserDTO userDTO) {
-        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
+    public void registerUser(UserDto userDto) {
+        String hashedPassword = passwordEncoder.encode(userDto.getPassword());
         user.setPassword(hashedPassword);
         // ...
     }
@@ -550,7 +550,7 @@ public class UserService {
 
 **Rationale**:
 - ✓ Simplified dependency management
-- ✓ Shared common code (DTOs, exceptions)
+- ✓ Shared common code (Dtos, exceptions)
 - ✓ Easier local development
 - ✓ Consistent versioning
 - ✓ Single build command
@@ -581,9 +581,9 @@ public class UserService {
 
 ---
 
-### 3. Why Shared DTO Module?
+### 3. Why Shared Dto Module?
 
-**Decision**: Create `shared-common` module for DTOs
+**Decision**: Create `shared-common` module for Dtos
 
 **Rationale**:
 - ✓ Avoid code duplication
@@ -734,12 +734,12 @@ and discover each other
 #### 3. Circuit Breaker
 ```java
 @CircuitBreaker(name = "catalogService", fallbackMethod = "fallbackMethod")
-public BookDTO fetchBook(Long id) {
-    return restTemplate.getForObject(url, BookDTO.class);
+public BookDto fetchBook(Long id) {
+    return restTemplate.getForObject(url, BookDto.class);
 }
 
-public BookDTO fallbackMethod(Long id, Exception e) {
-    return BookDTO.builder()
+public BookDto fallbackMethod(Long id, Exception e) {
+    return BookDto.builder()
         .id(id)
         .title("Unavailable")
         .build();

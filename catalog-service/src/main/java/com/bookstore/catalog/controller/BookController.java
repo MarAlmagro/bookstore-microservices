@@ -1,7 +1,7 @@
 package com.bookstore.catalog.controller;
 
 import com.bookstore.catalog.service.BookService;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -53,11 +53,11 @@ public class BookController {
     @Operation(summary = "Get all books", description = "Retrieves all books from the catalog")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved all books",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
+    public ResponseEntity<List<BookDto>> getAllBooks() {
         logger.info("GET /api/v1/books - Fetching all books");
-        List<BookDTO> books = bookService.findAll();
+        List<BookDto> books = bookService.findAll();
         logger.info("Retrieved {} books", books.size());
         return ResponseEntity.ok(books);
     }
@@ -72,14 +72,14 @@ public class BookController {
     @Operation(summary = "Get book by ID", description = "Retrieves a specific book by its unique identifier")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Book found",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))),
             @ApiResponse(responseCode = "404", description = "Book not found", content = @Content)
     })
-    public ResponseEntity<BookDTO> getBookById(
+    public ResponseEntity<BookDto> getBookById(
             @Parameter(description = "ID of the book to retrieve", required = true)
             @PathVariable @Min(1) Long id) {
         logger.info("GET /api/v1/books/{} - Fetching book by ID", id);
-        BookDTO book = bookService.findById(id);
+        BookDto book = bookService.findById(id);
         return ResponseEntity.ok(book);
     }
 
@@ -93,35 +93,35 @@ public class BookController {
     @Operation(summary = "Get book by ISBN", description = "Retrieves a book by its ISBN")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Book found",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))),
             @ApiResponse(responseCode = "404", description = "Book not found", content = @Content)
     })
-    public ResponseEntity<BookDTO> getBookByIsbn(
+    public ResponseEntity<BookDto> getBookByIsbn(
             @Parameter(description = "ISBN of the book to retrieve", required = true)
             @PathVariable @NotBlank String isbn) {
         logger.info("GET /api/v1/books/isbn/{} - Fetching book by ISBN", isbn);
-        BookDTO book = bookService.findByIsbn(isbn);
+        BookDto book = bookService.findByIsbn(isbn);
         return ResponseEntity.ok(book);
     }
 
     /**
      * Create a new book
      *
-     * @param bookDTO the book data to create
+     * @param bookDto the book data to create
      * @return the created book with generated ID
      */
     @PostMapping
     @Operation(summary = "Create a new book", description = "Adds a new book to the catalog")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Book created successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input or ISBN already exists", content = @Content)
     })
-    public ResponseEntity<BookDTO> createBook(
+    public ResponseEntity<BookDto> createBook(
             @Parameter(description = "Book details to create", required = true)
-            @Valid @RequestBody BookDTO bookDTO) {
-        logger.info("POST /api/v1/books - Creating new book with ISBN: {}", bookDTO.getIsbn());
-        BookDTO createdBook = bookService.create(bookDTO);
+            @Valid @RequestBody BookDto bookDto) {
+        logger.info("POST /api/v1/books - Creating new book with ISBN: {}", bookDto.getIsbn());
+        BookDto createdBook = bookService.create(bookDto);
         logger.info("Created book with ID: {}", createdBook.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
@@ -130,24 +130,24 @@ public class BookController {
      * Update an existing book
      *
      * @param id the book ID to update
-     * @param bookDTO the updated book data
+     * @param bookDto the updated book data
      * @return the updated book
      */
     @PutMapping("/{id}")
     @Operation(summary = "Update a book", description = "Updates an existing book's information")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Book updated successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
             @ApiResponse(responseCode = "404", description = "Book not found", content = @Content)
     })
-    public ResponseEntity<BookDTO> updateBook(
+    public ResponseEntity<BookDto> updateBook(
             @Parameter(description = "ID of the book to update", required = true)
             @PathVariable @Min(1) Long id,
             @Parameter(description = "Updated book details", required = true)
-            @Valid @RequestBody BookDTO bookDTO) {
+            @Valid @RequestBody BookDto bookDto) {
         logger.info("PUT /api/v1/books/{} - Updating book", id);
-        BookDTO updatedBook = bookService.update(id, bookDTO);
+        BookDto updatedBook = bookService.update(id, bookDto);
         logger.info("Updated book with ID: {}", updatedBook.getId());
         return ResponseEntity.ok(updatedBook);
     }
@@ -183,13 +183,13 @@ public class BookController {
     @Operation(summary = "Search books", description = "Searches books by title or author")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search completed successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> searchBooks(
+    public ResponseEntity<List<BookDto>> searchBooks(
             @Parameter(description = "Search term to match against title or author", required = true)
             @RequestParam @NotBlank String searchTerm) {
         logger.info("GET /api/v1/books/search?searchTerm={} - Searching books", searchTerm);
-        List<BookDTO> books = bookService.search(searchTerm);
+        List<BookDto> books = bookService.search(searchTerm);
         logger.info("Found {} books matching search term", books.size());
         return ResponseEntity.ok(books);
     }
@@ -204,13 +204,13 @@ public class BookController {
     @Operation(summary = "Get books by category", description = "Retrieves all books in a specific category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved books",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> getBooksByCategory(
+    public ResponseEntity<List<BookDto>> getBooksByCategory(
             @Parameter(description = "Category/genre to filter by", required = true)
             @PathVariable @NotBlank String category) {
         logger.info("GET /api/v1/books/category/{} - Fetching books by category", category);
-        List<BookDTO> books = bookService.findByCategory(category);
+        List<BookDto> books = bookService.findByCategory(category);
         logger.info("Found {} books in category: {}", books.size(), category);
         return ResponseEntity.ok(books);
     }
@@ -225,13 +225,13 @@ public class BookController {
     @Operation(summary = "Get books by author", description = "Retrieves all books by a specific author (case-insensitive partial match)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved books",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> getBooksByAuthor(
+    public ResponseEntity<List<BookDto>> getBooksByAuthor(
             @Parameter(description = "Author name to search for", required = true)
             @PathVariable @NotBlank String author) {
         logger.info("GET /api/v1/books/author/{} - Fetching books by author", author);
-        List<BookDTO> books = bookService.findByAuthor(author);
+        List<BookDto> books = bookService.findByAuthor(author);
         logger.info("Found {} books by author: {}", books.size(), author);
         return ResponseEntity.ok(books);
     }
@@ -245,11 +245,11 @@ public class BookController {
     @Operation(summary = "Get available books", description = "Retrieves all books that are currently in stock")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved available books",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> getAvailableBooks() {
+    public ResponseEntity<List<BookDto>> getAvailableBooks() {
         logger.info("GET /api/v1/books/available - Fetching available books");
-        List<BookDTO> books = bookService.findAvailableBooks();
+        List<BookDto> books = bookService.findAvailableBooks();
         logger.info("Found {} available books", books.size());
         return ResponseEntity.ok(books);
     }
@@ -264,13 +264,13 @@ public class BookController {
     @Operation(summary = "Get low stock books", description = "Retrieves books with stock below the specified threshold")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved low stock books",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class)))
     })
-    public ResponseEntity<List<BookDTO>> getLowStockBooks(
+    public ResponseEntity<List<BookDto>> getLowStockBooks(
             @Parameter(description = "Stock threshold (default: 10)")
             @RequestParam(defaultValue = "10") @Min(1) Integer threshold) {
         logger.info("GET /api/v1/books/low-stock?threshold={} - Fetching low stock books", threshold);
-        List<BookDTO> books = bookService.findLowStockBooks(threshold);
+        List<BookDto> books = bookService.findLowStockBooks(threshold);
         logger.info("Found {} books with stock below {}", books.size(), threshold);
         return ResponseEntity.ok(books);
     }
@@ -286,17 +286,17 @@ public class BookController {
     @Operation(summary = "Update book stock", description = "Updates the stock quantity for a book")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock updated successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDTO.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid quantity or insufficient stock", content = @Content),
             @ApiResponse(responseCode = "404", description = "Book not found", content = @Content)
     })
-    public ResponseEntity<BookDTO> updateStock(
+    public ResponseEntity<BookDto> updateStock(
             @Parameter(description = "ID of the book to update stock", required = true)
             @PathVariable @Min(1) Long id,
             @Parameter(description = "Quantity to add (positive) or remove (negative)", required = true)
             @RequestParam Integer quantity) {
         logger.info("PATCH /api/v1/books/{}/stock?quantity={} - Updating stock", id, quantity);
-        BookDTO updatedBook = bookService.updateStock(id, quantity);
+        BookDto updatedBook = bookService.updateStock(id, quantity);
         logger.info("Updated stock for book ID: {} to {}", id, updatedBook.getStock());
         return ResponseEntity.ok(updatedBook);
     }

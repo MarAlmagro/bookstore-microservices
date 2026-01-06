@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This directory contains the complete API contract documentation for Phase 12 (Angular SPA Integration). All files were generated through deep analysis of the microservices codebase, including REST controllers, DTOs, validation annotations, and gateway routing configuration.
+This directory contains the complete API contract documentation for Phase 12 (Angular SPA Integration). All files were generated through deep analysis of the microservices codebase, including REST controllers, Dtos, validation annotations, and gateway routing configuration.
 
 ## 📁 Files in This Directory
 
@@ -12,7 +12,7 @@ This directory contains the complete API contract documentation for Phase 12 (An
 **Contents**:
 - Complete API specification in OpenAPI 3.0.3 format
 - All 30+ REST endpoints across 3 microservices
-- Detailed schema definitions for 8 DTOs with validation constraints
+- Detailed schema definitions for 8 Dtos with validation constraints
 - Security scheme definition (JWT Bearer Authentication)
 - Request/response examples with proper type mappings
 - Error response schemas
@@ -65,7 +65,7 @@ ng serve --proxy-config proxy.conf.json
 ```
 
 ### 4. `frontend-models.ts` - TypeScript Interface Definitions
-**Purpose**: Type-safe TypeScript interfaces matching all Java DTOs for Angular development.
+**Purpose**: Type-safe TypeScript interfaces matching all Java Dtos for Angular development.
 
 **Contents**:
 - 12 TypeScript interfaces with complete JSDoc documentation
@@ -84,10 +84,10 @@ ng serve --proxy-config proxy.conf.json
 
 **Usage in Angular**:
 ```typescript
-import { BookDTO, OrderDTO, AuthResponseDTO } from './models/frontend-models';
+import { BookDto, OrderDto, AuthResponseDto } from './models/frontend-models';
 
 // Type-safe HTTP calls
-this.http.get<BookDTO[]>('/api/v1/books').subscribe(books => {
+this.http.get<BookDto[]>('/api/v1/books').subscribe(books => {
   // TypeScript knows the exact shape of books
 });
 ```
@@ -112,20 +112,20 @@ this.http.get<BookDTO[]>('/api/v1/books').subscribe(books => {
 
 **Total Endpoints Mapped**: 28 REST endpoints + 2 batch endpoints = **30 endpoints**
 
-## 📊 DTO Coverage
+## 📊 Dto Coverage
 
 All 8 Data Transfer Objects have been fully documented:
 
-| DTO | Fields | Validation Rules | Used By |
+| Dto | Fields | Validation Rules | Used By |
 |:----|:------:|:----------------:|:--------|
-| `BookDTO` | 8 | @NotBlank, @Size, @DecimalMin, @Min | Catalog Service |
-| `OrderDTO` | 6 | @NotNull, @NotEmpty, @Valid | Order Service |
-| `OrderItemDTO` | 5 | @NotNull, @Min | Order Service |
-| `UserDTO` | 5 | @NotBlank, @Email, @Size | User Service |
-| `AuthRequestDTO` | 2 | @NotBlank, @Email, @Size | User Service |
-| `AuthResponseDTO` | 3 | None (response only) | User Service |
-| `BookImportDTO` | 7 | None (batch only) | Catalog Batch |
-| `OrderReportDTO` | 4 | None (batch only) | Order Batch |
+| `BookDto` | 8 | @NotBlank, @Size, @DecimalMin, @Min | Catalog Service |
+| `OrderDto` | 6 | @NotNull, @NotEmpty, @Valid | Order Service |
+| `OrderItemDto` | 5 | @NotNull, @Min | Order Service |
+| `UserDto` | 5 | @NotBlank, @Email, @Size | User Service |
+| `AuthRequestDto` | 2 | @NotBlank, @Email, @Size | User Service |
+| `AuthResponseDto` | 3 | None (response only) | User Service |
+| `BookImportDto` | 7 | None (batch only) | Catalog Batch |
+| `OrderReportDto` | 4 | None (batch only) | Order Batch |
 | `ErrorResponse` | 5 | None (error only) | All Services |
 
 ## 🔐 Security & Authentication
@@ -171,7 +171,7 @@ cp frontend-models.ts src/app/models/
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookDTO, OrderDTO, AuthResponseDTO } from './models/frontend-models';
+import { BookDto, OrderDto, AuthResponseDto } from './models/frontend-models';
 
 @Injectable({ providedIn: 'root' })
 export class BookstoreApiService {
@@ -180,22 +180,22 @@ export class BookstoreApiService {
   constructor(private http: HttpClient) {}
 
   // Books
-  getAllBooks(): Observable<BookDTO[]> {
-    return this.http.get<BookDTO[]>(`${this.baseUrl}/books`);
+  getAllBooks(): Observable<BookDto[]> {
+    return this.http.get<BookDto[]>(`${this.baseUrl}/books`);
   }
 
-  getBookById(id: number): Observable<BookDTO> {
-    return this.http.get<BookDTO>(`${this.baseUrl}/books/${id}`);
+  getBookById(id: number): Observable<BookDto> {
+    return this.http.get<BookDto>(`${this.baseUrl}/books/${id}`);
   }
 
   // Orders
-  createOrder(order: OrderDTO): Observable<OrderDTO> {
-    return this.http.post<OrderDTO>(`${this.baseUrl}/orders`, order);
+  createOrder(order: OrderDto): Observable<OrderDto> {
+    return this.http.post<OrderDto>(`${this.baseUrl}/orders`, order);
   }
 
   // Auth
-  login(email: string, password: string): Observable<AuthResponseDTO> {
-    return this.http.post<AuthResponseDTO>(`${this.baseUrl}/auth/login`, {
+  login(email: string, password: string): Observable<AuthResponseDto> {
+    return this.http.post<AuthResponseDto>(`${this.baseUrl}/auth/login`, {
       email,
       password
     });
@@ -317,7 +317,7 @@ curl -X POST http://localhost:8080/api/v1/orders \
 
 When adding new endpoints:
 1. Update the OpenAPI specification
-2. Add TypeScript interfaces for new DTOs
+2. Add TypeScript interfaces for new Dtos
 3. Update the routing documentation
 4. Document any new authentication requirements
 5. Add examples to this README
@@ -326,7 +326,7 @@ When adding new endpoints:
 
 - **v1.0.0** (2026-01-05): Initial contract generation for Phase 12
   - 30 endpoints documented
-  - 8 DTOs with full validation rules
+  - 8 Dtos with full validation rules
   - Complete TypeScript type definitions
   - Angular proxy configuration
   - Gateway routing documentation
@@ -337,4 +337,4 @@ When adding new endpoints:
 **Target Phase**: Phase 12 - Angular SPA Development  
 **Services Analyzed**: catalog-service, order-service, user-service, api-gateway  
 **Total Endpoints**: 30  
-**Total DTOs**: 9 (including ErrorResponse)
+**Total Dtos**: 9 (including ErrorResponse)

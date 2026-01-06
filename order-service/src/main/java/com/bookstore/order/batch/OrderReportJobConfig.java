@@ -1,6 +1,6 @@
 package com.bookstore.order.batch;
 
-import com.bookstore.common.dto.OrderReportDTO;
+import com.bookstore.common.dto.OrderReportDto;
 import com.bookstore.common.exception.MalformedDataException;
 import com.bookstore.order.document.Order;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +48,10 @@ public class OrderReportJobConfig {
 
     @Bean
     @StepScope
-    public FlatFileItemWriter<OrderReportDTO> orderReportWriter(
+    public FlatFileItemWriter<OrderReportDto> orderReportWriter(
             @Value("#{jobParameters['outputFile']}") String outputFile) {
         
-        FlatFileItemWriter<OrderReportDTO> writer = new FlatFileItemWriter<>();
+        FlatFileItemWriter<OrderReportDto> writer = new FlatFileItemWriter<>();
         writer.setResource(new FileSystemResource(outputFile));
         writer.setEncoding(StandardCharsets.UTF_8.name());
         writer.setLineSeparator("\r\n");
@@ -61,14 +61,14 @@ public class OrderReportJobConfig {
     }
 
     @Bean
-    public LineAggregator<OrderReportDTO> mainframeLineAggregator() {
+    public LineAggregator<OrderReportDto> mainframeLineAggregator() {
         return new MainframeOrderLineAggregator();
     }
 
     @Bean
     public Step orderReportStep() {
         return stepBuilderFactory.get("orderReportStep")
-                .<Order, OrderReportDTO>chunk(100)
+                .<Order, OrderReportDto>chunk(100)
                 .reader(orderReader(null, null))
                 .processor(mainframeOrderProcessor)
                 .writer(orderReportWriter(null))

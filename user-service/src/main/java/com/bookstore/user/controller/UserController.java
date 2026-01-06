@@ -1,7 +1,7 @@
 package com.bookstore.user.controller;
 
 import com.bookstore.common.constants.ApiConstants;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,10 +33,10 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDTO> getCurrentUserProfile() {
+    public ResponseEntity<UserDto> getCurrentUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        UserDTO user = userService.getUserByEmail(email);
+        UserDto user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }
 
@@ -48,11 +48,11 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDTO> updateCurrentUserProfile(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDto> updateCurrentUserProfile(@Valid @RequestBody UserDto userDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        UserDTO currentUser = userService.getUserByEmail(email);
-        UserDTO updatedUser = userService.updateUser(currentUser.getId(), userDTO);
+        UserDto currentUser = userService.getUserByEmail(email);
+        UserDto updatedUser = userService.updateUser(currentUser.getId(), userDto);
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -65,8 +65,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        UserDTO user = userService.getUserById(id);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        UserDto user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 

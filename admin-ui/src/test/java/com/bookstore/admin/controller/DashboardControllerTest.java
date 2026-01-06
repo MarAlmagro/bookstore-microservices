@@ -2,8 +2,8 @@ package com.bookstore.admin.controller;
 
 import com.bookstore.admin.client.CatalogClient;
 import com.bookstore.admin.client.OrderClient;
-import com.bookstore.admin.dto.BookDTO;
-import com.bookstore.admin.dto.OrderDTO;
+import com.bookstore.admin.dto.BookDto;
+import com.bookstore.admin.dto.OrderDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,11 +39,11 @@ class DashboardControllerTest {
 
     @Test
     void testDashboard() {
-        List<BookDTO> books = new ArrayList<>();
-        books.add(new BookDTO(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction"));
+        List<BookDto> books = new ArrayList<>();
+        books.add(new BookDto(1L, "ISBN1", "Book 1", "Author 1", "Desc", BigDecimal.TEN, 10, "Fiction"));
 
-        List<OrderDTO> orders = new ArrayList<>();
-        orders.add(new OrderDTO("1", 1L, "user@test.com", null, BigDecimal.valueOf(100), "PENDING", null));
+        List<OrderDto> orders = new ArrayList<>();
+        orders.add(new OrderDto("1", 1L, "user@test.com", null, BigDecimal.valueOf(100), "PENDING", null));
 
         when(catalogClient.getAllBooks()).thenReturn(books);
         when(orderClient.getAllOrders()).thenReturn(orders);

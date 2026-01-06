@@ -1,6 +1,6 @@
 /**
  * Frontend TypeScript Models
- * Auto-generated from Java DTOs in the Bookstore Microservices Platform
+ * Auto-generated from Java Dtos in the Bookstore Microservices Platform
  * 
  * Type Mapping Rules:
  * - Java Long/Integer -> TypeScript number
@@ -15,7 +15,7 @@
  * Book Data Transfer Object
  * Represents a book in the catalog with all its details
  */
-export interface BookDTO {
+export interface BookDto {
   /**
    * Unique identifier for the book
    */
@@ -75,7 +75,7 @@ export interface BookDTO {
  * Order Data Transfer Object
  * Represents a customer order containing one or more items
  */
-export interface OrderDTO {
+export interface OrderDto {
   /**
    * Unique identifier for the order (MongoDB ObjectId)
    * Auto-generated on creation
@@ -93,7 +93,7 @@ export interface OrderDTO {
    * Must contain at least one item
    * Required field
    */
-  items: OrderItemDTO[];
+  items: OrderItemDto[];
 
   /**
    * Total amount for the entire order
@@ -121,7 +121,7 @@ export interface OrderDTO {
  * Order Item Data Transfer Object
  * Represents a single book item with quantity and price in an order
  */
-export interface OrderItemDTO {
+export interface OrderItemDto {
   /**
    * Identifier of the book being ordered
    * Required field
@@ -159,7 +159,7 @@ export interface OrderItemDTO {
  * User Data Transfer Object
  * Used for transferring user profile data (without sensitive information like password)
  */
-export interface UserDTO {
+export interface UserDto {
   /**
    * Unique identifier for the user
    * Auto-generated on creation
@@ -200,7 +200,7 @@ export interface UserDTO {
  * Authentication Request Data Transfer Object
  * Contains user credentials for authentication
  */
-export interface AuthRequestDTO {
+export interface AuthRequestDto {
   /**
    * Email address of the user attempting to authenticate
    * Must be valid email format
@@ -220,7 +220,7 @@ export interface AuthRequestDTO {
  * Authentication Response Data Transfer Object
  * Contains JWT tokens and user information returned after successful authentication
  */
-export interface AuthResponseDTO {
+export interface AuthResponseDto {
   /**
    * JWT access token for authenticating API requests
    * Short-lived token used in Authorization header
@@ -237,14 +237,14 @@ export interface AuthResponseDTO {
    * User information for the authenticated user
    * Contains profile details without sensitive data
    */
-  user: UserDTO;
+  user: UserDto;
 }
 
 /**
  * Registration Request Data Transfer Object
  * Used when registering a new user account
  */
-export interface RegisterRequestDTO {
+export interface RegisterRequestDto {
   /**
    * Email address for the new account
    * Must be valid email format
@@ -276,7 +276,7 @@ export interface RegisterRequestDTO {
  * Token Refresh Request Data Transfer Object
  * Used when refreshing an expired access token
  */
-export interface RefreshTokenRequestDTO {
+export interface RefreshTokenRequestDto {
   /**
    * The refresh token to use for generating a new access token
    * Required field
@@ -288,7 +288,7 @@ export interface RefreshTokenRequestDTO {
  * Book Import Data Transfer Object
  * Used for batch import operations
  */
-export interface BookImportDTO {
+export interface BookImportDto {
   /**
    * International Standard Book Number
    */
@@ -329,7 +329,7 @@ export interface BookImportDTO {
  * Order Report Data Transfer Object
  * Used for batch reporting operations
  */
-export interface OrderReportDTO {
+export interface OrderReportDto {
   /**
    * Numeric identifier for the report entry
    */

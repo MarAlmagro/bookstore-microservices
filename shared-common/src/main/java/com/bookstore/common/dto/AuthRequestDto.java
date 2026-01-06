@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthRequestDTO {
+public class AuthRequestDto {
 
     /**
      * Email address of the user attempting to authenticate.

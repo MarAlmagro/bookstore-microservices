@@ -1,6 +1,6 @@
 package com.bookstore.user.service;
 
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.mapper.UserMapper;
@@ -25,38 +25,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDTO getUserById(Long id) {
+    public UserDto getUserById(Long id) {
         logger.debug("Fetching user with id: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDTO getUserByEmail(String email) {
+    public UserDto getUserByEmail(String email) {
         logger.debug("Fetching user with email: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     @Override
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public UserDto updateUser(Long id, UserDto userDto) {
         logger.debug("Updating user with id: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        if (userDTO.getFirstName() != null) {
-            user.setFirstName(userDTO.getFirstName());
+        if (userDto.getFirstName() != null) {
+            user.setFirstName(userDto.getFirstName());
         }
-        if (userDTO.getLastName() != null) {
-            user.setLastName(userDTO.getLastName());
+        if (userDto.getLastName() != null) {
+            user.setLastName(userDto.getLastName());
         }
 
         User updatedUser = userRepository.save(user);
         logger.info("User updated successfully with id: {}", id);
-        return userMapper.toDTO(updatedUser);
+        return userMapper.toDto(updatedUser);
     }
 
     @Override

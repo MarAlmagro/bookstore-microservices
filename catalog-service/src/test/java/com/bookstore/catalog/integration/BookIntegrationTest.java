@@ -3,7 +3,7 @@ package com.bookstore.catalog.integration;
 import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.repository.BookRepository;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,40 +53,40 @@ class BookIntegrationTest {
     @DisplayName("Should create, retrieve, update and delete a book (full CRUD)")
     void fullCrudLifecycle_ShouldWorkCorrectly() throws Exception {
         // Create a new book
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
 
         String createResponse = mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newBookDTO)))
+                        .content(objectMapper.writeValueAsString(newBookDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.isbn", is(newBookDTO.getIsbn())))
-                .andExpect(jsonPath("$.title", is(newBookDTO.getTitle())))
+                .andExpect(jsonPath("$.isbn", is(newBookDto.getIsbn())))
+                .andExpect(jsonPath("$.title", is(newBookDto.getTitle())))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        BookDTO createdBook = objectMapper.readValue(createResponse, BookDTO.class);
+        BookDto createdBook = objectMapper.readValue(createResponse, BookDto.class);
         Long bookId = createdBook.getId();
 
         // Retrieve the created book
         mockMvc.perform(get("/api/v1/books/{id}", bookId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(newBookDTO.getTitle())));
+                .andExpect(jsonPath("$.title", is(newBookDto.getTitle())));
 
         // Update the book
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
-        updateDTO.setId(bookId);
-        updateDTO.setIsbn(newBookDTO.getIsbn()); // Keep same ISBN
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
+        updateDto.setId(bookId);
+        updateDto.setIsbn(newBookDto.getIsbn()); // Keep same ISBN
 
         mockMvc.perform(put("/api/v1/books/{id}", bookId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(updateDTO.getTitle())));
+                .andExpect(jsonPath("$.title", is(updateDto.getTitle())));
 
         // Delete the book
         mockMvc.perform(delete("/api/v1/books/{id}", bookId))
@@ -141,13 +141,13 @@ class BookIntegrationTest {
         bookRepository.save(existingBook);
 
         // Try to create another book with same ISBN
-        BookDTO duplicateBookDTO = BookTestFixtures.createNewBookDTO();
-        duplicateBookDTO.setIsbn(existingBook.getIsbn());
+        BookDto duplicateBookDto = BookTestFixtures.createNewBookDto();
+        duplicateBookDto.setIsbn(existingBook.getIsbn());
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(duplicateBookDTO)))
+                        .content(objectMapper.writeValueAsString(duplicateBookDto)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -316,7 +316,7 @@ class BookIntegrationTest {
     @DisplayName("Should validate required fields when creating book")
     void createBook_WithMissingRequiredFields_ShouldFail() throws Exception {
         // Arrange - Book with missing required fields
-        BookDTO invalidBook = BookDTO.builder()
+        BookDto invalidBook = BookDto.builder()
                 .isbn("")  // Invalid: empty
                 .title("")  // Invalid: empty
                 .price(new BigDecimal("-10"))  // Invalid: negative
@@ -335,7 +335,7 @@ class BookIntegrationTest {
     void createMultipleBooks_Concurrently_ShouldSucceed() throws Exception {
         // Arrange & Act - Create multiple books with different ISBNs
         for (int i = 1; i <= 5; i++) {
-            BookDTO book = BookTestFixtures.createNewBookDTO();
+            BookDto book = BookTestFixtures.createNewBookDto();
             book.setIsbn("978123456" + i);  // Valid 10-character ISBN
             book.setTitle("Test Book " + i);
 

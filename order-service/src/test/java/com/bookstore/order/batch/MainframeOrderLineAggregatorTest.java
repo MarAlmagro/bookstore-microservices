@@ -1,6 +1,6 @@
 package com.bookstore.order.batch;
 
-import com.bookstore.common.dto.OrderReportDTO;
+import com.bookstore.common.dto.OrderReportDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldProduce47Characters_WithTypicalInput() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(123456789L)
                 .category("Fiction")
                 .totalAmount(new BigDecimal("1234.56"))
@@ -34,7 +34,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldProduce47Characters_WithMinimalValues() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(1L)
                 .category("A")
                 .totalAmount(new BigDecimal("0.01"))
@@ -49,7 +49,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldProduce47Characters_WithMaxValues() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(9999999999L)
                 .category("VeryLongCategoryName")
                 .totalAmount(new BigDecimal("99999999.99"))
@@ -64,7 +64,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldProduce47Characters_WithZeroAmount() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(555L)
                 .category("NonFiction")
                 .totalAmount(BigDecimal.ZERO)
@@ -79,7 +79,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldProduce47Characters_WithDecimalRounding() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(999L)
                 .category("Science")
                 .totalAmount(new BigDecimal("123.456"))
@@ -94,7 +94,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldTruncateCategory_WhenTooLong() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(100L)
                 .category("ThisIsAVeryLongCategoryNameThatExceeds15Characters")
                 .totalAmount(new BigDecimal("50.00"))
@@ -109,7 +109,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldPadCategory_WhenTooShort() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(200L)
                 .category("Tech")
                 .totalAmount(new BigDecimal("100.00"))
@@ -124,7 +124,7 @@ class MainframeOrderLineAggregatorTest {
 
     @Test
     void aggregate_ShouldFormatCorrectly_WithAllFieldsPresent() {
-        OrderReportDTO order = OrderReportDTO.builder()
+        OrderReportDto order = OrderReportDto.builder()
                 .numericId(42L)
                 .category("Mystery")
                 .totalAmount(new BigDecimal("99.99"))

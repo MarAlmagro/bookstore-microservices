@@ -6,22 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * Data Transfer Object for Order.
- * Represents a customer order containing one or more items.
- */
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class OrderDTO {
+public class OrderDto {
 
     /**
      * Unique identifier for the order.
@@ -40,7 +36,9 @@ public class OrderDTO {
      */
     @NotEmpty(message = "Order must contain at least one item")
     @Valid
-    private List<OrderItemDTO> items;
+    @lombok.Setter(lombok.AccessLevel.NONE)
+    @lombok.Getter(lombok.AccessLevel.NONE)
+    private List<OrderItemDto> items;
 
     /**
      * Total amount for the entire order.
@@ -59,4 +57,22 @@ public class OrderDTO {
      * Timestamp when the order was created.
      */
     private LocalDateTime createdAt;
+
+    public OrderDto(String id, Long userId, List<OrderItemDto> items, BigDecimal totalAmount, String status,
+            LocalDateTime createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.items = items != null ? new ArrayList<>(items) : null;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
+    public void setItems(List<OrderItemDto> items) {
+        this.items = items != null ? new ArrayList<>(items) : null;
+    }
+
+    public List<OrderItemDto> getItems() {
+        return items != null ? new ArrayList<>(items) : null;
+    }
 }

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DashboardStatsDTO {
+public class DashboardStatsDto {
     private Long totalBooks;
     private Long totalOrders;
     private Long totalUsers;
