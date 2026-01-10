@@ -3,6 +3,7 @@ package com.bookstore.catalog.controller;
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.service.BookService;
 import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.exception.GlobalExceptionHandler;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -32,6 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests REST endpoint behavior without starting the full Spring context.
  */
 @WebMvcTest(BookController.class)
+@Import(GlobalExceptionHandler.class)
+@TestPropertySource(properties = {
+    "spring.batch.job.enabled=false"
+})
 @DisplayName("BookController Integration Tests")
 class BookControllerTest {
 
@@ -274,7 +283,7 @@ class BookControllerTest {
 
                 // Act & Assert
                 mockMvc.perform(get("/api/v1/books/search")
-                                .param("searchTerm", searchTerm))
+                                .param("query", searchTerm))
                                 .andDo(print())
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$", hasSize(1)))
