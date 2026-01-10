@@ -52,21 +52,6 @@ docker-compose.override.yml
 # Spring Boot
 spring-boot-devtools.properties
 
-# Coding Agents
-.claude/
-.cursor/
-.deepseek/
-.gemini/
-.google/
-.openai/
-.anthropic/
-.grok/
-.perplexity/
-.grok/
-.windsurf/
-AGENT*.md
-CLAUDE.md
-
 # Node.js / Frontend (admin-ui specific)
 admin-ui/node/
 admin-ui/node_modules/
