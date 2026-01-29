@@ -1,6 +1,8 @@
 package com.bookstore.catalog.service;
 
 import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.PageRequestDto;
+import com.bookstore.common.dto.PageResponseDto;
 
 import java.util.List;
 
@@ -115,4 +117,10 @@ public interface BookService {
      * @throws com.bookstore.common.exception.InvalidRequestException if resulting stock would be negative
      */
     BookDto updateStock(Long id, Integer quantity);
+
+    PageResponseDto<BookDto> findAllPaginated(PageRequestDto pageRequest);
+
+    PageResponseDto<BookDto> findByCategoryPaginated(String category, PageRequestDto pageRequest);
+
+    PageResponseDto<BookDto> searchPaginated(String searchTerm, PageRequestDto pageRequest);
 }
