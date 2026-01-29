@@ -5,12 +5,14 @@ import com.bookstore.common.exception.MalformedDataException;
 import com.bookstore.order.document.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "spring.batch.job.enabled", havingValue = "true", matchIfMissing = true)
 public class MainframeOrderProcessor implements ItemProcessor<Order, OrderReportDto> {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");

@@ -170,14 +170,14 @@ class BookIntegrationTest {
 
         // Search by title
         mockMvc.perform(get("/api/v1/books/search")
-                        .param("searchTerm", "Java"))
+                        .param("query", "Java"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", containsString("Java")));
 
         // Search by author
         mockMvc.perform(get("/api/v1/books/search")
-                        .param("searchTerm", "Martin"))
+                        .param("query", "Martin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].author", containsString("Martin")));

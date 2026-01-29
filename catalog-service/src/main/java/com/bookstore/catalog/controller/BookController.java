@@ -89,6 +89,27 @@ public class BookController {
                 return ResponseEntity.ok(bookService.findByCategory(category));
         }
 
+        @Operation(summary = "Get books by author", description = "Retrieves all books by a specific author")
+        @GetMapping("/author/{author}")
+        public ResponseEntity<List<BookDto>> getBooksByAuthor(@PathVariable String author) {
+                log.debug("REST request to get books by author: {}", author);
+                return ResponseEntity.ok(bookService.findByAuthor(author));
+        }
+
+        @Operation(summary = "Get available books", description = "Retrieves all books that are currently in stock")
+        @GetMapping("/available")
+        public ResponseEntity<List<BookDto>> getAvailableBooks() {
+                log.debug("REST request to get available books");
+                return ResponseEntity.ok(bookService.findAvailableBooks());
+        }
+
+        @Operation(summary = "Get low stock books", description = "Retrieves books with stock below threshold")
+        @GetMapping("/low-stock")
+        public ResponseEntity<List<BookDto>> getLowStockBooks(@RequestParam(defaultValue = "10") Integer threshold) {
+                log.debug("REST request to get low stock books with threshold: {}", threshold);
+                return ResponseEntity.ok(bookService.findLowStockBooks(threshold));
+        }
+
         @Operation(summary = "Update book stock", description = "Updates the stock level for a book")
         @PatchMapping("/{id}/stock")
         public ResponseEntity<BookDto> updateStock(@PathVariable Long id, @RequestParam Integer quantity) {

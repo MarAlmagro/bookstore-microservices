@@ -16,6 +16,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -28,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.batch.job.enabled", havingValue = "true", matchIfMissing = true)
 public class OrderReportJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
