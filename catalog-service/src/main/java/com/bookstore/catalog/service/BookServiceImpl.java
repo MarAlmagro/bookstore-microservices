@@ -217,7 +217,7 @@ public class BookServiceImpl implements BookService {
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
         
-        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage);
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
         response.setContent(bookDtos);
         
         logger.debug("Returning {} books out of {} total", bookDtos.size(), bookPage.getTotalElements());
@@ -237,7 +237,7 @@ public class BookServiceImpl implements BookService {
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
         
-        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage);
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
         response.setContent(bookDtos);
         
         logger.debug("Returning {} books in category '{}' out of {} total",
@@ -258,7 +258,7 @@ public class BookServiceImpl implements BookService {
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
         
-        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage);
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
         response.setContent(bookDtos);
         
         logger.debug("Returning {} books matching '{}' out of {} total",

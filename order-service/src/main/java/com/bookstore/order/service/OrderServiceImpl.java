@@ -180,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toDto)
                 .collect(Collectors.toList());
         
-        PageResponseDto<OrderDto> response = PageMapper.toPageResponse(orderPage);
+        PageResponseDto<OrderDto> response = PageMapper.toPageResponse(orderPage, OrderDto.class);
         response.setContent(orderDtos);
         
         log.debug("Returning {} orders out of {} total", orderDtos.size(), orderPage.getTotalElements());
@@ -199,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toDto)
                 .collect(Collectors.toList());
         
-        PageResponseDto<OrderDto> response = PageMapper.toPageResponse(orderPage);
+        PageResponseDto<OrderDto> response = PageMapper.toPageResponse(orderPage, OrderDto.class);
         response.setContent(orderDtos);
         
         log.debug("Returning {} orders for user {} out of {} total",

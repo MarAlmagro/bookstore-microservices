@@ -13,16 +13,16 @@ public class PageMapper {
     private PageMapper() {
     }
 
-    public static <T> PageResponseDto<T> toPageResponse(Page<T> page) {
-        return PageResponseDto.<T>builder()
-                .content(page.getContent())
-                .page(page.getNumber())
-                .size(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .first(page.isFirst())
-                .last(page.isLast())
-                .build();
+    public static <T> PageResponseDto<T> toPageResponse(Page<?> page, Class<T> type) {
+        PageResponseDto<T> response = new PageResponseDto<>();
+        response.setContent(null); // Will be set by caller
+        response.setTotalElements(page.getTotalElements());
+        response.setTotalPages(page.getTotalPages());
+        response.setSize(page.getSize());
+        response.setPage(page.getNumber());
+        response.setFirst(page.isFirst());
+        response.setLast(page.isLast());
+        return response;
     }
 
     public static Pageable toPageable(int page, int size, String sortBy, String sortDir) {
