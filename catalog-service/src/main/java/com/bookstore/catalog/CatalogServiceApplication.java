@@ -14,11 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Bookstore Team
  * @version 1.0.0
  */
-@SpringBootApplication
-@ComponentScan(basePackages = {
-    "com.bookstore.catalog",
-    "com.bookstore.common.exception"  // Include shared exception handlers
-})
+@SpringBootApplication(scanBasePackages = {"com.bookstore.catalog", "com.bookstore.common"})
 public class CatalogServiceApplication {
 
     public static void main(String[] args) {
