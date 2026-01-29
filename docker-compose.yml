@@ -27,12 +27,16 @@ services:
     container_name: bookstore-api-gateway
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8080:8080"
     networks:
       - bookstore-network
     depends_on:
       eureka-server:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
@@ -101,6 +105,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Redis for Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: bookstore-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   # Catalog Service
   catalog-service:
@@ -273,6 +292,7 @@ volumes:
   mysql-data:
   mongodb-data:
   postgres-data:
+  redis-data:
   prometheus-data:
   loki-data:
   grafana-data:
