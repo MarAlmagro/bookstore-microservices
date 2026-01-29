@@ -1,22 +1,26 @@
 package com.bookstore.catalog.controller;
 
 import com.bookstore.catalog.fixtures.BookTestFixtures;
+import com.bookstore.catalog.security.JwtAuthenticationFilter;
 import com.bookstore.catalog.service.BookService;
 import com.bookstore.common.dto.BookDto;
 import com.bookstore.common.exception.GlobalExceptionHandler;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
+import com.bookstore.common.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -38,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(BookController.class)
 @Import(GlobalExceptionHandler.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
     "spring.batch.job.enabled=false"
 })
@@ -52,6 +57,12 @@ class BookControllerTest {
 
         @MockBean
         private BookService bookService;
+
+        @MockBean
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+        @MockBean
+        private JwtTokenProvider jwtTokenProvider;
 
         private BookDto sampleBookDto;
 

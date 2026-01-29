@@ -1,6 +1,8 @@
 package com.bookstore.catalog.repository;
 
 import com.bookstore.catalog.entity.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -105,4 +107,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      */
     @Query("SELECT b FROM Book b WHERE b.stock < :threshold AND b.stock > 0")
     List<Book> findLowStockBooks(@Param("threshold") Integer threshold);
+
+    Page<Book> findByCategory(String category, Pageable pageable);
+
+    @Query("SELECT b FROM Book b WHERE " +
+           "LOWER(b.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(b.author) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Book> searchByTitleOrAuthor(@Param("searchTerm") String searchTerm, Pageable pageable);
 }

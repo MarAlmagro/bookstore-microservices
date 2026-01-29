@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
         User savedUser = userRepository.save(user);
         logger.info("User registered successfully with email: {}", userDto.getEmail());
 
-        String token = tokenProvider.generateTokenFromUsername(savedUser.getEmail());
+        String token = tokenProvider.generateTokenWithClaims(savedUser.getEmail(), savedUser.getId(), savedUser.getRole().name());
         String refreshToken = tokenProvider.generateRefreshToken(savedUser.getEmail());
 
         return AuthResponseDto.builder()
@@ -77,18 +77,18 @@ public class AuthServiceImpl implements AuthService {
         logger.debug("User login attempt with email: {}", authRequest.getEmail());
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authRequest.getEmail(),
                             authRequest.getPassword()
                     )
             );
 
-            String token = tokenProvider.generateToken(authentication);
-            String refreshToken = tokenProvider.generateRefreshToken(authRequest.getEmail());
-
             User user = userRepository.findByEmail(authRequest.getEmail())
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+
+            String token = tokenProvider.generateTokenWithClaims(user.getEmail(), user.getId(), user.getRole().name());
+            String refreshToken = tokenProvider.generateRefreshToken(authRequest.getEmail());
 
             logger.info("User logged in successfully with email: {}", authRequest.getEmail());
 
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
-        String newToken = tokenProvider.generateTokenFromUsername(email);
+        String newToken = tokenProvider.generateTokenWithClaims(user.getEmail(), user.getId(), user.getRole().name());
         String newRefreshToken = tokenProvider.generateRefreshToken(email);
 
         logger.info("Token refreshed successfully for email: {}", email);

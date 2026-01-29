@@ -2,6 +2,9 @@ package com.bookstore.order.controller;
 
 import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.PageRequestDto;
+import com.bookstore.common.dto.PageResponseDto;
+import com.bookstore.order.security.OrderSecurityService;
 import com.bookstore.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,6 +36,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody OrderDto orderDto) {
         log.info("Received request to create order for user: {}", orderDto.getUserId());
         OrderDto createdOrder = orderService.createOrder(orderDto);
@@ -45,6 +50,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("@orderSecurityService.isOrderOwnerOrAdmin(#id)")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable String id) {
         log.info("Received request to get order: {}", id);
         OrderDto order = orderService.getOrderById(id);
@@ -57,6 +63,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDto>> getAllOrders() {
         log.info("Received request to get all orders");
         List<OrderDto> orders = orderService.getAllOrders();
@@ -69,6 +76,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/user/{userId}")
+    @PreAuthorize("@orderSecurityService.isSameUserOrAdmin(#userId)")
     public ResponseEntity<List<OrderDto>> getUserOrders(@PathVariable Long userId) {
         log.info("Received request to get orders for user: {}", userId);
         List<OrderDto> orders = orderService.getUserOrders(userId);
@@ -81,6 +89,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDto>> getOrdersByStatus(@PathVariable OrderStatus status) {
         log.info("Received request to get orders with status: {}", status);
         List<OrderDto> orders = orderService.getOrdersByStatus(status);
@@ -94,6 +103,7 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> updateOrderStatus(
             @PathVariable String id,
             @RequestParam OrderStatus status) {
@@ -109,9 +119,47 @@ public class OrderController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
         log.info("Received request to delete order: {}", id);
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get paginated orders", description = "Retrieves all orders with pagination support")
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageResponseDto<OrderDto>> getAllOrdersPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        log.info("Received request to get paginated orders - page: {}, size: {}", page, size);
+        PageRequestDto pageRequest = PageRequestDto.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .sortDir(sortDir)
+                .build();
+        return ResponseEntity.ok(orderService.getAllOrdersPaginated(pageRequest));
+    }
+
+    @Operation(summary = "Get paginated user orders", description = "Retrieves orders for a specific user with pagination")
+    @GetMapping("/user/{userId}/page")
+    @PreAuthorize("@orderSecurityService.isSameUserOrAdmin(#userId)")
+    public ResponseEntity<PageResponseDto<OrderDto>> getUserOrdersPaginated(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        log.info("Received request to get paginated orders for user: {}", userId);
+        PageRequestDto pageRequest = PageRequestDto.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .sortDir(sortDir)
+                .build();
+        return ResponseEntity.ok(orderService.getUserOrdersPaginated(userId, pageRequest));
     }
 }

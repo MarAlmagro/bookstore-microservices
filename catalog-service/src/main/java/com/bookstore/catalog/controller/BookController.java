@@ -1,6 +1,8 @@
 package com.bookstore.catalog.controller;
 
 import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.PageRequestDto;
+import com.bookstore.common.dto.PageResponseDto;
 import com.bookstore.catalog.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -54,6 +57,7 @@ public class BookController {
 
         @Operation(summary = "Create a new book", description = "Adds a new book to the catalog")
         @PostMapping
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BookDto> createBook(@Valid @RequestBody BookDto bookDto) {
                 log.debug("REST request to save book : {}", bookDto);
                 BookDto result = bookService.create(bookDto);
@@ -62,6 +66,7 @@ public class BookController {
 
         @Operation(summary = "Update an existing book", description = "Updates book details by ID")
         @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @Valid @RequestBody BookDto bookDto) {
                 log.debug("REST request to update book : {}, {}", id, bookDto);
                 return ResponseEntity.ok(bookService.update(id, bookDto));
@@ -69,6 +74,7 @@ public class BookController {
 
         @Operation(summary = "Delete a book", description = "Removes a book from the catalog by ID")
         @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
                 log.debug("REST request to delete book : {}", id);
                 bookService.delete(id);
@@ -112,8 +118,62 @@ public class BookController {
 
         @Operation(summary = "Update book stock", description = "Updates the stock level for a book")
         @PatchMapping("/{id}/stock")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BookDto> updateStock(@PathVariable Long id, @RequestParam Integer quantity) {
                 log.debug("REST request to update stock for book : {} by {}", id, quantity);
                 return ResponseEntity.ok(bookService.updateStock(id, quantity));
+        }
+
+        @Operation(summary = "Get paginated books", description = "Retrieves books with pagination support")
+        @GetMapping("/page")
+        public ResponseEntity<PageResponseDto<BookDto>> getAllBooksPaginated(
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "20") int size,
+                        @RequestParam(defaultValue = "createdAt") String sortBy,
+                        @RequestParam(defaultValue = "desc") String sortDir) {
+                log.debug("REST request to get paginated books - page: {}, size: {}", page, size);
+                PageRequestDto pageRequest = PageRequestDto.builder()
+                                .page(page)
+                                .size(size)
+                                .sortBy(sortBy)
+                                .sortDir(sortDir)
+                                .build();
+                return ResponseEntity.ok(bookService.findAllPaginated(pageRequest));
+        }
+
+        @Operation(summary = "Get paginated books by category", description = "Retrieves books in a category with pagination")
+        @GetMapping("/category/{category}/page")
+        public ResponseEntity<PageResponseDto<BookDto>> getBooksByCategoryPaginated(
+                        @PathVariable String category,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "20") int size,
+                        @RequestParam(defaultValue = "title") String sortBy,
+                        @RequestParam(defaultValue = "asc") String sortDir) {
+                log.debug("REST request to get paginated books for category: {}", category);
+                PageRequestDto pageRequest = PageRequestDto.builder()
+                                .page(page)
+                                .size(size)
+                                .sortBy(sortBy)
+                                .sortDir(sortDir)
+                                .build();
+                return ResponseEntity.ok(bookService.findByCategoryPaginated(category, pageRequest));
+        }
+
+        @Operation(summary = "Search books with pagination", description = "Searches books by title or author with pagination")
+        @GetMapping("/search/page")
+        public ResponseEntity<PageResponseDto<BookDto>> searchBooksPaginated(
+                        @RequestParam String query,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "20") int size,
+                        @RequestParam(defaultValue = "title") String sortBy,
+                        @RequestParam(defaultValue = "asc") String sortDir) {
+                log.debug("REST request to search paginated books for query: {}", query);
+                PageRequestDto pageRequest = PageRequestDto.builder()
+                                .page(page)
+                                .size(size)
+                                .sortBy(sortBy)
+                                .sortDir(sortDir)
+                                .build();
+                return ResponseEntity.ok(bookService.searchPaginated(query, pageRequest));
         }
 }

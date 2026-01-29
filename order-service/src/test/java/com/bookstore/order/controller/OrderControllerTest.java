@@ -5,11 +5,15 @@ import com.bookstore.common.dto.OrderDto;
 import com.bookstore.common.dto.OrderItemDto;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.common.exception.GlobalExceptionHandler;
+import com.bookstore.common.security.JwtTokenProvider;
+import com.bookstore.order.security.JwtAuthenticationFilter;
+import com.bookstore.order.security.OrderSecurityService;
 import com.bookstore.order.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration.class,
                 org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration.class
 })
+@AutoConfigureMockMvc(addFilters = false)
 @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = com.bookstore.order.config.MongoAuditingConfig.class))
 @Import(GlobalExceptionHandler.class)
 @TestPropertySource(properties = {
@@ -49,6 +54,15 @@ class OrderControllerTest {
 
         @MockBean
         private OrderService orderService;
+
+        @MockBean
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+        @MockBean
+        private JwtTokenProvider jwtTokenProvider;
+
+        @MockBean
+        private OrderSecurityService orderSecurityService;
 
         private OrderDto testOrderDto;
 

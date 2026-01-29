@@ -4,15 +4,21 @@ import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.mapper.BookMapper;
 import com.bookstore.catalog.repository.BookRepository;
 import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.dto.PageRequestDto;
+import com.bookstore.common.dto.PageResponseDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
+import com.bookstore.common.util.PageMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of BookService interface.
@@ -26,6 +32,8 @@ import java.util.List;
 public class BookServiceImpl implements BookService {
 
     private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
+    private static final String BOOK_NOT_FOUND_LOG = "Book not found with id: {}";
+    private static final String BOOK_NOT_FOUND_MSG = "Book not found with id: ";
 
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
@@ -51,8 +59,8 @@ public class BookServiceImpl implements BookService {
         logger.debug("Fetching book with id: {}", id);
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> {
-                    logger.error("Book not found with id: {}", id);
-                    return new ResourceNotFoundException("Book not found with id: " + id);
+                    logger.error(BOOK_NOT_FOUND_LOG, id);
+                    return new ResourceNotFoundException(BOOK_NOT_FOUND_MSG + id);
                 });
         logger.debug("Found book: {}", book.getTitle());
         return bookMapper.toDto(book);
@@ -94,16 +102,14 @@ public class BookServiceImpl implements BookService {
         // Find existing book
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> {
-                    logger.error("Book not found with id: {}", id);
-                    return new ResourceNotFoundException("Book not found with id: " + id);
+                    logger.error(BOOK_NOT_FOUND_LOG, id);
+                    return new ResourceNotFoundException(BOOK_NOT_FOUND_MSG + id);
                 });
 
         // Check if ISBN is being changed to one that already exists
-        if (!existingBook.getIsbn().equals(bookDto.getIsbn())) {
-            if (bookRepository.existsByIsbn(bookDto.getIsbn())) {
-                logger.error("Cannot update book: ISBN {} already exists for another book", bookDto.getIsbn());
-                throw new InvalidRequestException("Book with ISBN " + bookDto.getIsbn() + " already exists");
-            }
+        if (!existingBook.getIsbn().equals(bookDto.getIsbn()) && bookRepository.existsByIsbn(bookDto.getIsbn())) {
+            logger.error("Cannot update book: ISBN {} already exists for another book", bookDto.getIsbn());
+            throw new InvalidRequestException("Book with ISBN " + bookDto.getIsbn() + " already exists");
         }
 
         // Update the existing book entity
@@ -119,8 +125,8 @@ public class BookServiceImpl implements BookService {
 
         // Verify book exists before deleting
         if (!bookRepository.existsById(id)) {
-            logger.error("Book not found with id: {}", id);
-            throw new ResourceNotFoundException("Book not found with id: " + id);
+            logger.error(BOOK_NOT_FOUND_LOG, id);
+            throw new ResourceNotFoundException(BOOK_NOT_FOUND_MSG + id);
         }
 
         bookRepository.deleteById(id);
@@ -178,8 +184,8 @@ public class BookServiceImpl implements BookService {
 
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> {
-                    logger.error("Book not found with id: {}", id);
-                    return new ResourceNotFoundException("Book not found with id: " + id);
+                    logger.error(BOOK_NOT_FOUND_LOG, id);
+                    return new ResourceNotFoundException(BOOK_NOT_FOUND_MSG + id);
                 });
 
         int newStock = book.getStock() + quantity;
@@ -196,5 +202,67 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = bookRepository.save(book);
         logger.info("Updated stock for book id: {} to {}", id, newStock);
         return bookMapper.toDto(updatedBook);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<BookDto> findAllPaginated(PageRequestDto pageRequest) {
+        logger.debug("Fetching paginated books - page: {}, size: {}, sortBy: {}, sortDir: {}",
+                pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSortBy(), pageRequest.getSortDir());
+        
+        Pageable pageable = PageMapper.toPageable(pageRequest);
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+        
+        List<BookDto> bookDtos = bookPage.getContent().stream()
+                .map(bookMapper::toDto)
+                .collect(Collectors.toList());
+        
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
+        response.setContent(bookDtos);
+        
+        logger.debug("Returning {} books out of {} total", bookDtos.size(), bookPage.getTotalElements());
+        return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<BookDto> findByCategoryPaginated(String category, PageRequestDto pageRequest) {
+        logger.debug("Fetching paginated books for category: {} - page: {}, size: {}",
+                category, pageRequest.getPage(), pageRequest.getSize());
+        
+        Pageable pageable = PageMapper.toPageable(pageRequest);
+        Page<Book> bookPage = bookRepository.findByCategory(category, pageable);
+        
+        List<BookDto> bookDtos = bookPage.getContent().stream()
+                .map(bookMapper::toDto)
+                .collect(Collectors.toList());
+        
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
+        response.setContent(bookDtos);
+        
+        logger.debug("Returning {} books in category '{}' out of {} total",
+                bookDtos.size(), category, bookPage.getTotalElements());
+        return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<BookDto> searchPaginated(String searchTerm, PageRequestDto pageRequest) {
+        logger.debug("Searching paginated books with term: {} - page: {}, size: {}",
+                searchTerm, pageRequest.getPage(), pageRequest.getSize());
+        
+        Pageable pageable = PageMapper.toPageable(pageRequest);
+        Page<Book> bookPage = bookRepository.searchByTitleOrAuthor(searchTerm, pageable);
+        
+        List<BookDto> bookDtos = bookPage.getContent().stream()
+                .map(bookMapper::toDto)
+                .collect(Collectors.toList());
+        
+        PageResponseDto<BookDto> response = PageMapper.toPageResponse(bookPage, BookDto.class);
+        response.setContent(bookDtos);
+        
+        logger.debug("Returning {} books matching '{}' out of {} total",
+                bookDtos.size(), searchTerm, bookPage.getTotalElements());
+        return response;
     }
 }

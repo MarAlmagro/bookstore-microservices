@@ -15,6 +15,10 @@ spring:
     job:
       enabled: false
 
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm}
+
 server:
   port: 8082
   servlet:
