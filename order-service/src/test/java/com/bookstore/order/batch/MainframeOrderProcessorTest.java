@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MainframeOrderProcessorTest {
 
     private MainframeOrderProcessor processor;
+    private static final String FAILED_TO_PROCESS_ORDER_MESSAGE = "Failed to process order";
 
     @BeforeEach
     void setUp() {
@@ -176,7 +177,7 @@ class MainframeOrderProcessorTest {
 
         assertThatThrownBy(() -> processor.process(order))
                 .isInstanceOf(MalformedDataException.class)
-                .hasMessageContaining("Failed to process order");
+                .hasMessageContaining(FAILED_TO_PROCESS_ORDER_MESSAGE);
     }
 
     @Test
@@ -192,7 +193,7 @@ class MainframeOrderProcessorTest {
 
         assertThatThrownBy(() -> processor.process(order))
                 .isInstanceOf(MalformedDataException.class)
-                .hasMessageContaining("Failed to process order");
+                .hasMessageContaining(FAILED_TO_PROCESS_ORDER_MESSAGE);
     }
 
     @Test
@@ -208,7 +209,7 @@ class MainframeOrderProcessorTest {
 
         assertThatThrownBy(() -> processor.process(order))
                 .isInstanceOf(MalformedDataException.class)
-                .hasMessageContaining("Failed to process order");
+                .hasMessageContaining(FAILED_TO_PROCESS_ORDER_MESSAGE);
     }
 
     @Test

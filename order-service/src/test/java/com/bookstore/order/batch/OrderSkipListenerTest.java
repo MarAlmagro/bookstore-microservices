@@ -27,6 +27,8 @@ class OrderSkipListenerTest {
     private OrderSkipListener listener;
     private static final String REJECTED_DIR = "exports/rejected";
     private static final DateTimeFormatter FILE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final String PROCESSING_ERROR_MESSAGE = "Processing error";
+    private static final String REJECTED_ORDERS_FILE_PATTERN = "rejected_orders_%s.log";
 
     @BeforeEach
     void setUp() {
@@ -34,16 +36,19 @@ class OrderSkipListenerTest {
     }
 
     @AfterEach
-    void tearDown() {
-        File rejectedDir = new File(REJECTED_DIR);
-        if (rejectedDir.exists()) {
-            File[] files = rejectedDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    file.delete();
-                }
+    void tearDown() throws IOException {
+        Path rejectedDirPath = Path.of(REJECTED_DIR);
+        if (Files.exists(rejectedDirPath)) {
+            try (var stream = Files.list(rejectedDirPath)) {
+                stream.forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (IOException e) {
+                        // Log and continue
+                    }
+                });
             }
-            rejectedDir.delete();
+            Files.deleteIfExists(rejectedDirPath);
         }
     }
 
@@ -99,7 +104,7 @@ class OrderSkipListenerTest {
                 .status(OrderStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
-        Throwable throwable = new RuntimeException("Processing error");
+        Throwable throwable = new RuntimeException(PROCESSING_ERROR_MESSAGE);
 
         listener.onSkipInProcess(order, throwable);
 
@@ -107,7 +112,7 @@ class OrderSkipListenerTest {
         assertThat(rejectedDir).exists();
         assertThat(rejectedDir.isDirectory()).isTrue();
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(rejectedDir, expectedFileName);
         assertThat(deadLetterFile).exists();
 
@@ -115,7 +120,7 @@ class OrderSkipListenerTest {
         assertThat(lines).isNotEmpty();
         assertThat(lines.get(0)).contains("order-123");
         assertThat(lines.get(0)).contains("RuntimeException");
-        assertThat(lines.get(0)).contains("Processing error");
+        assertThat(lines.get(0)).contains(PROCESSING_ERROR_MESSAGE);
     }
 
     @Test
@@ -145,7 +150,7 @@ class OrderSkipListenerTest {
         listener.onSkipInProcess(order1, throwable1);
         listener.onSkipInProcess(order2, throwable2);
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(REJECTED_DIR, expectedFileName);
         
         List<String> lines = Files.readAllLines(deadLetterFile.toPath());
@@ -157,7 +162,7 @@ class OrderSkipListenerTest {
     @Test
     @DisplayName("onSkipInProcess should handle null order gracefully")
     void onSkipInProcess_withNullOrder_shouldNotWriteFile() {
-        Throwable throwable = new RuntimeException("Processing error");
+        Throwable throwable = new RuntimeException(PROCESSING_ERROR_MESSAGE);
 
         listener.onSkipInProcess(null, throwable);
 
@@ -181,7 +186,7 @@ class OrderSkipListenerTest {
 
         listener.onSkipInProcess(order, throwable);
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(REJECTED_DIR, expectedFileName);
         
         List<String> lines = Files.readAllLines(deadLetterFile.toPath());
@@ -205,7 +210,7 @@ class OrderSkipListenerTest {
 
         listener.onSkipInProcess(order, throwable);
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(REJECTED_DIR, expectedFileName);
         
         List<String> lines = Files.readAllLines(deadLetterFile.toPath());
@@ -227,7 +232,7 @@ class OrderSkipListenerTest {
 
         listener.onSkipInProcess(order, throwable);
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(REJECTED_DIR, expectedFileName);
         
         List<String> lines = Files.readAllLines(deadLetterFile.toPath());
@@ -250,7 +255,7 @@ class OrderSkipListenerTest {
 
         listener.onSkipInProcess(order, throwable);
 
-        String expectedFileName = String.format("rejected_orders_%s.log", LocalDateTime.now().format(FILE_DATE_FORMATTER));
+        String expectedFileName = String.format(REJECTED_ORDERS_FILE_PATTERN, LocalDateTime.now().format(FILE_DATE_FORMATTER));
         File deadLetterFile = new File(REJECTED_DIR, expectedFileName);
         
         assertThat(deadLetterFile).exists();
