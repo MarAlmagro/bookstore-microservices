@@ -33,6 +33,7 @@ class GlobalExceptionHandlerTest {
     private GlobalExceptionHandler exceptionHandler;
 
     private static final String TEST_PATH = "/api/test";
+    private static final String BOOK_DTO_NAME = "bookDto";
 
     @BeforeEach
     void setUp() {
@@ -93,9 +94,9 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("handleValidationException should return 400 with field errors")
     void handleValidationException_shouldReturn400WithFieldErrors() {
-        BindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "bookDto");
-        bindingResult.addError(new FieldError("bookDto", "title", "Title is required"));
-        bindingResult.addError(new FieldError("bookDto", "price", "Price must be greater than 0"));
+        BindingResult bindingResult = new BeanPropertyBindingResult(new Object(), BOOK_DTO_NAME);
+        bindingResult.addError(new FieldError(BOOK_DTO_NAME, "title", "Title is required"));
+        bindingResult.addError(new FieldError(BOOK_DTO_NAME, "price", "Price must be greater than 0"));
 
         MethodParameter methodParameter = mock(MethodParameter.class);
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);

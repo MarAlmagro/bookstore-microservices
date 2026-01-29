@@ -18,10 +18,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("PageMapper Unit Tests")
 class PageMapperTest {
 
+    private static final String ITEM_1 = "item1";
+    private static final String ITEM_2 = "item2";
+    private static final String TITLE_FIELD = "title";
+    private static final String CREATED_AT_FIELD = "createdAt";
+    private static final String AUTHOR_FIELD = "author";
+
     @Test
     @DisplayName("toPageResponse should map Page to PageResponseDto with valid data")
     void toPageResponse_withValidPage_shouldMapCorrectly() {
-        List<String> content = List.of("item1", "item2", "item3");
+        List<String> content = List.of(ITEM_1, ITEM_2, "item3");
         Page<String> page = new PageImpl<>(content, PageRequest.of(0, 10), 23);
 
         PageResponseDto<String> result = PageMapper.toPageResponse(page, String.class);
@@ -54,7 +60,7 @@ class PageMapperTest {
     @Test
     @DisplayName("toPageResponse should handle last page correctly")
     void toPageResponse_withLastPage_shouldSetLastTrue() {
-        List<String> content = List.of("item1", "item2");
+        List<String> content = List.of(ITEM_1, ITEM_2);
         Page<String> lastPage = new PageImpl<>(content, PageRequest.of(2, 10), 22);
 
         PageResponseDto<String> result = PageMapper.toPageResponse(lastPage, String.class);
@@ -68,7 +74,7 @@ class PageMapperTest {
     @Test
     @DisplayName("toPageResponse should handle single page correctly")
     void toPageResponse_withSinglePage_shouldSetFirstAndLastTrue() {
-        List<String> content = List.of("item1", "item2");
+        List<String> content = List.of(ITEM_1, ITEM_2);
         Page<String> singlePage = new PageImpl<>(content, PageRequest.of(0, 10), 2);
 
         PageResponseDto<String> result = PageMapper.toPageResponse(singlePage, String.class);
@@ -82,25 +88,25 @@ class PageMapperTest {
     @Test
     @DisplayName("toPageable should create Pageable with ascending sort")
     void toPageable_withAscendingSort_shouldCreateCorrectPageable() {
-        Pageable result = PageMapper.toPageable(0, 20, "title", "asc");
+        Pageable result = PageMapper.toPageable(0, 20, TITLE_FIELD, "asc");
 
         assertThat(result).isNotNull();
         assertThat(result.getPageNumber()).isEqualTo(0);
         assertThat(result.getPageSize()).isEqualTo(20);
-        assertThat(result.getSort().getOrderFor("title")).isNotNull();
-        assertThat(result.getSort().getOrderFor("title").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(result.getSort().getOrderFor(TITLE_FIELD)).isNotNull();
+        assertThat(result.getSort().getOrderFor(TITLE_FIELD).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
     @DisplayName("toPageable should create Pageable with descending sort")
     void toPageable_withDescendingSort_shouldCreateCorrectPageable() {
-        Pageable result = PageMapper.toPageable(1, 10, "createdAt", "desc");
+        Pageable result = PageMapper.toPageable(1, 10, CREATED_AT_FIELD, "desc");
 
         assertThat(result).isNotNull();
         assertThat(result.getPageNumber()).isEqualTo(1);
         assertThat(result.getPageSize()).isEqualTo(10);
-        assertThat(result.getSort().getOrderFor("createdAt")).isNotNull();
-        assertThat(result.getSort().getOrderFor("createdAt").getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(result.getSort().getOrderFor(CREATED_AT_FIELD)).isNotNull();
+        assertThat(result.getSort().getOrderFor(CREATED_AT_FIELD).getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 
     @Test
@@ -116,10 +122,10 @@ class PageMapperTest {
     @Test
     @DisplayName("toPageable should handle case-insensitive 'ASC'")
     void toPageable_withUppercaseAsc_shouldCreateAscendingSort() {
-        Pageable result = PageMapper.toPageable(0, 20, "price", "ASC");
+        Pageable result = PageMapper.toPageable(0, 20, AUTHOR_FIELD, "ASC");
 
         assertThat(result).isNotNull();
-        assertThat(result.getSort().getOrderFor("price").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(result.getSort().getOrderFor(AUTHOR_FIELD).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -128,7 +134,7 @@ class PageMapperTest {
         PageRequestDto pageRequest = PageRequestDto.builder()
                 .page(2)
                 .size(15)
-                .sortBy("author")
+                .sortBy(AUTHOR_FIELD)
                 .sortDir("asc")
                 .build();
 
@@ -137,8 +143,8 @@ class PageMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.getPageNumber()).isEqualTo(2);
         assertThat(result.getPageSize()).isEqualTo(15);
-        assertThat(result.getSort().getOrderFor("author")).isNotNull();
-        assertThat(result.getSort().getOrderFor("author").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(result.getSort().getOrderFor(AUTHOR_FIELD)).isNotNull();
+        assertThat(result.getSort().getOrderFor(AUTHOR_FIELD).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -151,7 +157,7 @@ class PageMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.getPageNumber()).isEqualTo(0);
         assertThat(result.getPageSize()).isEqualTo(20);
-        assertThat(result.getSort().getOrderFor("createdAt")).isNotNull();
-        assertThat(result.getSort().getOrderFor("createdAt").getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(result.getSort().getOrderFor(CREATED_AT_FIELD)).isNotNull();
+        assertThat(result.getSort().getOrderFor(CREATED_AT_FIELD).getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 }

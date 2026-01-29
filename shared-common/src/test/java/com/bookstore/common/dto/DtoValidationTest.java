@@ -19,6 +19,14 @@ class DtoValidationTest {
 
     private Validator validator;
 
+    private static final String VALID_ISBN = "1234567890";
+    private static final String VALID_TITLE = "Test Book";
+    private static final String VALID_AUTHOR = "Test Author";
+    private static final String VALID_PRICE = "19.99";
+    private static final String VALID_CATEGORY = "Fiction";
+    private static final String VALID_EMAIL = "test@example.com";
+    private static final String VALID_ROLE = "CUSTOMER";
+
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -29,13 +37,13 @@ class DtoValidationTest {
     @DisplayName("BookDto should pass validation with valid data")
     void bookDto_withValidData_shouldPassValidation() {
         BookDto bookDto = BookDto.builder()
-                .isbn("1234567890")
-                .title("Test Book")
-                .author("Test Author")
+                .isbn(VALID_ISBN)
+                .title(VALID_TITLE)
+                .author(VALID_AUTHOR)
                 .description("Test Description")
-                .price(new BigDecimal("19.99"))
+                .price(new BigDecimal(VALID_PRICE))
                 .stock(10)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -48,11 +56,11 @@ class DtoValidationTest {
     void bookDto_withBlankIsbn_shouldFailValidation() {
         BookDto bookDto = BookDto.builder()
                 .isbn("")
-                .title("Test Book")
-                .author("Test Author")
-                .price(new BigDecimal("19.99"))
+                .title(VALID_TITLE)
+                .author(VALID_AUTHOR)
+                .price(new BigDecimal(VALID_PRICE))
                 .stock(10)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -66,11 +74,11 @@ class DtoValidationTest {
     void bookDto_withShortIsbn_shouldFailValidation() {
         BookDto bookDto = BookDto.builder()
                 .isbn("123")
-                .title("Test Book")
-                .author("Test Author")
-                .price(new BigDecimal("19.99"))
+                .title(VALID_TITLE)
+                .author(VALID_AUTHOR)
+                .price(new BigDecimal(VALID_PRICE))
                 .stock(10)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -83,12 +91,12 @@ class DtoValidationTest {
     @DisplayName("BookDto should fail validation when title is blank")
     void bookDto_withBlankTitle_shouldFailValidation() {
         BookDto bookDto = BookDto.builder()
-                .isbn("1234567890")
+                .isbn(VALID_ISBN)
                 .title("")
-                .author("Test Author")
-                .price(new BigDecimal("19.99"))
+                .author(VALID_AUTHOR)
+                .price(new BigDecimal(VALID_PRICE))
                 .stock(10)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -101,12 +109,12 @@ class DtoValidationTest {
     @DisplayName("BookDto should fail validation when price is zero")
     void bookDto_withZeroPrice_shouldFailValidation() {
         BookDto bookDto = BookDto.builder()
-                .isbn("1234567890")
-                .title("Test Book")
-                .author("Test Author")
+                .isbn(VALID_ISBN)
+                .title(VALID_TITLE)
+                .author(VALID_AUTHOR)
                 .price(BigDecimal.ZERO)
                 .stock(10)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -119,12 +127,12 @@ class DtoValidationTest {
     @DisplayName("BookDto should fail validation when stock is negative")
     void bookDto_withNegativeStock_shouldFailValidation() {
         BookDto bookDto = BookDto.builder()
-                .isbn("1234567890")
-                .title("Test Book")
-                .author("Test Author")
-                .price(new BigDecimal("19.99"))
+                .isbn(VALID_ISBN)
+                .title(VALID_TITLE)
+                .author(VALID_AUTHOR)
+                .price(new BigDecimal(VALID_PRICE))
                 .stock(-1)
-                .category("Fiction")
+                .category(VALID_CATEGORY)
                 .build();
 
         Set<ConstraintViolation<BookDto>> violations = validator.validate(bookDto);
@@ -137,10 +145,10 @@ class DtoValidationTest {
     @DisplayName("UserDto should pass validation with valid data")
     void userDto_withValidData_shouldPassValidation() {
         UserDto userDto = UserDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .firstName("John")
                 .lastName("Doe")
-                .role("CUSTOMER")
+                .role(VALID_ROLE)
                 .build();
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
@@ -155,7 +163,7 @@ class DtoValidationTest {
                 .email("invalid-email")
                 .firstName("John")
                 .lastName("Doe")
-                .role("CUSTOMER")
+                .role(VALID_ROLE)
                 .build();
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
@@ -168,10 +176,10 @@ class DtoValidationTest {
     @DisplayName("UserDto should fail validation when firstName is blank")
     void userDto_withBlankFirstName_shouldFailValidation() {
         UserDto userDto = UserDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .firstName("")
                 .lastName("Doe")
-                .role("CUSTOMER")
+                .role(VALID_ROLE)
                 .build();
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
@@ -184,7 +192,7 @@ class DtoValidationTest {
     @DisplayName("UserDto should fail validation when role is blank")
     void userDto_withBlankRole_shouldFailValidation() {
         UserDto userDto = UserDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .firstName("John")
                 .lastName("Doe")
                 .role("")
@@ -292,7 +300,7 @@ class DtoValidationTest {
     @DisplayName("AuthRequestDto should pass validation with valid data")
     void authRequestDto_withValidData_shouldPassValidation() {
         AuthRequestDto authRequestDto = AuthRequestDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .password("password123")
                 .build();
 
@@ -319,7 +327,7 @@ class DtoValidationTest {
     @DisplayName("AuthRequestDto should fail validation when password is too short")
     void authRequestDto_withShortPassword_shouldFailValidation() {
         AuthRequestDto authRequestDto = AuthRequestDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .password("12345")
                 .build();
 
@@ -333,7 +341,7 @@ class DtoValidationTest {
     @DisplayName("AuthRequestDto should fail validation when password is blank")
     void authRequestDto_withBlankPassword_shouldFailValidation() {
         AuthRequestDto authRequestDto = AuthRequestDto.builder()
-                .email("test@example.com")
+                .email(VALID_EMAIL)
                 .password("")
                 .build();
 
