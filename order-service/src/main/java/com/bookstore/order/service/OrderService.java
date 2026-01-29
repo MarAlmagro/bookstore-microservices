@@ -2,6 +2,8 @@ package com.bookstore.order.service;
 
 import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.PageRequestDto;
+import com.bookstore.common.dto.PageResponseDto;
 
 import java.util.List;
 
@@ -22,4 +24,8 @@ public interface OrderService {
     List<OrderDto> getAllOrders();
 
     boolean validateOrderOwnership(String orderId, Long userId);
+
+    PageResponseDto<OrderDto> getAllOrdersPaginated(PageRequestDto pageRequest);
+
+    PageResponseDto<OrderDto> getUserOrdersPaginated(Long userId, PageRequestDto pageRequest);
 }
