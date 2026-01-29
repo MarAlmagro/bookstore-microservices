@@ -33,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("CatalogImportJobConfig Unit Tests")
 class CatalogImportJobConfigTest {
 
+    private static final String TEST_CATALOG_FILE = "test-catalog.csv";
+
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
@@ -114,7 +116,7 @@ class CatalogImportJobConfigTest {
             entityManagerFactory
         );
 
-        String testFile = "test-catalog.csv";
+        String testFile = TEST_CATALOG_FILE;
         FlatFileItemReader<BookImportDto> reader = config.catalogReader(testFile);
 
         assertThat(reader).isNotNull();
@@ -130,7 +132,7 @@ class CatalogImportJobConfigTest {
             entityManagerFactory
         );
 
-        String testFile = "test-catalog.csv";
+        String testFile = TEST_CATALOG_FILE;
         ItemReader<BookImportDto> reader = config.catalogReader(testFile);
         ItemWriter<Book> writer = config.catalogWriter();
 
@@ -150,7 +152,7 @@ class CatalogImportJobConfigTest {
             entityManagerFactory
         );
 
-        String testFile = "test-catalog.csv";
+        String testFile = TEST_CATALOG_FILE;
         ItemReader<BookImportDto> reader = config.catalogReader(testFile);
         ItemWriter<Book> writer = config.catalogWriter();
         Step step = config.catalogImportStep(reader, writer);

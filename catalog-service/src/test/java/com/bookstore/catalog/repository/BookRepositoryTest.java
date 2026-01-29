@@ -25,6 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("BookRepository Unit Tests")
 class BookRepositoryTest {
 
+    private static final String EFFECTIVE_JAVA = "Effective Java";
+    private static final String PROGRAMMING = "Programming";
+
     @Autowired
     private TestEntityManager entityManager;
 
@@ -57,7 +60,7 @@ class BookRepositoryTest {
 
         assertThat(result).isPresent();
         assertThat(result.get().getIsbn()).isEqualTo(sampleBook.getIsbn());
-        assertThat(result.get().getTitle()).isEqualTo("Effective Java");
+        assertThat(result.get().getTitle()).isEqualTo(EFFECTIVE_JAVA);
     }
 
     @Test
@@ -75,10 +78,10 @@ class BookRepositoryTest {
         entityManager.persist(secondBook);
         entityManager.flush();
 
-        List<Book> result = bookRepository.findByCategory("Programming");
+        List<Book> result = bookRepository.findByCategory(PROGRAMMING);
 
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(Book::getCategory).containsOnly("Programming");
+        assertThat(result).extracting(Book::getCategory).containsOnly(PROGRAMMING);
     }
 
     @Test
@@ -124,7 +127,7 @@ class BookRepositoryTest {
         List<Book> result = bookRepository.searchByTitleOrAuthor("Effective");
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("Effective Java");
+        assertThat(result.get(0).getTitle()).isEqualTo(EFFECTIVE_JAVA);
     }
 
     @Test
@@ -149,7 +152,7 @@ class BookRepositoryTest {
         List<Book> result = bookRepository.searchByTitleOrAuthor("EFFECTIVE");
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("Effective Java");
+        assertThat(result.get(0).getTitle()).isEqualTo(EFFECTIVE_JAVA);
     }
 
     @Test
@@ -163,7 +166,7 @@ class BookRepositoryTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getStock()).isGreaterThan(10);
-        assertThat(result.get(0).getTitle()).isEqualTo("Effective Java");
+        assertThat(result.get(0).getTitle()).isEqualTo(EFFECTIVE_JAVA);
     }
 
     @Test
@@ -234,10 +237,10 @@ class BookRepositoryTest {
         entityManager.persist(lowStockBook);
         entityManager.flush();
 
-        List<Book> result = bookRepository.findByCategoryAndStockGreaterThan("Programming", 10);
+        List<Book> result = bookRepository.findByCategoryAndStockGreaterThan(PROGRAMMING, 10);
 
         assertThat(result).hasSize(2);
-        assertThat(result).allMatch(book -> book.getCategory().equals("Programming"));
+        assertThat(result).allMatch(book -> book.getCategory().equals(PROGRAMMING));
         assertThat(result).allMatch(book -> book.getStock() > 10);
     }
 
