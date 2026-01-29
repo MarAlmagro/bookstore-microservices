@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,7 +77,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail(testUserDto.getEmail())).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(tokenProvider.generateTokenFromUsername(testUser.getEmail())).thenReturn("accessToken");
+        when(tokenProvider.generateTokenWithClaims(eq(testUser.getEmail()), eq(testUser.getId()), eq(testUser.getRole().name()))).thenReturn("accessToken");
         when(tokenProvider.generateRefreshToken(testUser.getEmail())).thenReturn("refreshToken");
         when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
@@ -110,9 +111,9 @@ class AuthServiceTest {
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        when(tokenProvider.generateToken(authentication)).thenReturn("accessToken");
-        when(tokenProvider.generateRefreshToken(authRequest.getEmail())).thenReturn("refreshToken");
         when(userRepository.findByEmail(authRequest.getEmail())).thenReturn(Optional.of(testUser));
+        when(tokenProvider.generateTokenWithClaims(eq(testUser.getEmail()), eq(testUser.getId()), eq(testUser.getRole().name()))).thenReturn("accessToken");
+        when(tokenProvider.generateRefreshToken(authRequest.getEmail())).thenReturn("refreshToken");
         when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
         AuthResponseDto result = authService.login(authRequest);
@@ -142,7 +143,7 @@ class AuthServiceTest {
         when(tokenProvider.validateToken(refreshToken)).thenReturn(true);
         when(tokenProvider.getUsernameFromToken(refreshToken)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(tokenProvider.generateTokenFromUsername("test@example.com")).thenReturn("newAccessToken");
+        when(tokenProvider.generateTokenWithClaims(eq(testUser.getEmail()), eq(testUser.getId()), eq(testUser.getRole().name()))).thenReturn("newAccessToken");
         when(tokenProvider.generateRefreshToken("test@example.com")).thenReturn("newRefreshToken");
         when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
