@@ -24,6 +24,12 @@ import static org.mockito.Mockito.when;
 @DisplayName("JwtTokenProvider Unit Tests")
 class JwtTokenProviderTest {
 
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String ADMIN_EMAIL = "admin@example.com";
+    private static final String USER_ID_CLAIM = "userId";
+    private static final String ROLES_CLAIM = "roles";
+    private static final String JWT_EXPIRATION_FIELD = "jwtExpirationMs";
+
     private JwtTokenProvider jwtTokenProvider;
     private String jwtSecret;
     private long jwtExpirationMs;
@@ -37,14 +43,14 @@ class JwtTokenProviderTest {
         jwtRefreshExpirationMs = 604800000L;
 
         ReflectionTestUtils.setField(jwtTokenProvider, "jwtSecret", jwtSecret);
-        ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationMs", jwtExpirationMs);
+        ReflectionTestUtils.setField(jwtTokenProvider, JWT_EXPIRATION_FIELD, jwtExpirationMs);
         ReflectionTestUtils.setField(jwtTokenProvider, "jwtRefreshExpirationMs", jwtRefreshExpirationMs);
     }
 
     @Test
     @DisplayName("generateTokenWithClaims should create valid token with username only")
     void generateTokenWithClaims_withUsernameOnly_shouldCreateValidToken() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
 
@@ -56,7 +62,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateTokenWithClaims should create token with all claims")
     void generateTokenWithClaims_withAllClaims_shouldIncludeAllClaims() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         Long userId = 123L;
         String role = "ADMIN";
 
@@ -65,14 +71,14 @@ class JwtTokenProviderTest {
         assertThat(token).isNotNull();
         Claims claims = parseToken(token);
         assertThat(claims.getSubject()).isEqualTo(username);
-        assertThat(claims.get("userId", Long.class)).isEqualTo(userId);
-        assertThat(claims.get("roles", List.class)).containsExactly(role);
+        assertThat(claims.get(USER_ID_CLAIM, Long.class)).isEqualTo(userId);
+        assertThat(claims.get(ROLES_CLAIM, List.class)).containsExactly(role);
     }
 
     @Test
     @DisplayName("generateTokenWithClaims should set correct expiration time")
     void generateTokenWithClaims_shouldSetCorrectExpiration() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         long beforeGeneration = System.currentTimeMillis();
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
@@ -89,7 +95,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateRefreshToken should create valid refresh token")
     void generateRefreshToken_withUsername_shouldCreateValidToken() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
 
         String token = jwtTokenProvider.generateRefreshToken(username);
 
@@ -101,7 +107,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateRefreshToken should set longer expiration time")
     void generateRefreshToken_shouldSetLongerExpiration() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         long beforeGeneration = System.currentTimeMillis();
 
         String token = jwtTokenProvider.generateRefreshToken(username);
@@ -117,7 +123,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateToken should create token from Authentication")
     void generateToken_withAuthentication_shouldCreateValidToken() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         UserDetails userDetails = User.builder()
                 .username(username)
                 .password("password")
@@ -137,7 +143,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateTokenFromUsername should create valid token")
     void generateTokenFromUsername_withUsername_shouldCreateValidToken() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
 
         String token = jwtTokenProvider.generateTokenFromUsername(username);
 
@@ -149,7 +155,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("validateToken should return true for valid token")
     void validateToken_withValidToken_shouldReturnTrue() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
 
         boolean isValid = jwtTokenProvider.validateToken(token);
@@ -160,11 +166,11 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("validateToken should return false for expired token")
     void validateToken_withExpiredToken_shouldReturnFalse() {
-        ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationMs", -1000L);
-        String username = "test@example.com";
+        ReflectionTestUtils.setField(jwtTokenProvider, JWT_EXPIRATION_FIELD, -1000L);
+        String username = TEST_EMAIL;
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
 
-        ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationMs", jwtExpirationMs);
+        ReflectionTestUtils.setField(jwtTokenProvider, JWT_EXPIRATION_FIELD, jwtExpirationMs);
 
         boolean isValid = jwtTokenProvider.validateToken(token);
 
@@ -200,7 +206,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("getUsernameFromToken should extract username correctly")
     void getUsernameFromToken_withValidToken_shouldExtractUsername() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
 
         String extractedUsername = jwtTokenProvider.getUsernameFromToken(token);
@@ -211,7 +217,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("getUsernameFromToken should extract username from token with claims")
     void getUsernameFromToken_withTokenWithClaims_shouldExtractUsername() {
-        String username = "admin@example.com";
+        String username = ADMIN_EMAIL;
         Long userId = 456L;
         String role = "ADMIN";
         String token = jwtTokenProvider.generateTokenWithClaims(username, userId, role);
@@ -224,7 +230,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("token should contain issued at timestamp")
     void generateTokenWithClaims_shouldContainIssuedAt() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         long beforeGeneration = System.currentTimeMillis();
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, null);
@@ -238,48 +244,48 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("generateTokenWithClaims should handle userId claim correctly")
     void generateTokenWithClaims_withUserId_shouldIncludeUserIdClaim() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         Long userId = 999L;
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, userId, null);
 
         Claims claims = parseToken(token);
-        assertThat(claims.get("userId", Long.class)).isEqualTo(userId);
+        assertThat(claims.get(USER_ID_CLAIM, Long.class)).isEqualTo(userId);
     }
 
     @Test
     @DisplayName("generateTokenWithClaims should handle role claim correctly")
     void generateTokenWithClaims_withRole_shouldIncludeRoleClaim() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
         String role = "CUSTOMER";
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, role);
 
         Claims claims = parseToken(token);
-        List<String> roles = claims.get("roles", List.class);
+        List<String> roles = claims.get(ROLES_CLAIM, List.class);
         assertThat(roles).containsExactly(role);
     }
 
     @Test
     @DisplayName("generateTokenWithClaims should not include userId claim when null")
     void generateTokenWithClaims_withNullUserId_shouldNotIncludeUserIdClaim() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, "CUSTOMER");
 
         Claims claims = parseToken(token);
-        assertThat(claims.get("userId")).isNull();
+        assertThat(claims.get(USER_ID_CLAIM)).isNull();
     }
 
     @Test
     @DisplayName("generateTokenWithClaims should not include roles claim when null")
     void generateTokenWithClaims_withNullRole_shouldNotIncludeRolesClaim() {
-        String username = "test@example.com";
+        String username = TEST_EMAIL;
 
         String token = jwtTokenProvider.generateTokenWithClaims(username, 123L, null);
 
         Claims claims = parseToken(token);
-        assertThat(claims.get("roles")).isNull();
+        assertThat(claims.get(ROLES_CLAIM)).isNull();
     }
 
     private Claims parseToken(String token) {
