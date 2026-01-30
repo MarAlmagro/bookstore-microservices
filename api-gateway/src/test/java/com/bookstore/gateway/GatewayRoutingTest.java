@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,14 +20,24 @@ class GatewayRoutingTest {
 
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
-    private static final String BOOKS_PATH = "/api/v1/books";
-    private static final String BOOKS_PATH_PATTERN = "/api/v1/books.*";
-    private static final String ORDERS_PATH = "/api/v1/orders";
-    private static final String ORDERS_PATH_PATTERN = "/api/v1/orders.*";
-    private static final String CART_PATH = "/api/v1/cart";
-    private static final String AUTH_LOGIN_PATH = "/api/v1/auth/login";
-    private static final String USERS_PATH = "/api/v1/users";
-    private static final String USERS_PATH_PATTERN = "/api/v1/users.*";
+    @Value("${api.gateway.paths.books:/api/v1/books}")
+    private String booksPath;
+    
+    @Value("${api.gateway.paths.orders:/api/v1/orders}")
+    private String ordersPath;
+    
+    @Value("${api.gateway.paths.cart:/api/v1/cart}")
+    private String cartPath;
+    
+    @Value("${api.gateway.paths.auth.login:/api/v1/auth/login}")
+    private String authLoginPath;
+    
+    @Value("${api.gateway.paths.users:/api/v1/users}")
+    private String usersPath;
+    
+    private String booksPathPattern;
+    private String ordersPathPattern;
+    private String usersPathPattern;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -34,19 +45,22 @@ class GatewayRoutingTest {
     @BeforeEach
     void setUp() {
         resetAllRequests();
+        booksPathPattern = booksPath + ".*";
+        ordersPathPattern = ordersPath + ".*";
+        usersPathPattern = usersPath + ".*";
     }
 
     @Test
     @DisplayName("Should route GET request to catalog-service")
     void routeToCatalogService_whenGetBooks_shouldSucceed() {
-        stubFor(get(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("[]")));
 
         webTestClient.get()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(APPLICATION_JSON);
@@ -63,14 +77,14 @@ class GatewayRoutingTest {
                 "\"stock\": 10" +
                 "}";
 
-        stubFor(post(urlEqualTo(BOOKS_PATH))
+        stubFor(post(urlEqualTo(booksPath))
                 .willReturn(aResponse()
                         .withStatus(201)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody(bookJson)));
 
         webTestClient.post()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .bodyValue(bookJson)
                 .exchange()
@@ -80,14 +94,14 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should route GET request to order-service for orders")
     void routeToOrderService_whenGetOrders_shouldSucceed() {
-        stubFor(get(urlPathMatching(ORDERS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(ordersPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("[]")));
 
         webTestClient.get()
-                .uri(ORDERS_PATH)
+                .uri(ordersPath)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(APPLICATION_JSON);
@@ -101,14 +115,14 @@ class GatewayRoutingTest {
                 "\"quantity\": 2" +
                 "}";
 
-        stubFor(post(urlEqualTo(CART_PATH))
+        stubFor(post(urlEqualTo(cartPath))
                 .willReturn(aResponse()
                         .withStatus(201)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody(cartItemJson)));
 
         webTestClient.post()
-                .uri(CART_PATH)
+                .uri(cartPath)
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .bodyValue(cartItemJson)
                 .exchange()
@@ -128,14 +142,14 @@ class GatewayRoutingTest {
                 "\"refreshToken\": \"refresh-token-here\"" +
                 "}";
 
-        stubFor(post(urlEqualTo(AUTH_LOGIN_PATH))
+        stubFor(post(urlEqualTo(authLoginPath))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody(tokenResponse)));
 
         webTestClient.post()
-                .uri(AUTH_LOGIN_PATH)
+                .uri(authLoginPath)
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .bodyValue(authJson)
                 .exchange()
@@ -146,14 +160,14 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should route GET request to user-service for users")
     void routeToUserService_whenGetUsers_shouldSucceed() {
-        stubFor(get(urlPathMatching(USERS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(usersPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("[]")));
 
         webTestClient.get()
-                .uri(USERS_PATH)
+                .uri(usersPath)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(APPLICATION_JSON);
@@ -163,7 +177,7 @@ class GatewayRoutingTest {
     @DisplayName("Should handle CORS preflight request")
     void handleCorsPreflightRequest_shouldSucceed() {
         webTestClient.options()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .header("Origin", "http://localhost:3000")
                 .header("Access-Control-Request-Method", "POST")
                 .header("Access-Control-Request-Headers", "Content-Type,Authorization")
@@ -177,14 +191,14 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should allow GET request with CORS headers")
     void handleCorsGetRequest_shouldIncludeCorsHeaders() {
-        stubFor(get(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("[]")));
 
         webTestClient.get()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .header("Origin", "http://localhost:3000")
                 .exchange()
                 .expectStatus().isOk()
@@ -203,14 +217,14 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should handle 503 when service is unavailable")
     void handleServiceUnavailable_shouldReturn503() {
-        stubFor(get(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(503)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("{\"error\":\"Service Unavailable\"}")));
 
         webTestClient.get()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -218,20 +232,20 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should forward custom headers to downstream service")
     void forwardCustomHeaders_shouldSucceed() {
-        stubFor(get(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody("[]")));
 
         webTestClient.get()
-                .uri(BOOKS_PATH)
+                .uri(booksPath)
                 .header("X-User-Id", "user123")
                 .header("Authorization", "Bearer token123")
                 .exchange()
                 .expectStatus().isOk();
 
-        verify(getRequestedFor(urlPathMatching(BOOKS_PATH_PATTERN))
+        verify(getRequestedFor(urlPathMatching(booksPathPattern))
                 .withHeader("X-User-Id", equalTo("user123"))
                 .withHeader("Authorization", equalTo("Bearer token123")));
     }
@@ -248,14 +262,14 @@ class GatewayRoutingTest {
                 "\"stock\": 15" +
                 "}";
 
-        stubFor(put(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(put(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody(bookJson)));
 
         webTestClient.put()
-                .uri(BOOKS_PATH + "/1")
+                .uri(booksPath + "/1")
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .bodyValue(bookJson)
                 .exchange()
@@ -265,12 +279,12 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should handle DELETE request to catalog-service")
     void routeToCatalogService_whenDeleteBook_shouldSucceed() {
-        stubFor(delete(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(delete(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(204)));
 
         webTestClient.delete()
-                .uri(BOOKS_PATH + "/1")
+                .uri(booksPath + "/1")
                 .exchange()
                 .expectStatus().isNoContent();
     }
@@ -282,14 +296,14 @@ class GatewayRoutingTest {
                 "\"status\": \"SHIPPED\"" +
                 "}";
 
-        stubFor(patch(urlPathMatching(ORDERS_PATH_PATTERN))
+        stubFor(patch(urlPathMatching(ordersPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
                         .withBody(statusJson)));
 
         webTestClient.patch()
-                .uri(ORDERS_PATH + "/1")
+                .uri(ordersPath + "/1")
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .bodyValue(statusJson)
                 .exchange()
@@ -299,7 +313,7 @@ class GatewayRoutingTest {
     @Test
     @DisplayName("Should handle query parameters in routing")
     void handleQueryParameters_shouldForwardToService() {
-        stubFor(get(urlPathMatching(BOOKS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(booksPathPattern))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)
@@ -307,7 +321,7 @@ class GatewayRoutingTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(BOOKS_PATH)
+                        .path(booksPath)
                         .queryParam("category", "fiction")
                         .queryParam("page", "0")
                         .queryParam("size", "10")
@@ -315,7 +329,7 @@ class GatewayRoutingTest {
                 .exchange()
                 .expectStatus().isOk();
 
-        verify(getRequestedFor(urlPathMatching(BOOKS_PATH_PATTERN))
+        verify(getRequestedFor(urlPathMatching(booksPathPattern))
                 .withQueryParam("category", equalTo("fiction"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("size", equalTo("10")));

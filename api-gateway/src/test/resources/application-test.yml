@@ -48,6 +48,17 @@ spring:
             allow-credentials: true
             max-age: 3600
 
+# API Gateway Path Configuration
+api:
+  gateway:
+    paths:
+      books: /api/v1/books
+      orders: /api/v1/orders
+      cart: /api/v1/cart
+      auth:
+        login: /api/v1/auth/login
+      users: /api/v1/users
+
 eureka:
   client:
     enabled: false
