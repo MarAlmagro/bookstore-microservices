@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: api-gateway-test
+  redis:
+    host: localhost
+    port: 6379
+  cloud:
+    gateway:
+      routes:
+        - id: catalog-service
+          uri: http://localhost:${wiremock.server.port}
+          predicates:
+            - Path=/api/v1/books/**
+          filters:
+            - RewritePath=/api/v1/books/(?<segment>.*), /api/v1/books/${segment}
+            
+        - id: order-service
+          uri: http://localhost:${wiremock.server.port}
+          predicates:
+            - Path=/api/v1/orders/**, /api/v1/cart/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /api/v1/${segment}
+            
+        - id: user-service
+          uri: http://localhost:${wiremock.server.port}
+          predicates:
+            - Path=/api/v1/auth/**, /api/v1/users/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /api/v1/${segment}
+            
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - http://localhost:3000
+              - http://localhost:8084
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowed-headers:
+              - Authorization
+              - Content-Type
+              - X-User-Id
+            allow-credentials: true
+            max-age: 3600
+
+eureka:
+  client:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.bookstore.gateway: DEBUG
