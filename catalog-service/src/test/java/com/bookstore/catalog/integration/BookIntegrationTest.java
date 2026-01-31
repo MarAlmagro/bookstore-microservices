@@ -26,15 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Integration tests for Catalog Service.
- * Tests the full application stack with H2 in-memory database.
+ * Tests the full application stack with MySQL Testcontainers.
  */
-@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
 @Transactional
 @DisplayName("Book Integration Tests")
 @WithMockUser(roles = "ADMIN")
-class BookIntegrationTest {
+class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -24,13 +24,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @WithMockUser(roles = "ADMIN")
 @TestPropertySource(properties = {
     "spring.batch.job.enabled=true"
 })
-class CatalogImportJobIntegrationTest {
+class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
 
     @Autowired
     private JobLauncher jobLauncher;

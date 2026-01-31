@@ -14,9 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class UserServiceIntegrationTest {
+class UserServiceIntegrationTest extends BasePostgresIntegrationTest {
 
     @Autowired
     private AuthService authService;
