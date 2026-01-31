@@ -1,10 +1,10 @@
 package com.bookstore.order.integration;
 
+import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.common.dto.BookDto;
-import com.bookstore.order.dto.OrderDto;
-import com.bookstore.order.dto.OrderItemDto;
-import com.bookstore.order.model.Order;
-import com.bookstore.order.model.OrderStatus;
+import com.bookstore.common.dto.OrderDto;
+import com.bookstore.common.dto.OrderItemDto;
+import com.bookstore.order.document.Order;
 import com.bookstore.order.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;

@@ -57,7 +57,7 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
         if (testFile != null && testFile.exists()) {
             java.nio.file.Files.delete(testFile.toPath());
         }
