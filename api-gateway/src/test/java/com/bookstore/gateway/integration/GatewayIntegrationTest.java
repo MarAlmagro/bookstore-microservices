@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.Duration;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -143,14 +145,16 @@ class GatewayIntegrationTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Flaky test - timeout exceeds WebTestClient default timeout")
     void shouldHandleServiceTimeout() {
         stubFor(get(urlEqualTo(catalogBooksPath))
                 .willReturn(aResponse()
-                        .withFixedDelay(6000)
+                        .withFixedDelay(3000)
                         .withStatus(200)));
 
-        webTestClient.get()
+        webTestClient.mutate()
+                .responseTimeout(Duration.ofSeconds(5))
+                .build()
+                .get()
                 .uri(catalogBooksPath)
                 .exchange()
                 .expectStatus().is5xxServerError();
