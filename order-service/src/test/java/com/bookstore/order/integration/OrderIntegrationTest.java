@@ -34,6 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(roles = "ADMIN")
 class OrderIntegrationTest extends BaseMongoIntegrationTest {
 
+    private static final String ORDERS_API_PATH = "/api/v1/orders";
+    private static final String ORDER_BY_ID_PATH = "/api/v1/orders/";
+
         @Autowired
         private MockMvc mockMvc;
 
@@ -83,7 +86,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
         void shouldCreateAndRetrieveOrderSuccessfully() throws Exception {
                 when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-                String response = mockMvc.perform(post("/api/v1/orders")
+                String response = mockMvc.perform(post(ORDERS_API_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testOrderDto)))
                                 .andExpect(status().isCreated())
@@ -96,7 +99,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
 
                 OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-                mockMvc.perform(get("/api/v1/orders/" + createdOrder.getId()))
+                mockMvc.perform(get(ORDER_BY_ID_PATH + createdOrder.getId()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.id").value(createdOrder.getId()))
                                 .andExpect(jsonPath("$.userId").value(1));
@@ -106,7 +109,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
         void shouldGetUserOrdersSuccessfully() throws Exception {
                 when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-                mockMvc.perform(post("/api/v1/orders")
+                mockMvc.perform(post(ORDERS_API_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testOrderDto)))
                                 .andExpect(status().isCreated());
@@ -121,7 +124,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
         void shouldUpdateOrderStatusSuccessfully() throws Exception {
                 when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-                String response = mockMvc.perform(post("/api/v1/orders")
+                String response = mockMvc.perform(post(ORDERS_API_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testOrderDto)))
                                 .andExpect(status().isCreated())
@@ -131,7 +134,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
 
                 OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-                mockMvc.perform(put("/api/v1/orders/" + createdOrder.getId() + "/status")
+                mockMvc.perform(put(ORDER_BY_ID_PATH + createdOrder.getId() + "/status")
                                 .param("status", "CONFIRMED"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
@@ -141,7 +144,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
         void shouldDeleteOrderSuccessfully() throws Exception {
                 when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-                String response = mockMvc.perform(post("/api/v1/orders")
+                String response = mockMvc.perform(post(ORDERS_API_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testOrderDto)))
                                 .andExpect(status().isCreated())
@@ -151,7 +154,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
 
                 OrderDto createdOrder = objectMapper.readValue(response, OrderDto.class);
 
-                mockMvc.perform(delete("/api/v1/orders/" + createdOrder.getId()))
+                mockMvc.perform(delete(ORDER_BY_ID_PATH + createdOrder.getId()))
                                 .andExpect(status().isNoContent());
 
                 List<Order> orders = orderRepository.findAll();
@@ -162,7 +165,7 @@ class OrderIntegrationTest extends BaseMongoIntegrationTest {
         void shouldGetOrdersByStatusSuccessfully() throws Exception {
                 when(catalogClient.getBookById(anyLong())).thenReturn(testBook);
 
-                mockMvc.perform(post("/api/v1/orders")
+                mockMvc.perform(post(ORDERS_API_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testOrderDto)))
                                 .andExpect(status().isCreated());

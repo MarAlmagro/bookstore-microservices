@@ -34,6 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(roles = "ADMIN")
 class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
+    private static final String BOOKS_API_PATH = "/api/v1/books";
+    private static final String BOOK_BY_ID_PATH = "/api/v1/books/{id}";
+    private static final String BOOK_STOCK_PATH = "/api/v1/books/{id}/stock";
+    private static final String JSON_PATH_TITLE = "$.title";
+    private static final String PARAM_QUANTITY = "quantity";
+    private static final String CATEGORY_PROGRAMMING = "Programming";
+    private static final String ISBN_9999999999 = "978-9999999999";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -55,14 +63,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         // Create a new book
         BookDto newBookDto = BookTestFixtures.createNewBookDto();
 
-        String createResponse = mockMvc.perform(post("/api/v1/books")
+        String createResponse = mockMvc.perform(post(BOOKS_API_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newBookDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.isbn", is(newBookDto.getIsbn())))
-                .andExpect(jsonPath("$.title", is(newBookDto.getTitle())))
+                .andExpect(jsonPath(JSON_PATH_TITLE, is(newBookDto.getTitle())))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -71,29 +79,29 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Long bookId = createdBook.getId();
 
         // Retrieve the created book
-        mockMvc.perform(get("/api/v1/books/{id}", bookId))
+        mockMvc.perform(get(BOOK_BY_ID_PATH, bookId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(newBookDto.getTitle())));
+                .andExpect(jsonPath(JSON_PATH_TITLE, is(newBookDto.getTitle())));
 
         // Update the book
         BookDto updateDto = BookTestFixtures.createUpdateBookDto();
         updateDto.setId(bookId);
         updateDto.setIsbn(newBookDto.getIsbn()); // Keep same ISBN
 
-        mockMvc.perform(put("/api/v1/books/{id}", bookId)
+        mockMvc.perform(put(BOOK_BY_ID_PATH, bookId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(updateDto.getTitle())));
+                .andExpect(jsonPath(JSON_PATH_TITLE, is(updateDto.getTitle())));
 
         // Delete the book
-        mockMvc.perform(delete("/api/v1/books/{id}", bookId))
+        mockMvc.perform(delete(BOOK_BY_ID_PATH, bookId))
                 .andExpect(status().isNoContent());
 
         // Verify book is deleted
-        mockMvc.perform(get("/api/v1/books/{id}", bookId))
+        mockMvc.perform(get(BOOK_BY_ID_PATH, bookId))
                 .andExpect(status().isNotFound());
     }
 
@@ -110,7 +118,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         bookRepository.save(book2);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books"))
+        mockMvc.perform(get(BOOKS_API_PATH))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -145,7 +153,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         duplicateBookDto.setIsbn(existingBook.getIsbn());
 
         // Act & Assert
-        mockMvc.perform(post("/api/v1/books")
+        mockMvc.perform(post(BOOKS_API_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicateBookDto)))
                 .andExpect(status().isBadRequest());
@@ -189,21 +197,21 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         // Arrange
         Book programmingBook = BookTestFixtures.createSampleBook();
         programmingBook.setId(null);
-        programmingBook.setCategory("Programming");
+        programmingBook.setCategory(CATEGORY_PROGRAMMING);
 
         Book architectureBook = BookTestFixtures.createOutOfStockBook();
         architectureBook.setId(null);
-        architectureBook.setIsbn("978-9999999999");
+        architectureBook.setIsbn(ISBN_9999999999);
         architectureBook.setCategory("Software Architecture");
 
         bookRepository.save(programmingBook);
         bookRepository.save(architectureBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/category/{category}", "Programming"))
+        mockMvc.perform(get("/api/v1/books/category/{category}", CATEGORY_PROGRAMMING))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].category", is("Programming")));
+                .andExpect(jsonPath("$[0].category", is(CATEGORY_PROGRAMMING)));
     }
 
     @Test
@@ -238,7 +246,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
         Book outOfStockBook = BookTestFixtures.createOutOfStockBook();
         outOfStockBook.setId(null);
-        outOfStockBook.setIsbn("978-9999999999");
+        outOfStockBook.setIsbn(ISBN_9999999999);
         outOfStockBook.setStock(0);
 
         bookRepository.save(inStockBook);
@@ -261,7 +269,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
         Book lowStockBook = BookTestFixtures.createLowStockBook();
         lowStockBook.setId(null);
-        lowStockBook.setIsbn("978-9999999999");
+        lowStockBook.setIsbn(ISBN_9999999999);
         lowStockBook.setStock(5);
 
         bookRepository.save(highStockBook);
@@ -285,14 +293,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act - Increase stock
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "50"))
+        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
+                        .param(PARAM_QUANTITY, "50"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(150)));
 
         // Act - Decrease stock
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "-30"))
+        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
+                        .param(PARAM_QUANTITY, "-30"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(120)));
     }
@@ -307,8 +315,8 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "-100"))
+        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
+                        .param(PARAM_QUANTITY, "-100"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -324,7 +332,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(post("/api/v1/books")
+        mockMvc.perform(post(BOOKS_API_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidBook)))
                 .andExpect(status().isBadRequest());
@@ -339,14 +347,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
             book.setIsbn("978123456" + i);  // Valid 10-character ISBN
             book.setTitle("Test Book " + i);
 
-            mockMvc.perform(post("/api/v1/books")
+            mockMvc.perform(post(BOOKS_API_PATH)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(book)))
                     .andExpect(status().isCreated());
         }
 
         // Assert - Verify all books were created
-        mockMvc.perform(get("/api/v1/books"))
+        mockMvc.perform(get(BOOKS_API_PATH))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)));
     }

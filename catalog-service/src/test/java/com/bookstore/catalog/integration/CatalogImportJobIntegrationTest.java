@@ -30,6 +30,11 @@ import static org.junit.jupiter.api.Assertions.*;
 })
 class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
 
+    private static final String PARAM_INPUT_FILE = "inputFile";
+    private static final String PARAM_TIMESTAMP = "timestamp";
+    private static final String TEMP_FILE_PREFIX = "catalog_import_test";
+    private static final String TEMP_FILE_SUFFIX = ".csv";
+
     @Autowired
     private JobLauncher jobLauncher;
 
@@ -47,14 +52,14 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
     @BeforeEach
     void setUp() throws IOException {
         bookRepository.deleteAll();
-        testFile = File.createTempFile("catalog_import_test", ".csv");
+        testFile = File.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
         testFile.deleteOnExit();
     }
 
     @AfterEach
     void tearDown() {
         if (testFile != null && testFile.exists()) {
-            testFile.delete();
+            java.nio.file.Files.delete(testFile.toPath());
         }
     }
 
@@ -66,8 +71,8 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
                         "978-0-222222-22-2,Test Book 2,Author 2,Description 2,39.99,200,NonFiction\n");
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("inputFile", testFile.getAbsolutePath())
-                .addLong("timestamp", System.currentTimeMillis())
+                .addString(PARAM_INPUT_FILE, testFile.getAbsolutePath())
+                .addLong(PARAM_TIMESTAMP, System.currentTimeMillis())
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncher.run(catalogImportJob, jobParameters);
@@ -103,8 +108,8 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
                         "978-0-333333-33-3,Updated Title,Updated Author,Updated Description,49.99,150,UpdatedCategory\n");
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("inputFile", testFile.getAbsolutePath())
-                .addLong("timestamp", System.currentTimeMillis())
+                .addString(PARAM_INPUT_FILE, testFile.getAbsolutePath())
+                .addLong(PARAM_TIMESTAMP, System.currentTimeMillis())
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncher.run(catalogImportJob, jobParameters);
@@ -127,8 +132,8 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
                         "978-0-444444-44-4,Metadata Test,Author,Description,25.00,75,Test\n");
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("inputFile", testFile.getAbsolutePath())
-                .addLong("timestamp", System.currentTimeMillis())
+                .addString(PARAM_INPUT_FILE, testFile.getAbsolutePath())
+                .addLong(PARAM_TIMESTAMP, System.currentTimeMillis())
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncher.run(catalogImportJob, jobParameters);
@@ -176,8 +181,8 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
                         "978-0-777777-77-7,Another New Book,Author 3,Description 3,55.00,300,Category3\n");
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("inputFile", testFile.getAbsolutePath())
-                .addLong("timestamp", System.currentTimeMillis())
+                .addString(PARAM_INPUT_FILE, testFile.getAbsolutePath())
+                .addLong(PARAM_TIMESTAMP, System.currentTimeMillis())
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncher.run(catalogImportJob, jobParameters);
@@ -212,8 +217,8 @@ class CatalogImportJobIntegrationTest extends BaseMySQLIntegrationTest {
                         "978-1-222222-22-2,Book 5,Author 5,Desc 5,50.00,50,Cat5\n");
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("inputFile", testFile.getAbsolutePath())
-                .addLong("timestamp", System.currentTimeMillis())
+                .addString(PARAM_INPUT_FILE, testFile.getAbsolutePath())
+                .addLong(PARAM_TIMESTAMP, System.currentTimeMillis())
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncher.run(catalogImportJob, jobParameters);
