@@ -4,6 +4,7 @@ import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.repository.BookRepository;
 import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.test.ApiPathConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,14 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(roles = "ADMIN")
 class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
-    private static final String BOOKS_API_PATH = "/api/v1/books";
-    private static final String BOOK_BY_ID_PATH = "/api/v1/books/{id}";
-    private static final String BOOK_STOCK_PATH = "/api/v1/books/{id}/stock";
-    private static final String JSON_PATH_TITLE = "$.title";
-    private static final String PARAM_QUANTITY = "quantity";
-    private static final String CATEGORY_PROGRAMMING = "Programming";
-    private static final String ISBN_9999999999 = "978-9999999999";
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -63,14 +56,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         // Create a new book
         BookDto newBookDto = BookTestFixtures.createNewBookDto();
 
-        String createResponse = mockMvc.perform(post(BOOKS_API_PATH)
+        String createResponse = mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newBookDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.isbn", is(newBookDto.getIsbn())))
-                .andExpect(jsonPath(JSON_PATH_TITLE, is(newBookDto.getTitle())))
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(newBookDto.getTitle())))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -79,17 +72,17 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Long bookId = createdBook.getId();
 
         // Retrieve the created book
-        mockMvc.perform(get(BOOK_BY_ID_PATH, bookId))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath(JSON_PATH_TITLE, is(newBookDto.getTitle())));
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(newBookDto.getTitle())));
 
         // Update the book
         BookDto updateDto = BookTestFixtures.createUpdateBookDto();
         updateDto.setId(bookId);
         updateDto.setIsbn(newBookDto.getIsbn()); // Keep same ISBN
 
-        mockMvc.perform(put(BOOK_BY_ID_PATH, bookId)
+        mockMvc.perform(put(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -97,11 +90,11 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
                 .andExpect(jsonPath(JSON_PATH_TITLE, is(updateDto.getTitle())));
 
         // Delete the book
-        mockMvc.perform(delete(BOOK_BY_ID_PATH, bookId))
+        mockMvc.perform(delete(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isNoContent());
 
         // Verify book is deleted
-        mockMvc.perform(get(BOOK_BY_ID_PATH, bookId))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isNotFound());
     }
 
@@ -118,7 +111,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         bookRepository.save(book2);
 
         // Act & Assert
-        mockMvc.perform(get(BOOKS_API_PATH))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_API_PATH()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -153,7 +146,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         duplicateBookDto.setIsbn(existingBook.getIsbn());
 
         // Act & Assert
-        mockMvc.perform(post(BOOKS_API_PATH)
+        mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicateBookDto)))
                 .andExpect(status().isBadRequest());
@@ -177,14 +170,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         bookRepository.save(book2);
 
         // Search by title
-        mockMvc.perform(get("/api/v1/books/search")
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_SEARCH_PATH())
                         .param("query", "Java"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", containsString("Java")));
 
         // Search by author
-        mockMvc.perform(get("/api/v1/books/search")
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_SEARCH_PATH())
                         .param("query", "Martin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -197,21 +190,21 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         // Arrange
         Book programmingBook = BookTestFixtures.createSampleBook();
         programmingBook.setId(null);
-        programmingBook.setCategory(CATEGORY_PROGRAMMING);
+        programmingBook.setCategory(ApiPathConstants.CATEGORY_PROGRAMMING);
 
         Book architectureBook = BookTestFixtures.createOutOfStockBook();
         architectureBook.setId(null);
-        architectureBook.setIsbn(ISBN_9999999999);
+        architectureBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         architectureBook.setCategory("Software Architecture");
 
         bookRepository.save(programmingBook);
         bookRepository.save(architectureBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/category/{category}", CATEGORY_PROGRAMMING))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_BY_CATEGORY_PATH(), ApiPathConstants.CATEGORY_PROGRAMMING))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].category", is(CATEGORY_PROGRAMMING)));
+                .andExpect(jsonPath("$[0].category", is(ApiPathConstants.CATEGORY_PROGRAMMING)));
     }
 
     @Test
@@ -230,7 +223,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         bookRepository.save(book2);
 
         // Act & Assert - Partial match
-        mockMvc.perform(get("/api/v1/books/author/{author}", "Joshua"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_BY_AUTHOR_PATH(), "Joshua"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].author", containsString("Joshua")));
@@ -246,14 +239,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
         Book outOfStockBook = BookTestFixtures.createOutOfStockBook();
         outOfStockBook.setId(null);
-        outOfStockBook.setIsbn(ISBN_9999999999);
+        outOfStockBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         outOfStockBook.setStock(0);
 
         bookRepository.save(inStockBook);
         bookRepository.save(outOfStockBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/available"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_AVAILABLE_BOOKS_PATH()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].stock", greaterThan(0)));
@@ -269,14 +262,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
         Book lowStockBook = BookTestFixtures.createLowStockBook();
         lowStockBook.setId(null);
-        lowStockBook.setIsbn(ISBN_9999999999);
+        lowStockBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         lowStockBook.setStock(5);
 
         bookRepository.save(highStockBook);
         bookRepository.save(lowStockBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/low-stock")
+        mockMvc.perform(get(ApiPathConstants.CATALOG_LOW_STOCK_BOOKS_PATH())
                         .param("threshold", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -293,14 +286,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act - Increase stock
-        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
-                        .param(PARAM_QUANTITY, "50"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "50"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(150)));
 
         // Act - Decrease stock
-        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
-                        .param(PARAM_QUANTITY, "-30"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "-30"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(120)));
     }
@@ -315,8 +308,8 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act & Assert
-        mockMvc.perform(patch(BOOK_STOCK_PATH, savedBook.getId())
-                        .param(PARAM_QUANTITY, "-100"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "-100"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -332,7 +325,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(post(BOOKS_API_PATH)
+        mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidBook)))
                 .andExpect(status().isBadRequest());
@@ -347,14 +340,14 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
             book.setIsbn("978123456" + i);  // Valid 10-character ISBN
             book.setTitle("Test Book " + i);
 
-            mockMvc.perform(post(BOOKS_API_PATH)
+            mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(book)))
                     .andExpect(status().isCreated());
         }
 
         // Assert - Verify all books were created
-        mockMvc.perform(get(BOOKS_API_PATH))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_API_PATH()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)));
     }
