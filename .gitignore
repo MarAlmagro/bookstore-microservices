@@ -1,5 +1,5 @@
 # Maven
-target/
+**/target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -11,35 +11,13 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # IDE - IntelliJ IDEA
-.idea/
 *.iws
 *.iml
 *.ipr
-out/
-
-# IDE - Eclipse
-.classpath
-.project
-.settings/
-bin/
-
-# IDE - VSCode
-.vscode/
-*.code-workspace
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-logs/
-*.log
-hs_err_pid*
-
-# Test Results (exclude execution logs, keep test artifacts)
-test-results/
-test-logs/
-*.test.log
 
 # Environment
 .env
@@ -49,18 +27,26 @@ test-logs/
 # Docker
 docker-compose.override.yml
 
-# Spring Boot
-spring-boot-devtools.properties
-
 # Node.js / Frontend (admin-ui specific)
-admin-ui/node/
-admin-ui/node_modules/
-admin-ui/npm-debug.log*
-admin-ui/yarn-debug.log*
-admin-ui/yarn-error.log*
-admin-ui/package-lock.json
-admin-ui/.npm
-admin-ui/.eslintcache
+**/node/
+**/node_modules/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/package-lock.json
+**/.npm
+**/.eslintcache
+**/dist/
+**/.next/
+**/.nuxt/
+**/.vuepress/dist/
+**/.serverless/
+**/.fusebox/
+**/coverage/
+**/.nyc_output/
+**/.cache/
+**/.parcel-cache/
+**/.vite/
 
 # Temporary files
 *.tmp
@@ -68,3 +54,65 @@ admin-ui/.eslintcache
 *.swp
 *.swo
 *~
+
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# Spring Boot specific
+application-*.properties
+application-*.yml
+!application.properties.example
+!application.yml.example
+spring-boot-devtools.properties
+
+# Testing
+**/test-results/
+**/test-logs/
+**/*.test.log
+**/test-output/
+**/junit-
+**/surefire-
+**/failsafe-
+
+# Build tools
+**/build/
+**/out/
+**/bin/
+**/classes/
+**/dependency-cache/
+**/libs/
+
+# IDE specific
+**/.idea/
+**/.vscode/
+**/.eclipse/
+**/.settings/
+**/.classpath
+**/.project
+**/*.iws
+**/*.iml
+**/*.ipr
+**/*.code-workspace
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+
+# Monitoring & Observability
+**/logs/
+**/*.log
+**/metrics/
+**/traces/
+**/dumps/
+**/heapdump*
+**/coredump*
