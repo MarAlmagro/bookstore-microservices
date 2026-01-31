@@ -72,7 +72,9 @@ class JwtTokenProviderTest {
         Claims claims = parseToken(token);
         assertThat(claims.getSubject()).isEqualTo(username);
         assertThat(claims.get(USER_ID_CLAIM, Long.class)).isEqualTo(userId);
-        assertThat(claims.get(ROLES_CLAIM, List.class)).containsExactly(role);
+        @SuppressWarnings("unchecked")
+        List<String> roles = (List<String>) claims.get(ROLES_CLAIM);
+        assertThat(roles).containsExactly(role);
     }
 
     @Test
@@ -262,7 +264,8 @@ class JwtTokenProviderTest {
         String token = jwtTokenProvider.generateTokenWithClaims(username, null, role);
 
         Claims claims = parseToken(token);
-        List<String> roles = claims.get(ROLES_CLAIM, List.class);
+        @SuppressWarnings("unchecked")
+        List<String> roles = (List<String>) claims.get(ROLES_CLAIM);
         assertThat(roles).containsExactly(role);
     }
 
