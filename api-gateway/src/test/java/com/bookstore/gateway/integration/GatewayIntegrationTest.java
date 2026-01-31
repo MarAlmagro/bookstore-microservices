@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +19,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 @ActiveProfiles("test")
 class GatewayIntegrationTest {
 
-    private static final String CATALOG_BOOKS_PATH = "/api/v1/books";
-    private static final String ORDERS_PATH = "/api/v1/orders";
-    private static final String AUTH_PATH = "/api/v1/auth/login";
+    @Value("${api.gateway.paths.books}")
+    private String catalogBooksPath;
+
+    @Value("${api.gateway.paths.orders}")
+    private String ordersPath;
+
+    @Value("${api.gateway.paths.auth.login}")
+    private String authPath;
     private static final String CONTENT_TYPE_JSON = "application/json";
     private static final String TEST_BOOK_RESPONSE = "{\"id\":1,\"title\":\"Test Book\"}";
     private static final String TEST_ORDER_RESPONSE = "{\"id\":\"123\",\"status\":\"PENDING\"}";
@@ -36,14 +42,14 @@ class GatewayIntegrationTest {
 
     @Test
     void shouldRouteCatalogServiceRequests() {
-        stubFor(get(urlEqualTo(CATALOG_BOOKS_PATH))
+        stubFor(get(urlEqualTo(catalogBooksPath))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON)
                         .withBody(TEST_BOOK_RESPONSE)));
 
         webTestClient.get()
-                .uri(CATALOG_BOOKS_PATH)
+                .uri(catalogBooksPath)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -54,14 +60,14 @@ class GatewayIntegrationTest {
 
     @Test
     void shouldRouteOrderServiceRequests() {
-        stubFor(get(urlEqualTo(ORDERS_PATH))
+        stubFor(get(urlEqualTo(ordersPath))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON)
                         .withBody(TEST_ORDER_RESPONSE)));
 
         webTestClient.get()
-                .uri(ORDERS_PATH)
+                .uri(ordersPath)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -72,14 +78,14 @@ class GatewayIntegrationTest {
 
     @Test
     void shouldRouteUserServiceRequests() {
-        stubFor(post(urlEqualTo(AUTH_PATH))
+        stubFor(post(urlEqualTo(authPath))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON)
                         .withBody(TEST_AUTH_RESPONSE)));
 
         webTestClient.post()
-                .uri(AUTH_PATH)
+                .uri(authPath)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\"username\":\"test\",\"password\":\"test\"}")
                 .exchange()
@@ -91,14 +97,14 @@ class GatewayIntegrationTest {
 
     @Test
     void shouldIncludeCorsHeaders() {
-        stubFor(get(urlEqualTo(CATALOG_BOOKS_PATH))
+        stubFor(get(urlEqualTo(catalogBooksPath))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON)
                         .withBody(TEST_BOOK_RESPONSE)));
 
         webTestClient.get()
-                .uri(CATALOG_BOOKS_PATH)
+                .uri(catalogBooksPath)
                 .header(HttpHeaders.ORIGIN, "http://localhost:3000")
                 .exchange()
                 .expectStatus().isOk()
@@ -108,7 +114,7 @@ class GatewayIntegrationTest {
     @Test
     void shouldHandleOptionsRequestForCors() {
         webTestClient.options()
-                .uri(CATALOG_BOOKS_PATH)
+                .uri(catalogBooksPath)
                 .header(HttpHeaders.ORIGIN, "http://localhost:3000")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
                 .exchange()
@@ -126,25 +132,25 @@ class GatewayIntegrationTest {
 
     @Test
     void shouldHandleServiceUnavailable() {
-        stubFor(get(urlEqualTo(CATALOG_BOOKS_PATH))
+        stubFor(get(urlEqualTo(catalogBooksPath))
                 .willReturn(aResponse()
                         .withStatus(503)));
 
         webTestClient.get()
-                .uri(CATALOG_BOOKS_PATH)
+                .uri(catalogBooksPath)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
 
     @Test
     void shouldHandleServiceTimeout() {
-        stubFor(get(urlEqualTo(CATALOG_BOOKS_PATH))
+        stubFor(get(urlEqualTo(catalogBooksPath))
                 .willReturn(aResponse()
                         .withFixedDelay(30000)
                         .withStatus(200)));
 
         webTestClient.get()
-                .uri(CATALOG_BOOKS_PATH)
+                .uri(catalogBooksPath)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

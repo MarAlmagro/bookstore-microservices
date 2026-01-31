@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.MediaType;
@@ -30,8 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureWireMock(port = 0)
 class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
 
-    private static final String ORDERS_API_PATH = "/api/v1/orders";
-    private static final String BOOKS_API_PATH = "/api/v1/books/";
+    @Value("${api.paths.orders}")
+    private String ordersApiPath;
+
+    @Value("${api.paths.books}")
+    private String booksApiPath;
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,7 +61,7 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
         OrderDto orderDto = createOrderDto(1L, 2);
         String orderJson = objectMapper.writeValueAsString(orderDto);
 
-        mockMvc.perform(post(ORDERS_API_PATH)
+        mockMvc.perform(post(ordersApiPath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderJson))
                 .andExpect(status().isCreated())
@@ -78,7 +82,7 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
         OrderDto orderDto = createOrderDto(999L, 1);
         String orderJson = objectMapper.writeValueAsString(orderDto);
 
-        mockMvc.perform(post(ORDERS_API_PATH)
+        mockMvc.perform(post(ordersApiPath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderJson))
                 .andExpect(status().isNotFound());
@@ -96,7 +100,7 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
         OrderDto orderDto = createOrderDto(1L, 5);
         String orderJson = objectMapper.writeValueAsString(orderDto);
 
-        mockMvc.perform(post(ORDERS_API_PATH)
+        mockMvc.perform(post(ordersApiPath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderJson))
                 .andExpect(status().isBadRequest());
@@ -113,14 +117,14 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
         OrderDto orderDto = createOrderDto(1L, 1);
         String orderJson = objectMapper.writeValueAsString(orderDto);
 
-        mockMvc.perform(post(ORDERS_API_PATH)
+        mockMvc.perform(post(ordersApiPath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderJson))
                 .andExpect(status().is5xxServerError());
     }
 
     private void stubCatalogServiceGetBook(Long bookId, BookDto bookDto) throws Exception {
-        stubFor(get(urlEqualTo(BOOKS_API_PATH + bookId))
+        stubFor(get(urlEqualTo(booksApiPath + bookId))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -128,13 +132,13 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
     }
 
     private void stubCatalogServiceBookNotFound(Long bookId) {
-        stubFor(get(urlEqualTo(BOOKS_API_PATH + bookId))
+        stubFor(get(urlEqualTo(booksApiPath + bookId))
                 .willReturn(aResponse()
                         .withStatus(404)));
     }
 
     private void stubCatalogServiceTimeout(Long bookId) {
-        stubFor(get(urlEqualTo(BOOKS_API_PATH + bookId))
+        stubFor(get(urlEqualTo(booksApiPath + bookId))
                 .willReturn(aResponse()
                         .withFixedDelay(5000)
                         .withStatus(200)));
