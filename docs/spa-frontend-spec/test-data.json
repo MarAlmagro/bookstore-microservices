@@ -1,0 +1,88 @@
+{
+  "users": {
+    "admin": {
+      "email": "admin@bookstore.com",
+      "password": "admin123",
+      "role": "ADMIN"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "password": "customer123",
+      "role": "CUSTOMER"
+    }
+  },
+  "sampleBooks": [
+    {
+      "isbn": "9780134685991",
+      "title": "Effective Java",
+      "author": "Joshua Bloch",
+      "description": "The definitive guide to Java programming language best practices",
+      "price": 45.99,
+      "stock": 50,
+      "category": "Programming"
+    },
+    {
+      "isbn": "9780596517748",
+      "title": "JavaScript: The Good Parts",
+      "author": "Douglas Crockford",
+      "description": "Unearthing the excellence in JavaScript",
+      "price": 29.99,
+      "stock": 30,
+      "category": "Programming"
+    },
+    {
+      "isbn": "9780321125217",
+      "title": "Domain-Driven Design",
+      "author": "Eric Evans",
+      "description": "Tackling complexity in the heart of software",
+      "price": 59.99,
+      "stock": 25,
+      "category": "Software Architecture"
+    }
+  ],
+  "sampleOrder": {
+    "userId": 1,
+    "items": [
+      { "bookId": 1, "quantity": 2 },
+      { "bookId": 2, "quantity": 1 }
+    ]
+  },
+  "apiEndpoints": {
+    "baseUrl": "http://localhost:8080",
+    "auth": {
+      "login": "POST /api/v1/auth/login",
+      "register": "POST /api/v1/auth/register",
+      "refresh": "POST /api/v1/auth/refresh"
+    },
+    "books": {
+      "list": "GET /api/v1/books",
+      "listPaginated": "GET /api/v1/books/page",
+      "getById": "GET /api/v1/books/{id}",
+      "getByIsbn": "GET /api/v1/books/isbn/{isbn}",
+      "search": "GET /api/v1/books/search?query={query}",
+      "byCategory": "GET /api/v1/books/category/{category}",
+      "byAuthor": "GET /api/v1/books/author/{author}",
+      "available": "GET /api/v1/books/available",
+      "create": "POST /api/v1/books",
+      "update": "PUT /api/v1/books/{id}",
+      "delete": "DELETE /api/v1/books/{id}",
+      "updateStock": "PATCH /api/v1/books/{id}/stock?quantity={qty}"
+    },
+    "orders": {
+      "create": "POST /api/v1/orders",
+      "getById": "GET /api/v1/orders/{id}",
+      "listAll": "GET /api/v1/orders",
+      "listPaginated": "GET /api/v1/orders/page",
+      "byUser": "GET /api/v1/orders/user/{userId}",
+      "byStatus": "GET /api/v1/orders/status/{status}",
+      "updateStatus": "PUT /api/v1/orders/{id}/status?status={status}",
+      "delete": "DELETE /api/v1/orders/{id}"
+    },
+    "users": {
+      "profile": "GET /api/v1/users/profile",
+      "updateProfile": "PUT /api/v1/users/profile",
+      "getById": "GET /api/v1/users/{id}",
+      "delete": "DELETE /api/v1/users/{id}"
+    }
+  }
+}
