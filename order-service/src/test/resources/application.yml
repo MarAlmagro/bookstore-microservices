@@ -19,3 +19,8 @@ logging:
 catalog:
   service:
     url: http://localhost:8081
+
+api:
+  paths:
+    orders: /api/v1/orders
+    books: /api/v1/books/

@@ -1,0 +1,19 @@
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+  batch:
+    job:
+      enabled: false
+
+jwt:
+  secret: testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm
+
+catalog:
+  service:
+    url: http://localhost:8081
+
+logging:
+  level:
+    com.bookstore.order: DEBUG
+    org.testcontainers: INFO

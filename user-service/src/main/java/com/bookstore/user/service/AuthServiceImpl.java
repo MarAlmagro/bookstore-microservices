@@ -9,7 +9,7 @@ import com.bookstore.common.exception.UnauthorizedException;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.mapper.UserMapper;
 import com.bookstore.user.repository.UserRepository;
-import com.bookstore.user.security.JwtTokenProvider;
+import com.bookstore.common.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

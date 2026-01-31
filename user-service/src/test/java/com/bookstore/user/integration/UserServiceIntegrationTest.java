@@ -14,9 +14,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class UserServiceIntegrationTest {
+class UserServiceIntegrationTest extends BasePostgresIntegrationTest {
+
+    private static final String TEST_EMAIL = "integration@test.com";
+    private static final String TEST_PASSWORD = "password123";
 
     @Autowired
     private AuthService authService;
@@ -32,32 +33,32 @@ class UserServiceIntegrationTest {
     @Test
     void fullAuthenticationFlow_Success() {
         UserDto registerDto = UserDto.builder()
-                .email("integration@test.com")
+                .email(TEST_EMAIL)
                 .firstName("Integration")
                 .lastName("Test")
                 .role("CUSTOMER")
                 .build();
 
-        AuthResponseDto registerResponse = authService.register(registerDto, "password123");
+        AuthResponseDto registerResponse = authService.register(registerDto, TEST_PASSWORD);
         assertNotNull(registerResponse);
         assertNotNull(registerResponse.getToken());
         assertNotNull(registerResponse.getRefreshToken());
-        assertEquals("integration@test.com", registerResponse.getUser().getEmail());
+        assertEquals(TEST_EMAIL, registerResponse.getUser().getEmail());
 
-        User savedUser = userRepository.findByEmail("integration@test.com").orElse(null);
+        User savedUser = userRepository.findByEmail(TEST_EMAIL).orElse(null);
         assertNotNull(savedUser);
         assertEquals("Integration", savedUser.getFirstName());
         assertTrue(savedUser.getEnabled());
 
         AuthRequestDto loginRequest = AuthRequestDto.builder()
-                .email("integration@test.com")
-                .password("password123")
+                .email(TEST_EMAIL)
+                .password(TEST_PASSWORD)
                 .build();
 
         AuthResponseDto loginResponse = authService.login(loginRequest);
         assertNotNull(loginResponse);
         assertNotNull(loginResponse.getToken());
-        assertEquals("integration@test.com", loginResponse.getUser().getEmail());
+        assertEquals(TEST_EMAIL, loginResponse.getUser().getEmail());
 
         try {
             Thread.sleep(1000);
@@ -79,7 +80,7 @@ class UserServiceIntegrationTest {
                 .lastName("User")
                 .build();
 
-        authService.register(userDto, "password123");
+        authService.register(userDto, TEST_PASSWORD);
 
         UserDto duplicateDto = UserDto.builder()
                 .email("duplicate@test.com")
@@ -87,6 +88,6 @@ class UserServiceIntegrationTest {
                 .lastName("User")
                 .build();
 
-        assertThrows(Exception.class, () -> authService.register(duplicateDto, "password123"));
+        assertThrows(Exception.class, () -> authService.register(duplicateDto, TEST_PASSWORD));
     }
 }
