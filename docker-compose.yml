@@ -231,7 +231,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./test-data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./test-fixtures/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -257,7 +257,7 @@ services:
     image: grafana/promtail:latest
     container_name: promtail-agent
     volumes:
-      - ./test-data/promtail/promtail-config.yml:/etc/promtail/config.yml
+      - ./test-fixtures/promtail/promtail-config.yml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yml
     networks:
