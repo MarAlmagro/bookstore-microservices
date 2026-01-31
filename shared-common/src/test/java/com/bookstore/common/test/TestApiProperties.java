@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "test.api")
+@SuppressWarnings("java:S1075") // URIs are configurable defaults via @ConfigurationProperties
 public class TestApiProperties {
 
     private Catalog catalog = new Catalog();
