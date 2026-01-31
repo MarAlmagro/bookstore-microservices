@@ -73,6 +73,12 @@
             <artifactId>spring-data-commons</artifactId>
         </dependency>
 
+        <!-- Spring Security for authentication -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- JWT for token handling -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
