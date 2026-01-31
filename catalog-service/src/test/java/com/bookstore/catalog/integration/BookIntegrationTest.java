@@ -87,7 +87,7 @@ class BookIntegrationTest extends BaseMySQLIntegrationTest {
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath(JSON_PATH_TITLE, is(updateDto.getTitle())));
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(updateDto.getTitle())));
 
         // Delete the book
         mockMvc.perform(delete(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))

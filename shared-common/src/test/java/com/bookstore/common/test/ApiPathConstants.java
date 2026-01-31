@@ -14,7 +14,7 @@ public final class ApiPathConstants {
     private static TestApiProperties properties;
 
     @Autowired
-    public void setProperties(TestApiProperties properties) {
+    public static void setProperties(TestApiProperties properties) {
         ApiPathConstants.properties = properties;
     }
 
