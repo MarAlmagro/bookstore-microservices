@@ -18,7 +18,7 @@ logging:
 
 catalog:
   service:
-    url: http://localhost:8081
+    url: http://localhost:${wiremock.server.port:8081}
 
 api:
   paths:

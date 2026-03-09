@@ -155,6 +155,7 @@ class OrderCatalogIntegrationTest extends BaseMongoIntegrationTest {
 
     private OrderDto createOrderDto(Long bookId, Integer quantity) {
         OrderDto orderDto = new OrderDto();
+        orderDto.setUserId(1L);
         OrderItemDto itemDto = new OrderItemDto();
         itemDto.setBookId(bookId);
         itemDto.setQuantity(quantity);

@@ -6,12 +6,23 @@ spring:
     job:
       enabled: false
 
+eureka:
+  client:
+    enabled: false
+
+feign:
+  client:
+    config:
+      catalog-service:
+        connectTimeout: 2000
+        readTimeout: 3000
+
 jwt:
   secret: testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm
 
 catalog:
   service:
-    url: http://localhost:8081
+    url: http://localhost:${wiremock.server.port:8081}
 
 logging:
   level:
