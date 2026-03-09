@@ -1,67 +1,50 @@
 package com.bookstore.common.test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-/**
- * Constants for API paths used in integration tests.
- * This class provides centralized, customizable URI parameters for test endpoints
- * by leveraging Spring's @ConfigurationProperties.
- */
-@Component
 public final class ApiPathConstants {
 
-    private static TestApiProperties properties;
-
-    @Autowired
-    public static void setProperties(TestApiProperties properties) {
-        ApiPathConstants.properties = properties;
-    }
-
     private ApiPathConstants() {
-        // Utility class - prevent instantiation
     }
 
     // Catalog Service API paths
     public static String CATALOG_BOOKS_API_PATH() {
-        return properties.getCatalog().getBooksPath();
+        return "/api/v1/books";
     }
 
     public static String CATALOG_BOOK_BY_ID_PATH() {
-        return properties.getCatalog().getBookByIdPath();
+        return "/api/v1/books/{id}";
     }
 
     public static String CATALOG_BOOK_STOCK_PATH() {
-        return properties.getCatalog().getBookStockPath();
+        return "/api/v1/books/{id}/stock";
     }
 
     public static String CATALOG_BOOKS_SEARCH_PATH() {
-        return properties.getCatalog().getBooksSearchPath();
+        return "/api/v1/books/search";
     }
 
     public static String CATALOG_BOOKS_BY_CATEGORY_PATH() {
-        return properties.getCatalog().getBooksByCategoryPath();
+        return "/api/v1/books/category/{category}";
     }
 
     public static String CATALOG_BOOKS_BY_AUTHOR_PATH() {
-        return properties.getCatalog().getBooksByAuthorPath();
+        return "/api/v1/books/author/{author}";
     }
 
     public static String CATALOG_AVAILABLE_BOOKS_PATH() {
-        return properties.getCatalog().getAvailableBooksPath();
+        return "/api/v1/books/available";
     }
 
     public static String CATALOG_LOW_STOCK_BOOKS_PATH() {
-        return properties.getCatalog().getLowStockBooksPath();
+        return "/api/v1/books/low-stock";
     }
 
     // Order Service API paths
     public static String ORDERS_API_PATH() {
-        return properties.getOrder().getOrdersPath();
+        return "/api/v1/orders";
     }
 
     public static String ORDER_BY_ID_PATH() {
-        return properties.getOrder().getOrderByIdPath();
+        return "/api/v1/orders/";
     }
 
     // JSON path constants (these are not URIs, so they can remain static)
