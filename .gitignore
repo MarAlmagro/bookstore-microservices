@@ -102,6 +102,10 @@ spring-boot-devtools.properties
 **/*.ipr
 **/*.code-workspace
 
+# AI agent directories
+.claude/
+.windsurf/
+
 # Database
 *.db
 *.sqlite
