@@ -1,13 +1,13 @@
 package com.bookstore.catalog.fixtures;
 
 import com.bookstore.catalog.entity.Book;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Test fixtures for creating test data for Book entities and DTOs.
+ * Test fixtures for creating test data for Book entities and Dtos.
  * Provides static factory methods for consistent test data across test classes.
  */
 public class BookTestFixtures {
@@ -153,12 +153,12 @@ public class BookTestFixtures {
     }
 
     /**
-     * Creates a sample BookDTO with default values
+     * Creates a sample BookDto with default values
      *
-     * @return a BookDTO
+     * @return a BookDto
      */
-    public static BookDTO createSampleBookDTO() {
-        return BookDTO.builder()
+    public static BookDto createSampleBookDto() {
+        return BookDto.builder()
                 .id(1L)
                 .isbn("9780134685")  // Valid 10-character ISBN
                 .title("Effective Java")
@@ -171,12 +171,12 @@ public class BookTestFixtures {
     }
 
     /**
-     * Creates a BookDTO for creating a new book (no ID)
+     * Creates a BookDto for creating a new book (no ID)
      *
-     * @return a BookDTO
+     * @return a BookDto
      */
-    public static BookDTO createNewBookDTO() {
-        return BookDTO.builder()
+    public static BookDto createNewBookDto() {
+        return BookDto.builder()
                 .isbn("9781234567")  // Valid 10-character ISBN
                 .title("New Test Book")
                 .author("Test Author")
@@ -188,12 +188,12 @@ public class BookTestFixtures {
     }
 
     /**
-     * Creates a BookDTO with invalid data (for validation testing)
+     * Creates a BookDto with invalid data (for validation testing)
      *
-     * @return a BookDTO with invalid data
+     * @return a BookDto with invalid data
      */
-    public static BookDTO createInvalidBookDTO() {
-        return BookDTO.builder()
+    public static BookDto createInvalidBookDto() {
+        return BookDto.builder()
                 .isbn("")  // Invalid: empty ISBN
                 .title("")  // Invalid: empty title
                 .author("")  // Invalid: empty author
@@ -203,12 +203,12 @@ public class BookTestFixtures {
     }
 
     /**
-     * Creates a BookDTO for update operations
+     * Creates a BookDto for update operations
      *
-     * @return a BookDTO
+     * @return a BookDto
      */
-    public static BookDTO createUpdateBookDTO() {
-        return BookDTO.builder()
+    public static BookDto createUpdateBookDto() {
+        return BookDto.builder()
                 .id(1L)
                 .isbn("9780134685")  // Valid 10-character ISBN
                 .title("Effective Java - Updated Edition")

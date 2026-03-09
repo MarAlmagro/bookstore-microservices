@@ -1,15 +1,15 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.UnauthorizedException;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.mapper.UserMapper;
 import com.bookstore.user.repository.UserRepository;
-import com.bookstore.user.security.JwtTokenProvider;
+import com.bookstore.common.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,59 +43,59 @@ public class AuthServiceImpl implements AuthService {
     private UserMapper userMapper;
 
     @Override
-    public AuthResponseDTO register(UserDTO userDTO, String password) {
-        logger.debug("Registering new user with email: {}", userDTO.getEmail());
+    public AuthResponseDto register(UserDto userDto, String password) {
+        logger.debug("Registering new user with email: {}", userDto.getEmail());
 
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new InvalidRequestException("Email already exists: " + userDTO.getEmail());
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new InvalidRequestException("Email already exists: " + userDto.getEmail());
         }
 
         User user = User.builder()
-                .email(userDTO.getEmail())
+                .email(userDto.getEmail())
                 .password(passwordEncoder.encode(password))
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .role(userDTO.getRole() != null ? UserRole.valueOf(userDTO.getRole()) : UserRole.CUSTOMER)
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .role(userDto.getRole() != null ? UserRole.valueOf(userDto.getRole()) : UserRole.CUSTOMER)
                 .enabled(true)
                 .build();
 
         User savedUser = userRepository.save(user);
-        logger.info("User registered successfully with email: {}", userDTO.getEmail());
+        logger.info("User registered successfully with email: {}", userDto.getEmail());
 
-        String token = tokenProvider.generateTokenFromUsername(savedUser.getEmail());
+        String token = tokenProvider.generateTokenWithClaims(savedUser.getEmail(), savedUser.getId(), savedUser.getRole().name());
         String refreshToken = tokenProvider.generateRefreshToken(savedUser.getEmail());
 
-        return AuthResponseDTO.builder()
+        return AuthResponseDto.builder()
                 .token(token)
                 .refreshToken(refreshToken)
-                .user(userMapper.toDTO(savedUser))
+                .user(userMapper.toDto(savedUser))
                 .build();
     }
 
     @Override
-    public AuthResponseDTO login(AuthRequestDTO authRequest) {
+    public AuthResponseDto login(AuthRequestDto authRequest) {
         logger.debug("User login attempt with email: {}", authRequest.getEmail());
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authRequest.getEmail(),
                             authRequest.getPassword()
                     )
             );
 
-            String token = tokenProvider.generateToken(authentication);
-            String refreshToken = tokenProvider.generateRefreshToken(authRequest.getEmail());
-
             User user = userRepository.findByEmail(authRequest.getEmail())
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
+            String token = tokenProvider.generateTokenWithClaims(user.getEmail(), user.getId(), user.getRole().name());
+            String refreshToken = tokenProvider.generateRefreshToken(authRequest.getEmail());
+
             logger.info("User logged in successfully with email: {}", authRequest.getEmail());
 
-            return AuthResponseDTO.builder()
+            return AuthResponseDto.builder()
                     .token(token)
                     .refreshToken(refreshToken)
-                    .user(userMapper.toDTO(user))
+                    .user(userMapper.toDto(user))
                     .build();
 
         } catch (AuthenticationException e) {
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDTO refreshToken(String refreshToken) {
+    public AuthResponseDto refreshToken(String refreshToken) {
         logger.debug("Refreshing token");
 
         if (!tokenProvider.validateToken(refreshToken)) {
@@ -116,15 +116,15 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
-        String newToken = tokenProvider.generateTokenFromUsername(email);
+        String newToken = tokenProvider.generateTokenWithClaims(user.getEmail(), user.getId(), user.getRole().name());
         String newRefreshToken = tokenProvider.generateRefreshToken(email);
 
         logger.info("Token refreshed successfully for email: {}", email);
 
-        return AuthResponseDTO.builder()
+        return AuthResponseDto.builder()
                 .token(newToken)
                 .refreshToken(newRefreshToken)
-                .user(userMapper.toDTO(user))
+                .user(userMapper.toDto(user))
                 .build();
     }
 }

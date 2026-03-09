@@ -1,7 +1,6 @@
 package com.bookstore.user.controller;
 
-import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,11 +36,11 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    private UserDTO userDTO;
+    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        userDTO = UserDTO.builder()
+        userDto = UserDto.builder()
                 .id(1L)
                 .email("test@example.com")
                 .firstName("John")
@@ -51,9 +50,9 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "test@example.com", roles = { "CUSTOMER" })
     void getCurrentUserProfile_Success() throws Exception {
-        when(userService.getUserByEmail("test@example.com")).thenReturn(userDTO);
+        when(userService.getUserByEmail("test@example.com")).thenReturn(userDto);
 
         mockMvc.perform(get("/api/v1/users/profile"))
                 .andExpect(status().isOk())
@@ -69,16 +68,16 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "test@example.com", roles = { "CUSTOMER" })
     void updateCurrentUserProfile_Success() throws Exception {
-        UserDTO updateDTO = UserDTO.builder()
+        UserDto updateDto = UserDto.builder()
                 .email("test@example.com")
                 .firstName("Jane")
                 .lastName("Smith")
                 .role("CUSTOMER")
                 .build();
 
-        UserDTO updatedDTO = UserDTO.builder()
+        UserDto updatedDto = UserDto.builder()
                 .id(1L)
                 .email("test@example.com")
                 .firstName("Jane")
@@ -86,21 +85,21 @@ class UserControllerTest {
                 .role("CUSTOMER")
                 .build();
 
-        when(userService.getUserByEmail("test@example.com")).thenReturn(userDTO);
-        when(userService.updateUser(anyLong(), any(UserDTO.class))).thenReturn(updatedDTO);
+        when(userService.getUserByEmail("test@example.com")).thenReturn(userDto);
+        when(userService.updateUser(anyLong(), any(UserDto.class))).thenReturn(updatedDto);
 
         mockMvc.perform(put("/api/v1/users/profile")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Jane"))
                 .andExpect(jsonPath("$.lastName").value("Smith"));
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", roles = {"ADMIN"})
+    @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
     void getUserById_Success() throws Exception {
-        when(userService.getUserById(1L)).thenReturn(userDTO);
+        when(userService.getUserById(1L)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/v1/users/1"))
                 .andExpect(status().isOk())
@@ -108,7 +107,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "test@example.com", roles = { "CUSTOMER" })
     void getUserById_Forbidden() throws Exception {
         mockMvc.perform(get("/api/v1/users/1"))
                 .andExpect(result -> {
@@ -120,7 +119,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", roles = {"ADMIN"})
+    @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
     void deleteUser_Success() throws Exception {
         doNothing().when(userService).deleteUser(1L);
 

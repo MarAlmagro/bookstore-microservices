@@ -1,7 +1,7 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.constants.UserRole;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.mapper.UserMapper;
@@ -33,7 +33,7 @@ class UserServiceTest {
     private UserServiceImpl userService;
 
     private User testUser;
-    private UserDTO testUserDTO;
+    private UserDto testUserDto;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +49,7 @@ class UserServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        testUserDTO = UserDTO.builder()
+        testUserDto = UserDto.builder()
                 .id(1L)
                 .email("test@example.com")
                 .firstName("John")
@@ -61,14 +61,14 @@ class UserServiceTest {
     @Test
     void getUserById_Success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
-        UserDTO result = userService.getUserById(1L);
+        UserDto result = userService.getUserById(1L);
 
         assertNotNull(result);
-        assertEquals(testUserDTO.getEmail(), result.getEmail());
+        assertEquals(testUserDto.getEmail(), result.getEmail());
         verify(userRepository).findById(1L);
-        verify(userMapper).toDTO(testUser);
+        verify(userMapper).toDto(testUser);
     }
 
     @Test
@@ -82,18 +82,18 @@ class UserServiceTest {
     @Test
     void getUserByEmail_Success() {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(testUser)).thenReturn(testUserDto);
 
-        UserDTO result = userService.getUserByEmail("test@example.com");
+        UserDto result = userService.getUserByEmail("test@example.com");
 
         assertNotNull(result);
-        assertEquals(testUserDTO.getEmail(), result.getEmail());
+        assertEquals(testUserDto.getEmail(), result.getEmail());
         verify(userRepository).findByEmail("test@example.com");
     }
 
     @Test
     void updateUser_Success() {
-        UserDTO updateDTO = UserDTO.builder()
+        UserDto updateDto = UserDto.builder()
                 .firstName("Jane")
                 .lastName("Smith")
                 .build();
@@ -110,9 +110,9 @@ class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
-        when(userMapper.toDTO(updatedUser)).thenReturn(testUserDTO);
+        when(userMapper.toDto(updatedUser)).thenReturn(testUserDto);
 
-        UserDTO result = userService.updateUser(1L, updateDTO);
+        UserDto result = userService.updateUser(1L, updateDto);
 
         assertNotNull(result);
         verify(userRepository).findById(1L);

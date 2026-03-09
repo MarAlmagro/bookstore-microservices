@@ -1,5 +1,6 @@
 package com.bookstore.user.security;
 
+import com.bookstore.common.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.bookstore.catalog.batch;
 
 import com.bookstore.catalog.entity.Book;
-import com.bookstore.common.dto.BookImportDTO;
+import com.bookstore.common.dto.BookImportDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -10,12 +10,15 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -25,6 +28,7 @@ import javax.persistence.EntityManagerFactory;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.batch.job.enabled", havingValue = "true", matchIfMissing = true)
 public class CatalogImportJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -34,27 +38,27 @@ public class CatalogImportJobConfig {
 
     @Bean
     @StepScope
-    public FlatFileItemReader<BookImportDTO> catalogReader(
+    public FlatFileItemReader<BookImportDto> catalogReader(
             @Value("#{jobParameters['inputFile']}") String inputFile) {
-        
-        FlatFileItemReader<BookImportDTO> reader = new FlatFileItemReader<>();
+
+        FlatFileItemReader<BookImportDto> reader = new FlatFileItemReader<>();
         reader.setResource(new FileSystemResource(inputFile));
         reader.setLinesToSkip(1);
-        
-        DefaultLineMapper<BookImportDTO> lineMapper = new DefaultLineMapper<>();
-        
+
+        DefaultLineMapper<BookImportDto> lineMapper = new DefaultLineMapper<>();
+
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
         tokenizer.setNames("isbn", "title", "author", "description", "price", "stock", "category");
         tokenizer.setDelimiter(",");
-        
-        BeanWrapperFieldSetMapper<BookImportDTO> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(BookImportDTO.class);
-        
+
+        BeanWrapperFieldSetMapper<BookImportDto> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(BookImportDto.class);
+
         lineMapper.setLineTokenizer(tokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
-        
+
         reader.setLineMapper(lineMapper);
-        
+
         return reader;
     }
 
@@ -66,20 +70,22 @@ public class CatalogImportJobConfig {
     }
 
     @Bean
-    public Step catalogImportStep() {
+    public Step catalogImportStep(
+            ItemReader<BookImportDto> catalogReader,
+            ItemWriter<Book> catalogWriter) {
         return stepBuilderFactory.get("catalogImportStep")
-                .<BookImportDTO, Book>chunk(100)
-                .reader(catalogReader(null))
+                .<BookImportDto, Book>chunk(100)
+                .reader(catalogReader)
                 .processor(bookImportProcessor)
-                .writer(catalogWriter())
+                .writer(catalogWriter)
                 .build();
     }
 
     @Bean
-    public Job catalogImportJob() {
+    public Job catalogImportJob(Step catalogImportStep) {
         return jobBuilderFactory.get("catalogImportJob")
                 .incrementer(new RunIdIncrementer())
-                .start(catalogImportStep())
+                .start(catalogImportStep)
                 .build();
     }
 }

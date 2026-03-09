@@ -8,6 +8,9 @@ spring:
 server:
   port: 0
 
+jwt:
+  secret: testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm
+
 logging:
   level:
     com.bookstore.order: DEBUG
@@ -15,4 +18,9 @@ logging:
 
 catalog:
   service:
-    url: http://localhost:8081
+    url: http://localhost:${wiremock.server.port:8081}
+
+api:
+  paths:
+    orders: /api/v1/orders
+    books: /api/v1/books/

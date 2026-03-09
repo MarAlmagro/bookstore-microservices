@@ -1,9 +1,9 @@
 package com.bookstore.user.controller;
 
 import com.bookstore.common.constants.ApiConstants;
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 import com.bookstore.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,15 +31,15 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
-    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody Map<String, Object> request) {
-        UserDTO userDTO = UserDTO.builder()
+    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody Map<String, Object> request) {
+        UserDto userDto = UserDto.builder()
                 .email((String) request.get("email"))
                 .firstName((String) request.get("firstName"))
                 .lastName((String) request.get("lastName"))
                 .build();
 
         String password = (String) request.get("password");
-        AuthResponseDTO response = authService.register(userDTO, password);
+        AuthResponseDto response = authService.register(userDto, password);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -49,8 +49,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Login successful"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
-    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest) {
-        AuthResponseDTO response = authService.login(authRequest);
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto authRequest) {
+        AuthResponseDto response = authService.login(authRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -60,9 +60,9 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid refresh token")
     })
-    public ResponseEntity<AuthResponseDTO> refreshToken(@RequestBody Map<String, String> request) {
+    public ResponseEntity<AuthResponseDto> refreshToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
-        AuthResponseDTO response = authService.refreshToken(refreshToken);
+        AuthResponseDto response = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(response);
     }
 }

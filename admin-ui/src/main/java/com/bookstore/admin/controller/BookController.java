@@ -1,7 +1,7 @@
 package com.bookstore.admin.controller;
 
 import com.bookstore.admin.client.CatalogClient;
-import com.bookstore.admin.dto.BookDTO;
+import com.bookstore.admin.dto.BookDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +22,7 @@ public class BookController {
             @RequestParam(value = "query", required = false) String query,
             Model model) {
         try {
-            List<BookDTO> books;
+            List<BookDto> books;
             if (query != null && !query.isEmpty()) {
                 books = catalogClient.searchBooks(query);
             } else {
@@ -38,14 +38,14 @@ public class BookController {
 
     @GetMapping("/new")
     public String newBookForm(Model model) {
-        model.addAttribute("book", new BookDTO());
+        model.addAttribute("book", new BookDto());
         return "books/form";
     }
 
     @GetMapping("/{id}/edit")
     public String editBookForm(@PathVariable Long id, Model model) {
         try {
-            BookDTO book = catalogClient.getBookById(id);
+            BookDto book = catalogClient.getBookById(id);
             model.addAttribute("book", book);
         } catch (Exception e) {
             model.addAttribute("error", "books.error.notFound");
@@ -55,7 +55,7 @@ public class BookController {
     }
 
     @PostMapping
-    public String createBook(@ModelAttribute BookDTO book, RedirectAttributes redirectAttributes) {
+    public String createBook(@ModelAttribute BookDto book, RedirectAttributes redirectAttributes) {
         try {
             catalogClient.createBook(book);
             redirectAttributes.addFlashAttribute("success", "books.success.created");
@@ -66,7 +66,7 @@ public class BookController {
     }
 
     @PostMapping("/{id}")
-    public String updateBook(@PathVariable Long id, @ModelAttribute BookDTO book, RedirectAttributes redirectAttributes) {
+    public String updateBook(@PathVariable Long id, @ModelAttribute BookDto book, RedirectAttributes redirectAttributes) {
         try {
             catalogClient.updateBook(id, book);
             redirectAttributes.addFlashAttribute("success", "books.success.updated");

@@ -4,7 +4,7 @@ import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.mapper.BookMapper;
 import com.bookstore.catalog.repository.BookRepository;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
 import com.bookstore.common.exception.InvalidRequestException;
 import com.bookstore.common.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,12 +42,12 @@ class BookServiceTest {
     private BookServiceImpl bookService;
 
     private Book sampleBook;
-    private BookDTO sampleBookDTO;
+    private BookDto sampleBookDto;
 
     @BeforeEach
     void setUp() {
         sampleBook = BookTestFixtures.createSampleBook();
-        sampleBookDTO = BookTestFixtures.createSampleBookDTO();
+        sampleBookDto = BookTestFixtures.createSampleBookDto();
     }
 
     @Test
@@ -57,24 +56,22 @@ class BookServiceTest {
         // Arrange
         List<Book> books = Arrays.asList(
                 BookTestFixtures.createSampleBook(),
-                BookTestFixtures.createSecondSampleBook()
-        );
-        List<BookDTO> bookDTOs = Arrays.asList(
-                BookTestFixtures.createSampleBookDTO(),
-                BookTestFixtures.createSampleBookDTO()
-        );
+                BookTestFixtures.createSecondSampleBook());
+        List<BookDto> bookDtos = Arrays.asList(
+                BookTestFixtures.createSampleBookDto(),
+                BookTestFixtures.createSampleBookDto());
 
         when(bookRepository.findAll()).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.findAll();
+        List<BookDto> result = bookService.findAll();
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result).hasSize(2);
         verify(bookRepository, times(1)).findAll();
-        verify(bookMapper, times(1)).toDTOList(books);
+        verify(bookMapper, times(1)).toDtoList(books);
     }
 
     @Test
@@ -83,16 +80,16 @@ class BookServiceTest {
         // Arrange
         Long bookId = 1L;
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(sampleBook));
-        when(bookMapper.toDTO(sampleBook)).thenReturn(sampleBookDTO);
+        when(bookMapper.toDto(sampleBook)).thenReturn(sampleBookDto);
 
         // Act
-        BookDTO result = bookService.findById(bookId);
+        BookDto result = bookService.findById(bookId);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(bookId);
         verify(bookRepository, times(1)).findById(bookId);
-        verify(bookMapper, times(1)).toDTO(sampleBook);
+        verify(bookMapper, times(1)).toDto(sampleBook);
     }
 
     @Test
@@ -108,7 +105,7 @@ class BookServiceTest {
                 .hasMessageContaining("Book not found with id: " + bookId);
 
         verify(bookRepository, times(1)).findById(bookId);
-        verify(bookMapper, never()).toDTO(any());
+        verify(bookMapper, never()).toDto(any());
     }
 
     @Test
@@ -117,16 +114,16 @@ class BookServiceTest {
         // Arrange
         String isbn = "9780134685";
         when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(sampleBook));
-        when(bookMapper.toDTO(sampleBook)).thenReturn(sampleBookDTO);
+        when(bookMapper.toDto(sampleBook)).thenReturn(sampleBookDto);
 
         // Act
-        BookDTO result = bookService.findByIsbn(isbn);
+        BookDto result = bookService.findByIsbn(isbn);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getIsbn()).isEqualTo(isbn);
         verify(bookRepository, times(1)).findByIsbn(isbn);
-        verify(bookMapper, times(1)).toDTO(sampleBook);
+        verify(bookMapper, times(1)).toDto(sampleBook);
     }
 
     @Test
@@ -148,38 +145,38 @@ class BookServiceTest {
     @DisplayName("create should save and return new book")
     void create_WithValidData_ShouldCreateBook() {
         // Arrange
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
         Book newBook = BookTestFixtures.createSampleBook();
 
-        when(bookRepository.existsByIsbn(newBookDTO.getIsbn())).thenReturn(false);
-        when(bookMapper.toEntity(newBookDTO)).thenReturn(newBook);
+        when(bookRepository.existsByIsbn(newBookDto.getIsbn())).thenReturn(false);
+        when(bookMapper.toEntity(newBookDto)).thenReturn(newBook);
         when(bookRepository.save(newBook)).thenReturn(newBook);
-        when(bookMapper.toDTO(newBook)).thenReturn(newBookDTO);
+        when(bookMapper.toDto(newBook)).thenReturn(newBookDto);
 
         // Act
-        BookDTO result = bookService.create(newBookDTO);
+        BookDto result = bookService.create(newBookDto);
 
         // Assert
         assertThat(result).isNotNull();
-        verify(bookRepository, times(1)).existsByIsbn(newBookDTO.getIsbn());
+        verify(bookRepository, times(1)).existsByIsbn(newBookDto.getIsbn());
         verify(bookRepository, times(1)).save(newBook);
-        verify(bookMapper, times(1)).toEntity(newBookDTO);
-        verify(bookMapper, times(1)).toDTO(newBook);
+        verify(bookMapper, times(1)).toEntity(newBookDto);
+        verify(bookMapper, times(1)).toDto(newBook);
     }
 
     @Test
     @DisplayName("create should throw exception when ISBN already exists")
     void create_WithDuplicateIsbn_ShouldThrowException() {
         // Arrange
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
-        when(bookRepository.existsByIsbn(newBookDTO.getIsbn())).thenReturn(true);
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
+        when(bookRepository.existsByIsbn(newBookDto.getIsbn())).thenReturn(true);
 
         // Act & Assert
-        assertThatThrownBy(() -> bookService.create(newBookDTO))
+        assertThatThrownBy(() -> bookService.create(newBookDto))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessageContaining("already exists");
 
-        verify(bookRepository, times(1)).existsByIsbn(newBookDTO.getIsbn());
+        verify(bookRepository, times(1)).existsByIsbn(newBookDto.getIsbn());
         verify(bookRepository, never()).save(any());
     }
 
@@ -188,22 +185,22 @@ class BookServiceTest {
     void update_WhenBookExists_ShouldUpdateBook() {
         // Arrange
         Long bookId = 1L;
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
         Book existingBook = BookTestFixtures.createSampleBook();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
         when(bookRepository.save(existingBook)).thenReturn(existingBook);
-        when(bookMapper.toDTO(existingBook)).thenReturn(updateDTO);
-        doNothing().when(bookMapper).updateEntityFromDTO(updateDTO, existingBook);
+        when(bookMapper.toDto(existingBook)).thenReturn(updateDto);
+        doNothing().when(bookMapper).updateEntityFromDto(updateDto, existingBook);
 
         // Act
-        BookDTO result = bookService.update(bookId, updateDTO);
+        BookDto result = bookService.update(bookId, updateDto);
 
         // Assert
         assertThat(result).isNotNull();
         verify(bookRepository, times(1)).findById(bookId);
         verify(bookRepository, times(1)).save(existingBook);
-        verify(bookMapper, times(1)).updateEntityFromDTO(updateDTO, existingBook);
+        verify(bookMapper, times(1)).updateEntityFromDto(updateDto, existingBook);
     }
 
     @Test
@@ -211,11 +208,11 @@ class BookServiceTest {
     void update_WhenBookNotFound_ShouldThrowException() {
         // Arrange
         Long bookId = 999L;
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> bookService.update(bookId, updateDTO))
+        assertThatThrownBy(() -> bookService.update(bookId, updateDto))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Book not found with id: " + bookId);
 
@@ -228,20 +225,20 @@ class BookServiceTest {
     void update_WithDuplicateIsbn_ShouldThrowException() {
         // Arrange
         Long bookId = 1L;
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
-        updateDTO.setIsbn("978-9999999999");  // Different ISBN
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
+        updateDto.setIsbn("978-9999999999"); // Different ISBN
         Book existingBook = BookTestFixtures.createSampleBook();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-        when(bookRepository.existsByIsbn(updateDTO.getIsbn())).thenReturn(true);
+        when(bookRepository.existsByIsbn(updateDto.getIsbn())).thenReturn(true);
 
         // Act & Assert
-        assertThatThrownBy(() -> bookService.update(bookId, updateDTO))
+        assertThatThrownBy(() -> bookService.update(bookId, updateDto))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessageContaining("already exists");
 
         verify(bookRepository, times(1)).findById(bookId);
-        verify(bookRepository, times(1)).existsByIsbn(updateDTO.getIsbn());
+        verify(bookRepository, times(1)).existsByIsbn(updateDto.getIsbn());
         verify(bookRepository, never()).save(any());
     }
 
@@ -283,13 +280,13 @@ class BookServiceTest {
         // Arrange
         String category = "Programming";
         List<Book> books = Arrays.asList(sampleBook);
-        List<BookDTO> bookDTOs = Arrays.asList(sampleBookDTO);
+        List<BookDto> bookDtos = Arrays.asList(sampleBookDto);
 
         when(bookRepository.findByCategory(category)).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.findByCategory(category);
+        List<BookDto> result = bookService.findByCategory(category);
 
         // Assert
         assertThat(result).isNotNull();
@@ -303,13 +300,13 @@ class BookServiceTest {
         // Arrange
         String author = "Joshua";
         List<Book> books = Arrays.asList(sampleBook);
-        List<BookDTO> bookDTOs = Arrays.asList(sampleBookDTO);
+        List<BookDto> bookDtos = Arrays.asList(sampleBookDto);
 
         when(bookRepository.findByAuthorContainingIgnoreCase(author)).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.findByAuthor(author);
+        List<BookDto> result = bookService.findByAuthor(author);
 
         // Assert
         assertThat(result).isNotNull();
@@ -323,13 +320,13 @@ class BookServiceTest {
         // Arrange
         String searchTerm = "Java";
         List<Book> books = Arrays.asList(sampleBook);
-        List<BookDTO> bookDTOs = Arrays.asList(sampleBookDTO);
+        List<BookDto> bookDtos = Arrays.asList(sampleBookDto);
 
         when(bookRepository.searchByTitleOrAuthor(searchTerm)).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.search(searchTerm);
+        List<BookDto> result = bookService.search(searchTerm);
 
         // Assert
         assertThat(result).isNotNull();
@@ -342,13 +339,13 @@ class BookServiceTest {
     void findAvailableBooks_ShouldReturnInStockBooks() {
         // Arrange
         List<Book> books = Arrays.asList(sampleBook);
-        List<BookDTO> bookDTOs = Arrays.asList(sampleBookDTO);
+        List<BookDto> bookDtos = Arrays.asList(sampleBookDto);
 
         when(bookRepository.findByStockGreaterThan(0)).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.findAvailableBooks();
+        List<BookDto> result = bookService.findAvailableBooks();
 
         // Assert
         assertThat(result).isNotNull();
@@ -362,13 +359,13 @@ class BookServiceTest {
         // Arrange
         Integer threshold = 10;
         List<Book> books = Arrays.asList(BookTestFixtures.createLowStockBook());
-        List<BookDTO> bookDTOs = Arrays.asList(sampleBookDTO);
+        List<BookDto> bookDtos = Arrays.asList(sampleBookDto);
 
         when(bookRepository.findLowStockBooks(threshold)).thenReturn(books);
-        when(bookMapper.toDTOList(books)).thenReturn(bookDTOs);
+        when(bookMapper.toDtoList(books)).thenReturn(bookDtos);
 
         // Act
-        List<BookDTO> result = bookService.findLowStockBooks(threshold);
+        List<BookDto> result = bookService.findLowStockBooks(threshold);
 
         // Assert
         assertThat(result).isNotNull();
@@ -387,10 +384,10 @@ class BookServiceTest {
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDTO(book)).thenReturn(sampleBookDTO);
+        when(bookMapper.toDto(book)).thenReturn(sampleBookDto);
 
         // Act
-        BookDTO result = bookService.updateStock(bookId, quantity);
+        BookDto result = bookService.updateStock(bookId, quantity);
 
         // Assert
         assertThat(result).isNotNull();
@@ -410,10 +407,10 @@ class BookServiceTest {
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDTO(book)).thenReturn(sampleBookDTO);
+        when(bookMapper.toDto(book)).thenReturn(sampleBookDto);
 
         // Act
-        BookDTO result = bookService.updateStock(bookId, quantity);
+        BookDto result = bookService.updateStock(bookId, quantity);
 
         // Assert
         assertThat(result).isNotNull();

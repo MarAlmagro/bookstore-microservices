@@ -1,14 +1,14 @@
 package com.bookstore.user.service;
 
-import com.bookstore.common.dto.AuthRequestDTO;
-import com.bookstore.common.dto.AuthResponseDTO;
-import com.bookstore.common.dto.UserDTO;
+import com.bookstore.common.dto.AuthRequestDto;
+import com.bookstore.common.dto.AuthResponseDto;
+import com.bookstore.common.dto.UserDto;
 
 public interface AuthService {
 
-    AuthResponseDTO register(UserDTO userDTO, String password);
+    AuthResponseDto register(UserDto userDto, String password);
 
-    AuthResponseDTO login(AuthRequestDTO authRequest);
+    AuthResponseDto login(AuthRequestDto authRequest);
 
-    AuthResponseDTO refreshToken(String refreshToken);
+    AuthResponseDto refreshToken(String refreshToken);
 }

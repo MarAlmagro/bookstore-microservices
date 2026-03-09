@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  batch:
+    job:
+      enabled: false
+
+logging:
+  level:
+    com.bookstore.catalog: DEBUG
+    org.testcontainers: INFO

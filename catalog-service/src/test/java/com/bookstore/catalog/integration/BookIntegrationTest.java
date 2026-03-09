@@ -3,7 +3,8 @@ package com.bookstore.catalog.integration;
 import com.bookstore.catalog.entity.Book;
 import com.bookstore.catalog.fixtures.BookTestFixtures;
 import com.bookstore.catalog.repository.BookRepository;
-import com.bookstore.common.dto.BookDTO;
+import com.bookstore.common.dto.BookDto;
+import com.bookstore.common.test.ApiPathConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Integration tests for Catalog Service.
- * Tests the full application stack with H2 in-memory database.
+ * Tests the full application stack with MySQL Testcontainers.
  */
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @DisplayName("Book Integration Tests")
-class BookIntegrationTest {
+@WithMockUser(roles = "ADMIN")
+class BookIntegrationTest extends BaseMySQLIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,47 +54,47 @@ class BookIntegrationTest {
     @DisplayName("Should create, retrieve, update and delete a book (full CRUD)")
     void fullCrudLifecycle_ShouldWorkCorrectly() throws Exception {
         // Create a new book
-        BookDTO newBookDTO = BookTestFixtures.createNewBookDTO();
+        BookDto newBookDto = BookTestFixtures.createNewBookDto();
 
-        String createResponse = mockMvc.perform(post("/api/v1/books")
+        String createResponse = mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newBookDTO)))
+                        .content(objectMapper.writeValueAsString(newBookDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.isbn", is(newBookDTO.getIsbn())))
-                .andExpect(jsonPath("$.title", is(newBookDTO.getTitle())))
+                .andExpect(jsonPath("$.isbn", is(newBookDto.getIsbn())))
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(newBookDto.getTitle())))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        BookDTO createdBook = objectMapper.readValue(createResponse, BookDTO.class);
+        BookDto createdBook = objectMapper.readValue(createResponse, BookDto.class);
         Long bookId = createdBook.getId();
 
         // Retrieve the created book
-        mockMvc.perform(get("/api/v1/books/{id}", bookId))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(newBookDTO.getTitle())));
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(newBookDto.getTitle())));
 
         // Update the book
-        BookDTO updateDTO = BookTestFixtures.createUpdateBookDTO();
-        updateDTO.setId(bookId);
-        updateDTO.setIsbn(newBookDTO.getIsbn()); // Keep same ISBN
+        BookDto updateDto = BookTestFixtures.createUpdateBookDto();
+        updateDto.setId(bookId);
+        updateDto.setIsbn(newBookDto.getIsbn()); // Keep same ISBN
 
-        mockMvc.perform(put("/api/v1/books/{id}", bookId)
+        mockMvc.perform(put(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookId.intValue())))
-                .andExpect(jsonPath("$.title", is(updateDTO.getTitle())));
+                .andExpect(jsonPath(ApiPathConstants.JSON_PATH_TITLE, is(updateDto.getTitle())));
 
         // Delete the book
-        mockMvc.perform(delete("/api/v1/books/{id}", bookId))
+        mockMvc.perform(delete(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isNoContent());
 
         // Verify book is deleted
-        mockMvc.perform(get("/api/v1/books/{id}", bookId))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOK_BY_ID_PATH(), bookId))
                 .andExpect(status().isNotFound());
     }
 
@@ -110,7 +111,7 @@ class BookIntegrationTest {
         bookRepository.save(book2);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_API_PATH()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -141,13 +142,13 @@ class BookIntegrationTest {
         bookRepository.save(existingBook);
 
         // Try to create another book with same ISBN
-        BookDTO duplicateBookDTO = BookTestFixtures.createNewBookDTO();
-        duplicateBookDTO.setIsbn(existingBook.getIsbn());
+        BookDto duplicateBookDto = BookTestFixtures.createNewBookDto();
+        duplicateBookDto.setIsbn(existingBook.getIsbn());
 
         // Act & Assert
-        mockMvc.perform(post("/api/v1/books")
+        mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(duplicateBookDTO)))
+                        .content(objectMapper.writeValueAsString(duplicateBookDto)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -169,15 +170,15 @@ class BookIntegrationTest {
         bookRepository.save(book2);
 
         // Search by title
-        mockMvc.perform(get("/api/v1/books/search")
-                        .param("searchTerm", "Java"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_SEARCH_PATH())
+                        .param("query", "Java"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", containsString("Java")));
 
         // Search by author
-        mockMvc.perform(get("/api/v1/books/search")
-                        .param("searchTerm", "Martin"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_SEARCH_PATH())
+                        .param("query", "Martin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].author", containsString("Martin")));
@@ -189,21 +190,21 @@ class BookIntegrationTest {
         // Arrange
         Book programmingBook = BookTestFixtures.createSampleBook();
         programmingBook.setId(null);
-        programmingBook.setCategory("Programming");
+        programmingBook.setCategory(ApiPathConstants.CATEGORY_PROGRAMMING);
 
         Book architectureBook = BookTestFixtures.createOutOfStockBook();
         architectureBook.setId(null);
-        architectureBook.setIsbn("978-9999999999");
+        architectureBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         architectureBook.setCategory("Software Architecture");
 
         bookRepository.save(programmingBook);
         bookRepository.save(architectureBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/category/{category}", "Programming"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_BY_CATEGORY_PATH(), ApiPathConstants.CATEGORY_PROGRAMMING))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].category", is("Programming")));
+                .andExpect(jsonPath("$[0].category", is(ApiPathConstants.CATEGORY_PROGRAMMING)));
     }
 
     @Test
@@ -222,7 +223,7 @@ class BookIntegrationTest {
         bookRepository.save(book2);
 
         // Act & Assert - Partial match
-        mockMvc.perform(get("/api/v1/books/author/{author}", "Joshua"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_BY_AUTHOR_PATH(), "Joshua"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].author", containsString("Joshua")));
@@ -238,14 +239,14 @@ class BookIntegrationTest {
 
         Book outOfStockBook = BookTestFixtures.createOutOfStockBook();
         outOfStockBook.setId(null);
-        outOfStockBook.setIsbn("978-9999999999");
+        outOfStockBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         outOfStockBook.setStock(0);
 
         bookRepository.save(inStockBook);
         bookRepository.save(outOfStockBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/available"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_AVAILABLE_BOOKS_PATH()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].stock", greaterThan(0)));
@@ -261,14 +262,14 @@ class BookIntegrationTest {
 
         Book lowStockBook = BookTestFixtures.createLowStockBook();
         lowStockBook.setId(null);
-        lowStockBook.setIsbn("978-9999999999");
+        lowStockBook.setIsbn(ApiPathConstants.ISBN_9999999999);
         lowStockBook.setStock(5);
 
         bookRepository.save(highStockBook);
         bookRepository.save(lowStockBook);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/books/low-stock")
+        mockMvc.perform(get(ApiPathConstants.CATALOG_LOW_STOCK_BOOKS_PATH())
                         .param("threshold", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -285,14 +286,14 @@ class BookIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act - Increase stock
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "50"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "50"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(150)));
 
         // Act - Decrease stock
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "-30"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "-30"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock", is(120)));
     }
@@ -307,8 +308,8 @@ class BookIntegrationTest {
         Book savedBook = bookRepository.save(book);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/v1/books/{id}/stock", savedBook.getId())
-                        .param("quantity", "-100"))
+        mockMvc.perform(patch(ApiPathConstants.CATALOG_BOOK_STOCK_PATH(), savedBook.getId())
+                        .param(ApiPathConstants.PARAM_QUANTITY, "-100"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -316,7 +317,7 @@ class BookIntegrationTest {
     @DisplayName("Should validate required fields when creating book")
     void createBook_WithMissingRequiredFields_ShouldFail() throws Exception {
         // Arrange - Book with missing required fields
-        BookDTO invalidBook = BookDTO.builder()
+        BookDto invalidBook = BookDto.builder()
                 .isbn("")  // Invalid: empty
                 .title("")  // Invalid: empty
                 .price(new BigDecimal("-10"))  // Invalid: negative
@@ -324,7 +325,7 @@ class BookIntegrationTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(post("/api/v1/books")
+        mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidBook)))
                 .andExpect(status().isBadRequest());
@@ -335,18 +336,18 @@ class BookIntegrationTest {
     void createMultipleBooks_Concurrently_ShouldSucceed() throws Exception {
         // Arrange & Act - Create multiple books with different ISBNs
         for (int i = 1; i <= 5; i++) {
-            BookDTO book = BookTestFixtures.createNewBookDTO();
+            BookDto book = BookTestFixtures.createNewBookDto();
             book.setIsbn("978123456" + i);  // Valid 10-character ISBN
             book.setTitle("Test Book " + i);
 
-            mockMvc.perform(post("/api/v1/books")
+            mockMvc.perform(post(ApiPathConstants.CATALOG_BOOKS_API_PATH())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(book)))
                     .andExpect(status().isCreated());
         }
 
         // Assert - Verify all books were created
-        mockMvc.perform(get("/api/v1/books"))
+        mockMvc.perform(get(ApiPathConstants.CATALOG_BOOKS_API_PATH()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)));
     }

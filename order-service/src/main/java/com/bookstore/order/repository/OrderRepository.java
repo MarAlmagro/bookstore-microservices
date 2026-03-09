@@ -2,6 +2,8 @@ package com.bookstore.order.repository;
 
 import com.bookstore.common.constants.OrderStatus;
 import com.bookstore.order.document.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +26,6 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     long countByStatus(OrderStatus status);
 
     boolean existsByIdAndUserId(String id, Long userId);
+
+    Page<Order> findByUserId(Long userId, Pageable pageable);
 }
