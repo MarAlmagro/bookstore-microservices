@@ -46,7 +46,7 @@
         <mysql-connector.version>8.4.0</mysql-connector.version>
         <postgresql.version>42.7.4</postgresql.version>
         <modelmapper.version>3.1.1</modelmapper.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
 
         <!-- Security Overrides for Spring Boot Managed Dependencies -->
         <tomcat.version>9.0.102</tomcat.version>
