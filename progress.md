@@ -1,4 +1,4 @@
 # Progress Log
 
 ## Latest Status
-All missing unit tests implemented across all services. JwtTokenProvider test created in shared-common. Test coverage significantly improved. Status: Documentation overhaul completed. Created structured docs/ directory with 6 guides (Getting Started, Architecture, API Reference, Development, Testing, Deployment). Root README.md created with AI-disclosure, architecture diagram, and navigation links. Stale docs (LOCAL_SETUP_GUIDE.md, stack.md) deprecated with redirects. All documentation in English. Prior: 261+ tests passing, JaCoCo coverage, Docker stack healthy.
+Full application test run completed (2026-03-09). Fixed AuthServiceTest self-reference bug and CatalogImportJobConfigTest context failure. All 268 unit tests pass (0 failures, 0 errors, 5 skipped integration placeholders). JaCoCo coverage: user-service 84%, admin-ui 84%, catalog-service 64%, shared-common 53%, api-gateway 53%, order-service 46%. Coverage gaps in order-service batch/security and shared-common DTOs (Lombok-generated code).
