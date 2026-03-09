@@ -1,5 +1,7 @@
 # Database Initialization Scripts
 
+> Part of [Bookstore Microservices](../README.md) · [Documentation Hub](../docs/README.md)
+
 This directory contains initialization scripts that automatically populate the databases with sample data when Docker containers are started.
 
 ## Scripts Overview
@@ -230,5 +232,7 @@ To modify the sample data:
 
 ## See Also
 
-- Parent directory: Test credentials documented in `../.env.example`
-- API documentation: Access Swagger UI at `http://localhost:808[1-3]/swagger-ui.html`
+- [Getting Started](../docs/GETTING-STARTED.md) — Full setup and run instructions
+- [API Reference](../docs/API-REFERENCE.md) — Endpoint catalog and Swagger UI links
+- [Deployment & Operations](../docs/DEPLOYMENT.md) — Docker volumes, data persistence
+- [Documentation Hub](../docs/README.md) — Index of all project documentation
