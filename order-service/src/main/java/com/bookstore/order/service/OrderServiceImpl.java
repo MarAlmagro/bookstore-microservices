@@ -156,9 +156,14 @@ public class OrderServiceImpl implements OrderService {
             }
 
             return book;
+        } catch (ResourceNotFoundException | InvalidRequestException e) {
+            throw e;
+        } catch (feign.FeignException.NotFound e) {
+            log.error("Book not found in catalog service with id: {}", bookId);
+            throw new ResourceNotFoundException("Book not found with id: " + bookId);
         } catch (Exception e) {
             log.error("Error fetching book from catalog service: {}", e.getMessage());
-            throw new InvalidRequestException("Unable to validate book with id: " + bookId + ". " + e.getMessage());
+            throw e;
         }
     }
 
