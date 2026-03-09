@@ -1,5 +1,7 @@
 # Bookstore SPA Frontend Specification
 
+> Part of [Bookstore Microservices](../../README.md) · [Documentation Hub](../README.md)
+
 This directory contains all contracts and documentation needed to build a standalone SPA frontend for the Bookstore Microservices application.
 
 ## Files
@@ -60,7 +62,7 @@ curl http://localhost:8080/actuator/health
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@bookstore.com | admin123 |
-| Customer | customer@example.com | customer123 |
+| Customer | john.doe@bookstore.com | customer123 |
 
 ## Contract Validation
 
