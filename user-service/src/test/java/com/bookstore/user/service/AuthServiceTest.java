@@ -34,7 +34,7 @@ class AuthServiceTest {
     private static final String TEST_EMAIL = "test@example.com";
     private static final String TEST_PASSWORD = "password123";
     private static final String ACCESS_TOKEN = "accessToken";
-    private static final String REFRESH_TOKEN = REFRESH_TOKEN;
+    private static final String REFRESH_TOKEN = "refreshToken";
 
     @Mock
     private UserRepository userRepository;
