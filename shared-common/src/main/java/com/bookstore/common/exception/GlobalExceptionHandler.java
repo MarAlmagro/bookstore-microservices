@@ -94,6 +94,29 @@ public class GlobalExceptionHandler {
         }
 
         /**
+         * Handles ServiceUnavailableException - returns HTTP 503 Service Unavailable
+         *
+         * @param ex      the exception
+         * @param request the web request
+         * @return ResponseEntity with ErrorResponse and 503 status
+         */
+        @ExceptionHandler(ServiceUnavailableException.class)
+        public ResponseEntity<ErrorResponse> handleServiceUnavailableException(
+                        ServiceUnavailableException ex,
+                        WebRequest request) {
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                                .error(HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase())
+                                .message(ex.getMessage())
+                                .path(request.getDescription(false).replace("uri=", ""))
+                                .build();
+
+                return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        /**
          * Handles validation errors from @Valid annotation - returns HTTP 400 Bad
          * Request
          *
