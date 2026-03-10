@@ -123,4 +123,6 @@ public interface BookService {
     PageResponseDto<BookDto> findByCategoryPaginated(String category, PageRequestDto pageRequest);
 
     PageResponseDto<BookDto> searchPaginated(String searchTerm, PageRequestDto pageRequest);
+
+    List<BookDto> findByIds(List<Long> ids);
 }

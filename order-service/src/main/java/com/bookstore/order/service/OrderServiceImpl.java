@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -127,8 +128,18 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidRequestException("Order must contain at least one item");
         }
 
+        List<Long> bookIds = orderDto.getItems().stream()
+                .map(OrderItemDto::getBookId)
+                .collect(Collectors.toList());
+
+        Map<Long, BookDto> books = fetchBooksFromCatalog(bookIds);
+
         for (OrderItemDto item : orderDto.getItems()) {
-            BookDto book = fetchBookFromCatalog(item.getBookId());
+            BookDto book = books.get(item.getBookId());
+            
+            if (book == null) {
+                throw new ResourceNotFoundException("Book not found with id: " + item.getBookId());
+            }
 
             if (book.getStock() < item.getQuantity()) {
                 throw new InvalidRequestException(
@@ -163,6 +174,23 @@ public class OrderServiceImpl implements OrderService {
             throw new ResourceNotFoundException("Book not found with id: " + bookId);
         } catch (Exception e) {
             log.error("Error fetching book from catalog service: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @CircuitBreaker(name = "catalogService")
+    @Retry(name = "catalogService")
+    @Bulkhead(name = "catalogService")
+    private Map<Long, BookDto> fetchBooksFromCatalog(List<Long> bookIds) {
+        try {
+            log.debug("Fetching {} books from catalog service in batch", bookIds.size());
+
+            List<BookDto> books = catalogClient.getBooksByIds(bookIds);
+
+            return books.stream()
+                    .collect(Collectors.toMap(BookDto::getId, book -> book));
+        } catch (Exception e) {
+            log.error("Error fetching books from catalog service: {}", e.getMessage());
             throw e;
         }
     }

@@ -42,7 +42,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                .antMatchers("/actuator/info").permitAll()
+                .antMatchers("/actuator/**").hasRole("ADMIN")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

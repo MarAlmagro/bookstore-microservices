@@ -50,8 +50,8 @@ spring:
         cors-configurations:
           '[/**]':
             allowed-origins:
-              - ${CORS_ALLOWED_ORIGIN:http://localhost:3000}
-              - ${CORS_ADMIN_ORIGIN:http://localhost:8084}
+              - ${CORS_ALLOWED_ORIGIN}
+              - ${CORS_ADMIN_ORIGIN}
             allowed-methods:
               - GET
               - POST
@@ -90,6 +90,12 @@ management:
       show-details: always
     prometheus:
       enabled: true
+    env:
+      enabled: false
+    beans:
+      enabled: false
+    configprops:
+      enabled: false
   metrics:
     export:
       prometheus:

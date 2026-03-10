@@ -42,8 +42,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      *
      * @param author the author name or partial name
      * @return list of books by the author
+     * @deprecated Use {@link #findByAuthorContainingIgnoreCase(String, Pageable)} instead
      */
+    @Deprecated
     List<Book> findByAuthorContainingIgnoreCase(String author);
+
+    Page<Book> findByAuthorContainingIgnoreCase(String author, Pageable pageable);
 
     /**
      * Find all books with title containing the search term (case-insensitive)
@@ -57,8 +61,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      * Find all books with stock greater than zero (available books)
      *
      * @return list of books in stock
+     * @deprecated Use {@link #findByStockGreaterThan(Integer, Pageable)} instead
      */
+    @Deprecated
     List<Book> findByStockGreaterThan(Integer stock);
+
+    Page<Book> findByStockGreaterThan(Integer stock, Pageable pageable);
 
     /**
      * Check if a book with the given ISBN already exists
