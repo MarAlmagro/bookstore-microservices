@@ -176,4 +176,11 @@ public class BookController {
                                 .build();
                 return ResponseEntity.ok(bookService.searchPaginated(query, pageRequest));
         }
+
+        @Operation(summary = "Get books by IDs", description = "Retrieves multiple books by their IDs in a single batch request")
+        @GetMapping("/batch")
+        public ResponseEntity<List<BookDto>> getBooksByIds(@RequestParam List<Long> ids) {
+                log.debug("REST request to get books by IDs: {}", ids);
+                return ResponseEntity.ok(bookService.findByIds(ids));
+        }
 }

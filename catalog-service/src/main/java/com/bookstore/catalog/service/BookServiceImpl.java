@@ -12,6 +12,9 @@ import com.bookstore.common.util.PageMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,6 +58,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "books", key = "#id")
     public BookDto findById(Long id) {
         logger.debug("Fetching book with id: {}", id);
         Book book = bookRepository.findById(id)
@@ -80,6 +84,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @CacheEvict(value = {"books", "booksByCategory", "allBooks"}, allEntries = true)
     public BookDto create(BookDto bookDto) {
         logger.debug("Creating new book with ISBN: {}", bookDto.getIsbn());
 
@@ -96,6 +101,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @CachePut(value = "books", key = "#id")
+    @CacheEvict(value = {"booksByCategory", "allBooks"}, allEntries = true)
     public BookDto update(Long id, BookDto bookDto) {
         logger.debug("Updating book with id: {}", id);
 
@@ -120,6 +127,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @CacheEvict(value = {"books", "booksByCategory", "allBooks"}, allEntries = true)
     public void delete(Long id) {
         logger.debug("Deleting book with id: {}", id);
 
@@ -135,6 +143,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "booksByCategory", key = "#category")
     public List<BookDto> findByCategory(String category) {
         logger.debug("Fetching books in category: {}", category);
         List<Book> books = bookRepository.findByCategory(category);
@@ -264,5 +273,14 @@ public class BookServiceImpl implements BookService {
         logger.debug("Returning {} books matching '{}' out of {} total",
                 bookDtos.size(), searchTerm, bookPage.getTotalElements());
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookDto> findByIds(List<Long> ids) {
+        logger.debug("Fetching books by IDs: {}", ids);
+        List<Book> books = bookRepository.findAllById(ids);
+        logger.debug("Found {} books out of {} requested IDs", books.size(), ids.size());
+        return bookMapper.toDtoList(books);
     }
 }
