@@ -9,6 +9,7 @@ import com.bookstore.common.exception.UnauthorizedException;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.mapper.UserMapper;
 import com.bookstore.user.repository.UserRepository;
+import com.bookstore.user.security.LoginAttemptService;
 import com.bookstore.common.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     @Override
     public AuthResponseDto register(UserDto userDto, String password) {
@@ -76,6 +80,13 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDto login(AuthRequestDto authRequest) {
         logger.debug("User login attempt with email: {}", authRequest.getEmail());
 
+        String loginKey = authRequest.getEmail();
+
+        if (loginAttemptService.isBlocked(loginKey)) {
+            logger.warn("Login blocked for email: {} due to too many failed attempts", authRequest.getEmail());
+            throw new UnauthorizedException("Account temporarily locked due to too many failed login attempts. Please try again later.");
+        }
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -86,6 +97,8 @@ public class AuthServiceImpl implements AuthService {
 
             User user = userRepository.findByEmail(authRequest.getEmail())
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+
+            loginAttemptService.loginSucceeded(loginKey);
 
             String token = tokenProvider.generateTokenWithClaims(user.getEmail(), user.getId(), user.getRole().name());
             String refreshToken = tokenProvider.generateRefreshToken(authRequest.getEmail());
@@ -99,6 +112,7 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
         } catch (AuthenticationException e) {
+            loginAttemptService.loginFailed(loginKey);
             logger.error("Authentication failed for email: {}", authRequest.getEmail());
             throw new UnauthorizedException("Invalid email or password");
         }
