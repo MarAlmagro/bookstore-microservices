@@ -8,6 +8,9 @@ import lombok.Singular;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.Valid;
@@ -22,12 +25,17 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Document(collection = "orders")
+@CompoundIndexes({
+    @CompoundIndex(name = "user_status_idx", def = "{'userId': 1, 'status': 1}"),
+    @CompoundIndex(name = "user_created_idx", def = "{'userId': 1, 'createdAt': -1}")
+})
 public class Order {
 
     @Id
     private String id;
 
     @NotNull(message = "User ID is required")
+    @Indexed
     private Long userId;
 
     @NotEmpty(message = "Order must contain at least one item")
@@ -41,9 +49,11 @@ public class Order {
     private BigDecimal totalAmount;
 
     @NotNull(message = "Order status is required")
+    @Indexed
     private OrderStatus status;
 
     @CreatedDate
+    @Indexed
     private LocalDateTime createdAt;
 
     @LastModifiedDate
