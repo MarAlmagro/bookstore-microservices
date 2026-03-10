@@ -52,7 +52,7 @@ services:
     container_name: bookstore-mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-bookstore_catalog}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
@@ -61,7 +61,7 @@ services:
     networks:
       - bookstore-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -92,7 +92,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE:-bookstore_users}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -101,7 +101,7 @@ services:
     networks:
       - bookstore-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -130,8 +130,9 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-catalog:3306/${MYSQL_DATABASE:-bookstore_catalog}
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-password}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8081:8081"
@@ -161,6 +162,7 @@ services:
     environment:
       MONGODB_URI: mongodb://mongodb-order:27017/bookstore_orders
       CATALOG_SERVICE_URL: http://catalog-service
+      JWT_SECRET: ${JWT_SECRET}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8082:8082"
@@ -194,8 +196,8 @@ services:
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DATABASE:-bookstore_users}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      JWT_SECRET: ${JWT_SECRET:-mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8083:8083"
